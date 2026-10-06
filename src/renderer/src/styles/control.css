@@ -1,0 +1,80 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink-950: #08080a;
+  --color-ink-900: #0e0e12;
+  --color-ink-850: #131318;
+  --color-ink-800: #18181f;
+  --color-ink-700: #22222b;
+  --color-ink-600: #2e2e39;
+  --color-ink-500: #4a4a58;
+  --color-ink-400: #6f6f7f;
+  --color-ink-300: #9a9aaa;
+  --color-ink-200: #c8c8d4;
+  --color-ink-100: #ececf2;
+  --color-accent: #ff2e88;
+  --color-accent-2: #39d5ff;
+  --color-ok: #3ddc84;
+  --color-warn: #ffb020;
+  --color-bad: #ff4d4f;
+  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', ui-monospace, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: var(--color-ink-950);
+  color: var(--color-ink-200);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  overflow: hidden;
+}
+
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 16px;
+  width: 100%;
+}
+input[type='range']::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-ink-600);
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 11px;
+  width: 11px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: var(--color-ink-100);
+  box-shadow: 0 0 0 3px rgb(255 46 136 / 0.25);
+}
+input[type='range']:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgb(57 213 255 / 0.6);
+}
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink-700);
+  border-radius: 4px;
+}
+select {
+  background: var(--color-ink-800);
+  color: var(--color-ink-100);
+  border: 1px solid var(--color-ink-600);
+  border-radius: 4px;
+  padding: 2px 6px;
+  outline: none;
+}
+select:focus-visible,
+button:focus-visible {
+  outline: 1px solid var(--color-accent-2);
+}
