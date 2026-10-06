@@ -25,7 +25,8 @@ Other commands:
 | `npm run build` then `npm start` | Production build, then run it |
 | `npm test` | Unit tests: DSP (FFT, loudness, onsets, BPM, phase lock, drops) and engine (every preset valid and lossless through JSON, macros, modulation, palette cycling) |
 | `npm run smoke` | End-to-end test: launches the built app, plays a synthetic 128 BPM track, checks tempo lock and output sync, then drives the UI (load a preset, right-click → Modulate by → Bass, drag a macro, undo, Save as) |
-| `npm run tour` | Loads every preset and template in the running app and screenshots the output window into `test-output/tour/` |
+| `npm run lyrics:e2e` | End-to-end test of Spotify login, now playing and synced lyrics against local mock services (`scripts/mock-services.mjs`) |
+| `npm run tour` | Loads every preset and template in the running app and screenshots the output window into `test-output/tour/` (`npm run tour -- lyrics` tours only matching presets) |
 | `npm run presets:format` | Rewrites every file in `presets/` in canonical form (`presets:check` only reports) |
 | `npm run typecheck` | TypeScript checks for the main and renderer code |
 | `npm run dist:win` | Build a Windows installer into `release/` |
@@ -46,6 +47,24 @@ Other commands:
 * **Save** (`Ctrl+S`) writes a user copy (built-ins are read-only). *Save as*, *Template* (keeps layers and routing, clears colours) and *Export* are next to it. Everything is undoable (`Ctrl+Z`, `Ctrl+Shift+Z`), and the working look is restored on the next launch.
 
 User presets live in `%APPDATA%/BOOFVIZ/presets` (templates in `…/templates`) as plain JSON.
+
+### Lyrics & Spotify now playing
+
+BOOFVIZ can show the synced lyrics of whatever is playing in Spotify, either as a look of its own (the **Lyrics** category) or over every look while presets change and shuffle. The audio still comes from System Audio (or any input) as usual; Spotify only tells BOOFVIZ *which* track is playing and where.
+
+1. Create an app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard), add the redirect URI `http://127.0.0.1:43821/callback` (exactly, Spotify rejects `localhost`) and tick **Web API**.
+2. In BOOFVIZ open the **Lyrics** tab (left panel), paste the app's **Client ID** and click **Connect**. Your browser asks you to log in to Spotify once; after that BOOFVIZ remembers the session (the refresh token is encrypted with the OS keychain; without one it is kept in memory only). **Disconnect** deletes it.
+3. Turn on **Show lyrics over every look**, or load a preset from the **Lyrics** category. The lyrics generator (karaoke sweep, punch-in lines or typewriter) can also be added as a layer to any look.
+
+How lyrics are found, in order: your own `.lrc` files in the lyrics folder (`%APPDATA%/BOOFVIZ/lyrics`, named `Artist - Title.lrc`; **Open lyrics folder**, or drop an `.lrc` on the Lyrics tab to attach it to the playing track), then a local cache, then [LRCLIB](https://lrclib.net) (free, community-made synced lyrics). Titles like "Song - 2011 Remaster" or "Song (feat. X)" are cleaned up for the search. Turn off **Search lyrics online** to stay offline.
+
+If lines land early or late, use the **Offset** slider (±2 s, +100 ms steps; + shows lines earlier). Spotify's reported position, your audio output latency and the projector all add a little delay, and the right offset depends on your setup.
+
+Limits and caveats:
+
+* A Spotify app in *development mode* works for up to 5 users you add in the dashboard, and the app owner needs Spotify Premium. Play / pause / next / previous from BOOFVIZ also need Premium; showing what is playing does not.
+* **Lyrics are copyrighted.** Showing them at home or for personal use is one thing; displaying them at a public or commercial event needs a licence from the rights holders (e.g. via Musixmatch or LyricFind). LRCLIB provides no licence.
+* **Spotify's Developer Policy restricts synchronizing Spotify content with visual media.** BOOFVIZ only reads now-playing metadata (title, artist, position, album art) and never touches Spotify audio, which comes from system capture like any other source. Still, review the policy before any commercial release or public use of this feature.
 
 ### Keyboard
 

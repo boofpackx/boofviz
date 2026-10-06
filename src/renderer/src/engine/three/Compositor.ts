@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import type { AudioFrame } from '@shared/types/audio';
-import type { GlobalControls, Scene } from '@shared/types/engine';
+import type { GlobalControls, ParamBag, Scene } from '@shared/types/engine';
 import { createEffect, hdrTarget, type Effect, type FxContext } from '../fx/effects';
 import type { AudioEnv, GenContext, Generator } from '../generators/Generator';
 import { createGenerator } from '../generators';
+import type { Lyrics, LyricsRenderInfo } from '../generators/Lyrics';
 import { alignedBeat, ModulationEngine } from '../modulation';
+import { defaultParams, generatorDef } from '../registry';
 import { PaletteRuntime } from '../palettes';
 import { ScenePlan } from '../scenePlan';
 import { FULLSCREEN_VERT } from '../shaders/common';
@@ -15,7 +17,7 @@ precision highp float;
 uniform sampler2D uBase;
 uniform sampler2D uLayer;
 uniform sampler2D uMaskTex;
-uniform int uMode;        // 0 normal 1 add 2 screen 3 multiply 4 overlay 5 difference 6 lighten
+uniform int uMode;        // 0 normal 1 add 2 screen 3 multiply 4 overlay 5 difference 6 lighten 7 premultiplied over (lyrics overlay)
 uniform float uOpacity;
 uniform int uMask;        // 0 none, 1 luma, 2 shape
 uniform int uShape;       // 0 circle 1 rect 2 ring 3 linear 4 triangle
@@ -72,6 +74,7 @@ void main() {
   float a = clamp(l.a, 0.0, 1.0) * uOpacity * maskValue();
   vec3 r;
   if (uMode == 1) r = b.rgb + l.rgb * uOpacity * maskValue();
+  else if (uMode == 7) r = b.rgb * (1.0 - a) + l.rgb * uOpacity;
   else r = mix(b.rgb, blend(b.rgb, l.rgb), a);
   fragColor = vec4(max(r, 0.0), max(b.a, a));
 }
@@ -115,6 +118,10 @@ export class Compositor {
   private readonly blend: FullscreenPass;
   private readonly copy: FullscreenPass;
   private trails: Effect | null = null;
+  /** Global lyrics overlay: drawn over every look, after the scene's layers and trails. */
+  private overlayParams: ParamBag | null = null;
+  private overlayGen: Lyrics | null = null;
+  private sceneHasLyrics = false;
   private w = 1;
   private h = 1;
   private frameIndex = 0;
@@ -154,8 +161,20 @@ export class Compositor {
     return this.plan?.live ?? null;
   }
 
+  /** Lyrics over every look (null: off). Partial params are filled with the generator's defaults. */
+  setOverlay(params: ParamBag | null): void {
+    this.overlayParams = params && { ...defaultParams(generatorDef('lyrics')), ...params };
+  }
+
+  /** What the lyrics overlay showed last frame (null when it is off). */
+  get overlayInfo(): LyricsRenderInfo | null {
+    return this.overlayParams && this.overlayGen && !this.sceneHasLyrics ? this.overlayGen.info : null;
+  }
+
   setScene(scene: Scene): void {
     this.plan = new ScenePlan(scene);
+    // A look that already shows lyrics doesn't get a second copy from the overlay.
+    this.sceneHasLyrics = scene.layers.some((l) => l.enabled && l.source.kind === 'lyrics');
     this.palette.setScene(this.plan.scene);
     this.maskRefs = new Set(this.plan.scene.layers.filter((l) => l.enabled && l.mask?.type === 'luma' && l.mask.layer !== undefined).map((l) => l.mask!.layer!));
     this.mods.retain(this.plan.modKeys);
@@ -302,15 +321,37 @@ export class Compositor {
     });
 
     // Global trails quick-control: one feedback pass over the whole composite.
+    let out = this.accA;
     if (globals.trails > 0.001) {
       this.trails ??= createEffect('feedback');
       const res = this.trails!.render(r, this.accA, this.accB, { amount: Math.min(0.97, globals.trails), zoom: 0.004, blend: 'max' }, fxCtx);
       if (res === this.accB) {
         this.accB = this.accA;
         this.accA = res;
-      } else return res;
+      }
+      out = res;
     }
-    return this.accA;
+    if (this.overlayParams && !this.sceneHasLyrics) out = this.renderOverlay(out, ctx, this.overlayParams);
+    return out;
+  }
+
+  /** Composite the lyrics overlay (premultiplied over, full opacity, unmasked) onto `base`. */
+  private renderOverlay(base: THREE.WebGLRenderTarget, ctx: GenContext, params: ParamBag): THREE.WebGLRenderTarget {
+    const r = this.renderer;
+    this.overlayGen ??= createGenerator('lyrics') as Lyrics;
+    ctx.params = params;
+    this.overlayGen.update(ctx);
+    this.overlayGen.render(r, this.layerA);
+    const u = this.blend.material.uniforms;
+    u.uBase.value = base.texture;
+    u.uLayer.value = this.layerA.texture;
+    u.uMode.value = 7;
+    u.uOpacity.value = 1;
+    u.uMask.value = 0;
+    u.uMaskTex.value = null;
+    const dst = base === this.accB ? this.accA : this.accB;
+    this.blend.render(r, dst);
+    return dst;
   }
 
   dispose(): void {
@@ -320,6 +361,7 @@ export class Compositor {
     }
     for (const t of [this.accA, this.accB, this.layerA, this.layerB, ...this.masks.values()]) t.dispose();
     this.trails?.dispose();
+    this.overlayGen?.dispose();
     this.blend.dispose();
     this.copy.dispose();
   }

@@ -13,6 +13,7 @@ import { Inspector } from './components/Inspector';
 import { filteredEntries, Library, libraryView } from './components/Library';
 import { MacroStrip } from './components/MacroStrip';
 import { ContextMenuHost } from './components/ContextMenu';
+import { LyricsPanel } from './components/LyricsPanel';
 import { Kbd, Segmented } from './components/ui';
 
 function useBootstrap(): void {
@@ -196,7 +197,7 @@ function useShortcuts(): void {
   }, []);
 }
 
-type LeftTab = 'library' | 'input';
+type LeftTab = 'library' | 'input' | 'lyrics';
 type RightTab = 'layers' | 'audio' | 'master';
 
 export function App() {
@@ -220,10 +221,11 @@ export function App() {
                 options={[
                   { value: 'library', label: 'Library' },
                   { value: 'input', label: 'Input' },
+                  { value: 'lyrics', label: 'Lyrics' },
                 ]}
               />
             </div>
-            <div className="min-h-0 flex-1">{left === 'library' ? <Library /> : <SourcePanel />}</div>
+            <div className="min-h-0 flex-1">{left === 'library' ? <Library /> : left === 'input' ? <SourcePanel /> : <LyricsPanel />}</div>
           </aside>
         )}
         <main className="flex min-w-0 flex-1 flex-col">

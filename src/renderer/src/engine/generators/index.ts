@@ -6,6 +6,7 @@ import { Dots } from './Dots';
 import type { Generator } from './Generator';
 import { KineticType } from './KineticType';
 import { Lines } from './Lines';
+import { Lyrics } from './Lyrics';
 import { Memphis } from './Memphis';
 import { OpArt } from './OpArt';
 import { Orb } from './Orb';
@@ -35,6 +36,7 @@ const FACTORIES: Record<string, () => Generator> = {
   tiles: () => new Tiles(),
   memphis: () => new Memphis(),
   kineticType: () => new KineticType(),
+  lyrics: () => new Lyrics(),
   prism: () => new Prism(),
   synthSunset: () => new SynthSunset(),
   opArt: () => new OpArt(),

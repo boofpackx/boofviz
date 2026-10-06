@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { DisplayInfo, LinkState, OutputStatus } from '@shared/ipc';
+import { EMPTY_LYRICS, EMPTY_NOW_PLAYING, type NowPlaying, type TrackLyrics } from '@shared/lyrics';
 import { DEFAULT_SETTINGS, mergeSettings, type Settings, type SettingsPatch } from '@shared/settings';
 import { DEFAULT_GLOBALS, type GlobalControls } from '@shared/types/engine';
 import type { EngineStatus, InputDevice } from '@/audio/AudioEngine';
@@ -27,6 +28,9 @@ interface ControlState {
   showGuide: boolean;
   link: LinkState;
   midi: MidiStatus;
+  /** Spotify now playing (art kept across the 1 Hz updates) and the track's lyrics. */
+  nowPlaying: NowPlaying;
+  trackLyrics: TrackLyrics;
 
   hydrate(s: Settings): void;
   update(patch: SettingsPatch): void;
@@ -48,6 +52,8 @@ export const useControl = create<ControlState>((set, get) => ({
   showGuide: false,
   link: { available: false, enabled: false, peers: 0, tempo: 0, beat: 0, epochMs: 0, playing: false },
   midi: { supported: typeof navigator !== 'undefined' && 'requestMIDIAccess' in navigator, inputs: [], bpm: 0, running: false, receiving: false },
+  nowPlaying: { ...EMPTY_NOW_PLAYING },
+  trackLyrics: { ...EMPTY_LYRICS },
 
   hydrate: (s) => set({ settings: s, loaded: true, hud: s.ui.showHud, globals: { ...s.globals, blackout: false } }),
   update: (patch) => {

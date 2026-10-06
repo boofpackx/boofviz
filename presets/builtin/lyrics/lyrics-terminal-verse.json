@@ -1,0 +1,182 @@
+{
+  "schema": 1,
+  "name": "Terminal Verse",
+  "category": "Lyrics",
+  "tags": [
+    "lyrics",
+    "typewriter",
+    "terminal",
+    "retro",
+    "mono"
+  ],
+  "energy": 2,
+  "palette": "Phosphor Green",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "rain",
+      "name": "Binary rain",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "codeRain",
+        "params": {
+          "glyphs": "binary",
+          "columns": 70,
+          "speed": 0.5,
+          "trail": 0.8,
+          "change": 4,
+          "glow": 0.5,
+          "mirror": true
+        }
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.6,
+            "scanlines": 0.7,
+            "mask": 0.35,
+            "vignette": 0.6
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 0.22,
+      "modulators": []
+    },
+    {
+      "id": "lyrics",
+      "name": "Lyrics",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyrics",
+        "params": {
+          "mode": "typewriter",
+          "font": "mono",
+          "size": 0.95,
+          "position": "center",
+          "punch": 0.3,
+          "glow": 0.9,
+          "outline": 0,
+          "backdrop": 0,
+          "lead": 150,
+          "uppercase": true,
+          "nextLine": 0.3,
+          "titleCard": true,
+          "idleText": "> awaiting signal"
+        }
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.6,
+            "scanlines": 0.7,
+            "mask": 0.35,
+            "vignette": 0.6
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Text size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.6,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rain",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.opacity",
+          "range": [
+            0,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scanlines",
+      "value": 0.7,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.scanlines",
+          "range": [
+            0,
+            1
+          ]
+        },
+        {
+          "path": "layers.0.fx.0.params.scanlines",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Phosphor Green": [
+      "#000a02",
+      "#003b12",
+      "#00a83a",
+      "#2bff6a",
+      "#b6ffc9"
+    ]
+  },
+  "description": "Lyrics typed out on an old green screen, the block cursor blinking on the beat."
+}

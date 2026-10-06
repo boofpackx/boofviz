@@ -1,6 +1,7 @@
 import { PORT_MESSAGE_TAG } from '@shared/ipc';
 import { AudioEngine } from '@/audio/AudioEngine';
 import type { ThreeRenderer } from '@/engine/three/ThreeRenderer';
+import { connectLyricsFeed, lyricAt, lyricsFeed } from '@/engine/lyricsFeed';
 import { libraryEntries, useShow } from './show';
 import { useControl } from './store';
 
@@ -34,7 +35,21 @@ export function liveValue(layerId: string, path: string): number | undefined {
   updateSettings: (patch: Parameters<ReturnType<typeof useControl.getState>['update']>[0]) => useControl.getState().update(patch),
   gpu: () => preview.renderer?.gpuInfo ?? null,
   previewLastSwitch: () => preview.renderer?.lastSwitch ?? null,
+  /** Current lyric line at an epoch time (with the overlay's lead), and what the preview's overlay drew last frame. */
+  lyricsAt: (ms: number) => lyricAt(ms, overlayLead()),
+  lyricsOverlay: () => preview.renderer?.lyricsInfo ?? null,
+  nowPlaying: () => ({ ...lyricsFeed.now, artDataUrl: lyricsFeed.now.artDataUrl ? '(data url)' : undefined }),
+  trackLyrics: () => lyricsFeed.lyrics,
 };
+
+function overlayLead(): number {
+  const lead = useControl.getState().settings.lyrics.overlay.params.lead;
+  return typeof lead === 'number' ? lead : 150;
+}
+
+// Now playing + lyrics from main (registered at load, so main's replay is never missed).
+connectLyricsFeed(window.boofviz, () => useControl.setState({ nowPlaying: lyricsFeed.now, trackLyrics: lyricsFeed.lyrics }));
+useControl.subscribe((s) => void (lyricsFeed.offsetMs = s.settings.lyrics.offsetMs));
 
 let ready = false;
 const pendingPorts: MessagePort[] = [];

@@ -1,3 +1,4 @@
+import type { NowPlaying, SpotifyCommand, TrackLyrics } from './lyrics';
 import type { Settings, SettingsPatch } from './settings';
 import type { GlobalControls, Scene } from './types/engine';
 
@@ -78,6 +79,17 @@ export interface BoofvizApi {
   // Ableton Link
   setLinkEnabled(on: boolean): Promise<LinkState>;
   onLinkState(cb: (s: LinkState) => void): () => void;
+  // Spotify now playing + lyrics
+  spotifyConnect(): Promise<void>;
+  spotifyDisconnect(): Promise<void>;
+  /** Resolves to an error message (e.g. Premium required), or null. */
+  spotifyControl(cmd: SpotifyCommand): Promise<string | null>;
+  getNowPlaying(): Promise<{ nowPlaying: NowPlaying; lyrics: TrackLyrics }>;
+  onNowPlaying(cb: (s: NowPlaying) => void): () => void;
+  onLyrics(cb: (l: TrackLyrics) => void): () => void;
+  openLyricsFolder(): Promise<void>;
+  /** Attach .lrc text to the track playing now. Resolves to an error message, or null. */
+  saveLyricsForCurrentTrack(lrcText: string): Promise<string | null>;
 }
 
 export const IPC = {
@@ -103,6 +115,14 @@ export const IPC = {
   writeSession: 'session:write',
   setLinkEnabled: 'link:setEnabled',
   linkState: 'link:state',
+  spotifyConnect: 'spotify:connect',
+  spotifyDisconnect: 'spotify:disconnect',
+  spotifyControl: 'spotify:control',
+  getNowPlaying: 'spotify:get',
+  nowPlaying: 'spotify:nowPlaying',
+  lyrics: 'lyrics:track',
+  openLyricsFolder: 'lyrics:openFolder',
+  saveLyrics: 'lyrics:save',
 } as const;
 
 /** window.postMessage tag the preload uses to hand a MessagePort to the page. */

@@ -1,8 +1,10 @@
 import { app, ipcMain, BrowserWindow } from 'electron';
 import { IPC, type OutputCommand } from '@shared/ipc';
+import type { SpotifyCommand } from '@shared/lyrics';
 import type { SettingsPatch } from '@shared/settings';
 import { installCaptureHandlers } from './audioCapture';
 import { LinkService } from './link';
+import { NowPlayingService } from './nowPlaying';
 import { deleteUserPreset, exportPresetFile, flushSession, importPresetFiles, listUserPresets, openPresetFolder, readSession, saveUserPreset, writeSession } from './presetStore';
 import { dataDir, SettingsStore } from './settingsStore';
 import { listDisplays, WindowManager } from './windows';
@@ -22,6 +24,7 @@ if (!app.requestSingleInstanceLock()) app.quit();
 let store: SettingsStore;
 let windows: WindowManager;
 let link: LinkService;
+let nowPlaying: NowPlayingService;
 
 function registerIpc(): void {
   ipcMain.handle(IPC.getSettings, () => store.get());
@@ -45,6 +48,12 @@ function registerIpc(): void {
     link.setEnabled(on);
     return link.state();
   });
+  ipcMain.handle(IPC.spotifyConnect, () => nowPlaying.connect());
+  ipcMain.handle(IPC.spotifyDisconnect, () => nowPlaying.disconnect());
+  ipcMain.handle(IPC.spotifyControl, (_e, cmd: SpotifyCommand) => nowPlaying.control(cmd));
+  ipcMain.handle(IPC.getNowPlaying, () => nowPlaying.snapshot());
+  ipcMain.handle(IPC.openLyricsFolder, () => nowPlaying.openLyricsFolder());
+  ipcMain.handle(IPC.saveLyrics, (_e, text: string) => nowPlaying.saveLrc(String(text)));
 
   store.onChange((s) => {
     for (const w of BrowserWindow.getAllWindows()) w.webContents.send(IPC.settingsChanged, s);
@@ -56,9 +65,11 @@ app.whenReady().then(() => {
   windows = new WindowManager(store);
   installCaptureHandlers();
   link = new LinkService((s) => windows.control?.webContents.send(IPC.linkState, s));
+  nowPlaying = new NowPlayingService(store, (channel, value, replay) => windows.broadcast(channel, value, replay));
   registerIpc();
   windows.createControl();
   if (store.get().output.openOnLaunch) windows.openOutput();
+  nowPlaying.start();
 
   app.on('second-instance', () => windows.control?.focus());
 });
@@ -69,6 +80,7 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
   link?.dispose();
+  nowPlaying?.dispose();
   void store?.flush();
   void flushSession();
 });

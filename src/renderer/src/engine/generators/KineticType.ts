@@ -8,12 +8,17 @@ const ROW_H = 256;
 const MAX_WORDS = 8;
 const FONT_PX = 200;
 
-const FONTS: Record<string, string> = {
-  heavy: `900 ${FONT_PX}px "Segoe UI Black", "Arial Black", "Helvetica Neue", Arial, sans-serif`,
-  condensed: `700 ${FONT_PX}px Impact, "Bahnschrift Condensed", "Arial Narrow", "Roboto Condensed", sans-serif`,
-  mono: `700 ${FONT_PX}px "Cascadia Mono", Consolas, "DejaVu Sans Mono", "Courier New", monospace`,
-  serif: `700 ${FONT_PX}px Georgia, "Times New Roman", "DejaVu Serif", serif`,
+/** Canvas font stacks (Windows first, with common Linux/macOS fallbacks). Also used by the lyrics generator. */
+export const FONT_STACKS: Record<string, string> = {
+  heavy: `900 {px}px "Segoe UI Black", "Arial Black", "Helvetica Neue", Arial, sans-serif`,
+  condensed: `700 {px}px Impact, "Bahnschrift Condensed", "Arial Narrow", "Roboto Condensed", sans-serif`,
+  mono: `700 {px}px "Cascadia Mono", Consolas, "DejaVu Sans Mono", "Courier New", monospace`,
+  serif: `700 {px}px Georgia, "Times New Roman", "DejaVu Serif", serif`,
 };
+
+export function fontCss(name: string, px: number): string {
+  return (FONT_STACKS[name] ?? FONT_STACKS.heavy).replace('{px}', String(px));
+}
 
 const FRAG = /* glsl */ `${GEN_HEADER}
 uniform sampler2D uAtlas;     // R = fill, G = outline
@@ -181,7 +186,7 @@ export class KineticType extends ShaderGenerator {
     if (!this.words.length) this.words = [' '];
     const rows = [full, ...this.words];
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    ctx.font = FONTS[font] ?? FONTS.heavy;
+    ctx.font = fontCss(font, FONT_PX);
     const cap = ctx.measureText('H').actualBoundingBoxAscent || FONT_PX * 0.72;
     const widths = this.u.uWidths.value as number[];
     ctx.textBaseline = 'alphabetic';

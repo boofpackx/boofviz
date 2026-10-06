@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { AudioFrame } from '@shared/types/audio';
-import type { Renderer, RendererOptions, RenderContext, RenderStats, Scene } from '@shared/types/engine';
+import type { ParamBag, Renderer, RendererOptions, RenderContext, RenderStats, Scene } from '@shared/types/engine';
+import type { LyricsRenderInfo } from '../generators/Lyrics';
 import { OUTPUT_FRAG, OUTPUT_VERT } from '../shaders/output';
 import { Compositor } from './Compositor';
 import { FullscreenPass } from './fullscreen';
@@ -97,6 +98,16 @@ export class ThreeRenderer implements Renderer {
   /** Live modulated parameter values for UI meters. */
   get live(): Map<string, number> | null {
     return this.compositor?.live ?? null;
+  }
+
+  /** Lyrics over every look (settings.lyrics.overlay). */
+  setLyricsOverlay(overlay: { enabled: boolean; params: ParamBag } | null): void {
+    this.compositor.setOverlay(overlay?.enabled ? overlay.params : null);
+  }
+
+  /** What the lyrics overlay showed last frame (debug hooks). */
+  get lyricsInfo(): LyricsRenderInfo | null {
+    return this.compositor?.overlayInfo ?? null;
   }
 
   setRenderScale(scale: number): void {

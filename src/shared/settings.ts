@@ -1,5 +1,5 @@
 import { DEFAULT_ANALYSIS_SETTINGS, type AnalysisSettings } from './types/audio';
-import { DEFAULT_GLOBALS, type GlobalControls } from './types/engine';
+import { DEFAULT_GLOBALS, type GlobalControls, type ParamBag } from './types/engine';
 
 export type InputKind = 'loopback' | 'device' | 'file';
 
@@ -33,6 +33,15 @@ export interface LibrarySettings {
   shufflePool: 'favorites' | 'all';
 }
 
+export interface LyricsSettings {
+  /** Added to the song position: positive shows lyrics earlier. */
+  offsetMs: number;
+  /** Look lyrics up on LRCLIB when there's no local .lrc or cache entry. */
+  online: boolean;
+  /** Lyrics drawn over every look (on top of the scene, not one of its layers). */
+  overlay: { enabled: boolean; params: ParamBag };
+}
+
 export interface Settings {
   version: 1;
   input: InputSettings;
@@ -41,6 +50,8 @@ export interface Settings {
   globals: GlobalControls;
   ui: { showHud: boolean };
   library: LibrarySettings;
+  spotify: { clientId: string };
+  lyrics: LyricsSettings;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -51,6 +62,9 @@ export const DEFAULT_SETTINGS: Settings = {
   globals: DEFAULT_GLOBALS,
   ui: { showHud: true },
   library: { favorites: [], quantize: 'bar', autoShuffle: false, shuffleBars: 16, shufflePool: 'favorites' },
+  spotify: { clientId: '' },
+  // Overlay params are a partial bag: the lyrics generator's defaults fill the rest.
+  lyrics: { offsetMs: 0, online: true, overlay: { enabled: false, params: { mode: 'karaoke', position: 'lower', size: 0.7, backdrop: 0.45 } } },
 };
 
 type DeepPartial<T> = T extends readonly unknown[] ? T : T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;

@@ -32,6 +32,8 @@ export class WindowManager {
   private readonly ready = { control: false, output: false };
   /** Latest scene/globals for the output, replayed whenever the output (re)loads. */
   private outputState: OutputCommand = {};
+  /** Latest value per broadcast channel, replayed to a window when it (re)loads. */
+  private readonly replay = new Map<string, unknown>();
 
   constructor(private readonly store: SettingsStore) {}
 
@@ -149,8 +151,16 @@ export class WindowManager {
     win.webContents.on('did-finish-load', () => {
       this.ready[role] = true;
       if (role === 'output' && (this.outputState.scene || this.outputState.globals)) win.webContents.send(IPC.outputCommand, this.outputState);
+      for (const [channel, value] of this.replay) win.webContents.send(channel, value);
       this.connectAnalysis();
     });
+  }
+
+  /** Send to both windows; `replay` (default: the value) is what a window gets when it (re)loads. */
+  broadcast(channel: string, value: unknown, replay: unknown = value): void {
+    this.replay.set(channel, replay);
+    if (this.control && this.ready.control) this.control.webContents.send(channel, value);
+    if (this.output && this.ready.output) this.output.webContents.send(channel, value);
   }
 
   sendOutputCommand(cmd: OutputCommand): void {

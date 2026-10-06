@@ -33,12 +33,20 @@ export function Preview() {
     void renderer.init(canvas, { renderScale: 1, isOutput: false }).then(() => {
       if (disposed) return;
       renderer.setScene(currentScene());
+      renderer.setLyricsOverlay(useControl.getState().settings.lyrics.overlay);
       preview.renderer = renderer;
-      unsubscribe = useShow.subscribe((s, prev) => {
+      const offOverlay = useControl.subscribe((s, prev) => {
+        if (s.settings.lyrics.overlay !== prev.settings.lyrics.overlay) renderer.setLyricsOverlay(s.settings.lyrics.overlay);
+      });
+      const offShow = useShow.subscribe((s, prev) => {
         if (s.doc !== prev.doc || (s.queued !== prev.queued && !s.queued)) renderer.setScene(sceneOf(s.doc));
         // A queued launch goes live on its beat in the preview exactly as in the output.
         if (s.queued && (s.queued !== prev.queued || s.doc !== prev.doc)) renderer.setScene(sceneOf(s.queued.entry.preset), s.queued.atBeat);
       });
+      unsubscribe = () => {
+        offShow();
+        offOverlay();
+      };
       const fit = (): void => {
         const r = wrap.getBoundingClientRect();
         const dpr = Math.min(window.devicePixelRatio || 1, 1.5);

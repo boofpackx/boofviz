@@ -1,0 +1,201 @@
+// Local stand-ins for the Spotify accounts service, the Spotify Web API and
+// LRCLIB, for offline end-to-end tests (scripts/lyrics-e2e.mjs).
+//
+//   node scripts/mock-services.mjs [port]      (default 43890)
+//
+// Point the app at it with
+//   BOOFVIZ_SPOTIFY_ACCOUNTS_URL=http://127.0.0.1:<port>/accounts
+//   BOOFVIZ_SPOTIFY_API_URL=http://127.0.0.1:<port>/v1
+//   BOOFVIZ_LRCLIB_URL=http://127.0.0.1:<port>/lrclib
+//
+// All lyric lines are invented placeholder text.
+import { createHash, randomBytes } from 'node:crypto';
+import { createServer } from 'node:http';
+import { fileURLToPath } from 'node:url';
+
+const INVENTED = [
+  'paper lanterns over the parking lot',
+  'we count the static on the radio',
+  'somebody left the porch light on',
+  'and the vending machine hums in C',
+  'tell me again about the yellow bus',
+  'all the pigeons know my name by now',
+  'ooh, the elevator music never ends',
+  'cardboard castles in the rain',
+  'we were orbiting the laundromat',
+  'and the moon was a borrowed coin',
+  'hold the door, hold the door',
+  'paper lanterns, paper lanterns',
+];
+
+// Track 1 has synced lyrics on LRCLIB (under its normalized title); track 2 has none anywhere.
+export const TRACKS = [
+  { id: 'mocktrack1', name: 'Paper Lanterns - 2011 Remaster', lookupName: 'Paper Lanterns', artist: 'The Placeholder Ensemble', album: 'Invented Weather', durationMs: 180000, color: '#ff2e88' },
+  { id: 'mocktrack2', name: 'Quiet Interlude', lookupName: 'Quiet Interlude', artist: 'Nobody In Particular', album: 'Blank Tapes', durationMs: 120000, color: '#39d5ff' },
+];
+
+/** One line every 2.5 s from 1 s in, cycling through the invented lines. */
+export function syncedLyrics(durationMs) {
+  const out = [];
+  for (let t = 1000, i = 0; t < durationMs - 2000; t += 2500, i++) {
+    const m = Math.floor(t / 60000);
+    const s = ((t % 60000) / 1000).toFixed(2).padStart(5, '0');
+    out.push(`[${String(m).padStart(2, '0')}:${s}]${INVENTED[i % INVENTED.length]}`);
+  }
+  return out.join('\n');
+}
+
+const key = (s) => String(s ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+const b64url = (buf) => buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+export function startMockServices({ port = 43890, host = '127.0.0.1' } = {}) {
+  const counts = {};
+  const apiTimes = [];
+  const codes = new Map(); // code → { challenge, clientId, redirectUri }
+  const access = new Set();
+  const refresh = new Set();
+  // Player state: progress advances in real time while playing.
+  const player = { index: 0, playing: true, anchorProgress: 0, anchorAt: Date.now() };
+  const progress = () => {
+    const t = TRACKS[player.index];
+    const p = player.anchorProgress + (player.playing ? Date.now() - player.anchorAt : 0);
+    return Math.min(t.durationMs, Math.max(0, p));
+  };
+  const setPlayer = (patch) => {
+    const p = progress();
+    Object.assign(player, { anchorProgress: p, anchorAt: Date.now() }, patch);
+  };
+  let base = '';
+
+  const send = (res, status, body, headers = {}) => {
+    const isJson = body !== undefined && typeof body !== 'string';
+    res.writeHead(status, { ...(isJson ? { 'Content-Type': 'application/json' } : {}), ...headers });
+    res.end(body === undefined ? undefined : isJson ? JSON.stringify(body) : body);
+  };
+  const readBody = (req) =>
+    new Promise((resolve) => {
+      let data = '';
+      req.on('data', (c) => (data += c));
+      req.on('end', () => resolve(data));
+    });
+  const issue = () => {
+    const at = `at_${b64url(randomBytes(12))}`;
+    const rt = `rt_${b64url(randomBytes(12))}`;
+    access.add(at);
+    refresh.add(rt);
+    return { access_token: at, token_type: 'Bearer', expires_in: 3600, refresh_token: rt, scope: 'user-read-currently-playing user-read-playback-state user-modify-playback-state' };
+  };
+  const record = (t) => ({ id: TRACKS.indexOf(t) + 1, trackName: t.lookupName, artistName: t.artist, albumName: t.album, duration: t.durationMs / 1000, instrumental: false, plainLyrics: INVENTED.join('\n'), syncedLyrics: syncedLyrics(t.durationMs) });
+
+  const server = createServer(async (req, res) => {
+    const url = new URL(req.url ?? '/', `http://${host}`);
+    const path = url.pathname;
+    counts[path] = (counts[path] ?? 0) + 1;
+    const q = url.searchParams;
+
+    // ---- Accounts -----------------------------------------------------------
+    if (path === '/accounts/authorize' && req.method === 'GET') {
+      const redirectUri = q.get('redirect_uri') ?? '';
+      if (!q.get('client_id') || q.get('response_type') !== 'code' || q.get('code_challenge_method') !== 'S256' || !q.get('code_challenge') || !redirectUri.startsWith('http://127.0.0.1:')) {
+        return send(res, 400, { error: 'invalid_request' });
+      }
+      const code = `code_${b64url(randomBytes(9))}`;
+      codes.set(code, { challenge: q.get('code_challenge'), clientId: q.get('client_id'), redirectUri });
+      const to = new URL(redirectUri);
+      to.searchParams.set('code', code);
+      to.searchParams.set('state', q.get('state') ?? '');
+      return send(res, 302, '', { Location: to.toString() });
+    }
+    if (path === '/accounts/api/token' && req.method === 'POST') {
+      const f = new URLSearchParams(await readBody(req));
+      if (f.get('grant_type') === 'authorization_code') {
+        const c = codes.get(f.get('code'));
+        codes.delete(f.get('code'));
+        const verifier = f.get('code_verifier') ?? '';
+        if (!c || c.clientId !== f.get('client_id') || c.redirectUri !== f.get('redirect_uri')) return send(res, 400, { error: 'invalid_grant', error_description: 'Invalid authorization code' });
+        if (b64url(createHash('sha256').update(verifier).digest()) !== c.challenge) return send(res, 400, { error: 'invalid_grant', error_description: 'code_verifier was incorrect' });
+        return send(res, 200, issue());
+      }
+      if (f.get('grant_type') === 'refresh_token') {
+        const rt = f.get('refresh_token');
+        if (!rt || !refresh.has(rt) || !f.get('client_id')) return send(res, 400, { error: 'invalid_grant', error_description: 'Invalid refresh token' });
+        refresh.delete(rt); // rotation: the old refresh token stops working
+        return send(res, 200, issue());
+      }
+      return send(res, 400, { error: 'unsupported_grant_type' });
+    }
+
+    // ---- Web API ------------------------------------------------------------
+    if (path.startsWith('/v1/')) {
+      const auth = (req.headers.authorization ?? '').replace(/^Bearer /, '');
+      if (!access.has(auth)) return send(res, 401, { error: { status: 401, message: 'Invalid access token' } });
+      if (path === '/v1/me/player/currently-playing' && req.method === 'GET') {
+        apiTimes.push(Date.now());
+        const t = TRACKS[player.index];
+        return send(res, 200, {
+          timestamp: Date.now(),
+          is_playing: player.playing,
+          progress_ms: progress(),
+          currently_playing_type: 'track',
+          item: {
+            id: t.id,
+            name: t.name,
+            duration_ms: t.durationMs,
+            artists: [{ name: t.artist }],
+            album: { name: t.album, images: [640, 300, 64].map((w) => ({ url: `${base}/art/${t.id}-${w}.svg`, width: w, height: w })) },
+          },
+        });
+      }
+      if ((path === '/v1/me/player/pause' || path === '/v1/me/player/play') && req.method === 'PUT') {
+        setPlayer({ playing: path.endsWith('/play') });
+        return send(res, 204);
+      }
+      if (path === '/v1/me/player/next' && req.method === 'POST') {
+        Object.assign(player, { index: (player.index + 1) % TRACKS.length, playing: true, anchorProgress: 0, anchorAt: Date.now() });
+        return send(res, 204);
+      }
+      if (path === '/v1/me/player/previous' && req.method === 'POST') {
+        const index = progress() > 3000 ? player.index : (player.index + TRACKS.length - 1) % TRACKS.length;
+        Object.assign(player, { index, playing: true, anchorProgress: 0, anchorAt: Date.now() });
+        return send(res, 204);
+      }
+      return send(res, 404, { error: { status: 404, message: 'Not found' } });
+    }
+    const art = /^\/art\/(\w+)-(\d+)\.svg$/.exec(path);
+    if (art) {
+      const t = TRACKS.find((x) => x.id === art[1]);
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${art[2]}" height="${art[2]}" viewBox="0 0 10 10"><rect width="10" height="10" fill="#111"/><circle cx="5" cy="5" r="3.5" fill="${t?.color ?? '#888'}"/></svg>`;
+      return send(res, 200, svg, { 'Content-Type': 'image/svg+xml' });
+    }
+
+    // ---- LRCLIB -------------------------------------------------------------
+    if (path === '/lrclib/get') {
+      const t = TRACKS.find((x) => key(x.lookupName) === key(q.get('track_name')) && key(x.artist) === key(q.get('artist_name')) && Math.abs(x.durationMs / 1000 - Number(q.get('duration'))) <= 2);
+      if (!t || t.id === 'mocktrack2') return send(res, 404, { code: 404, name: 'TrackNotFound', message: 'Failed to find specified track' });
+      return send(res, 200, record(t));
+    }
+    if (path === '/lrclib/search') {
+      const t = TRACKS.find((x) => key(x.lookupName) === key(q.get('track_name')));
+      if (!t || t.id === 'mocktrack2') return send(res, 200, []);
+      // A decoy edit with the wrong length, then the real one.
+      return send(res, 200, [{ ...record(t), id: 99, duration: t.durationMs / 1000 + 30, syncedLyrics: '[00:01.00]wrong edit' }, record(t)]);
+    }
+
+    if (path === '/__stats') return send(res, 200, { counts, apiTimes, player: { ...player, progress: progress() } });
+    return send(res, 404, { error: 'not found' });
+  });
+
+  return new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(port, host, () => {
+      const actual = server.address().port;
+      base = `http://${host}:${actual}`;
+      resolve({ server, port: actual, url: base, stats: () => ({ counts: { ...counts }, apiTimes: [...apiTimes], player: { ...player } }), close: () => new Promise((r) => server.close(r)) });
+    });
+  });
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const m = await startMockServices({ port: Number(process.argv[2] ?? process.env.BOOFVIZ_MOCK_PORT ?? 43890) });
+  console.log(`Mock Spotify + LRCLIB on ${m.url}  (accounts ${m.url}/accounts · api ${m.url}/v1 · lrclib ${m.url}/lrclib)`);
+}

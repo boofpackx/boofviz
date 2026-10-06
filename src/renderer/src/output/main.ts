@@ -5,6 +5,8 @@ import { DEFAULT_GLOBALS, type GlobalControls } from '@shared/types/engine';
 import { AudioFrameBuilder } from '@/audio/frameBuilder';
 import { ThreeRenderer } from '@/engine/three/ThreeRenderer';
 import { RenderLoop } from '@/engine/RenderLoop';
+import { connectLyricsFeed, lyricAt, lyricsFeed } from '@/engine/lyricsFeed';
+import type { Settings } from '@shared/settings';
 import type { Scene } from '@shared/types/engine';
 
 const api = window.boofviz;
@@ -23,12 +25,29 @@ let renderer: ThreeRenderer | null = null;
   lastSwitch: () => renderer?.lastSwitch ?? null,
   gpu: () => renderer?.gpuInfo ?? null,
   beatAtEpoch: (ms: number) => builder.beatAtEpoch(ms),
+  /** Current lyric line at an epoch time (with the overlay's lead), and what the overlay drew last frame. */
+  lyricsAt: (ms: number) => lyricAt(ms, overlayLead()),
+  lyricsOverlay: () => renderer?.lyricsInfo ?? null,
+  nowPlaying: () => ({ ...lyricsFeed.now, artDataUrl: lyricsFeed.now.artDataUrl ? '(data url)' : undefined }),
+  trackLyrics: () => lyricsFeed.lyrics,
+};
+
+let lyricsSettings: Settings['lyrics'] | null = null;
+const overlayLead = (): number => {
+  const lead = lyricsSettings?.overlay.params.lead;
+  return typeof lead === 'number' ? lead : 150;
+};
+const applyLyricsSettings = (s: Settings): void => {
+  lyricsSettings = s.lyrics;
+  lyricsFeed.offsetMs = s.lyrics.offsetMs;
+  renderer?.setLyricsOverlay(s.lyrics.overlay);
 };
 
 // Register before any await so the analysis port can't arrive unheard.
 window.addEventListener('message', (e: MessageEvent) => {
   if (e.source === window && e.data?.tag === PORT_MESSAGE_TAG && e.ports[0]) builder.attach(e.ports[0]);
 });
+connectLyricsFeed(api);
 api.onOutputCommand((cmd) => {
   if (cmd.globals) globals = cmd.globals;
   if (cmd.scene) {
@@ -51,13 +70,17 @@ async function start(): Promise<void> {
     return;
   }
   renderer = r;
+  applyLyricsSettings(settings);
   // Black until the control window sends the scene (main replays it on load).
   if (scene) r.setScene(scene, applyAtBeat);
 
   const fit = (): void => r.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio || 1);
   fit();
   window.addEventListener('resize', fit);
-  api.onSettings((s) => r.setRenderScale(s.output.renderScale));
+  api.onSettings((s) => {
+    r.setRenderScale(s.output.renderScale);
+    applyLyricsSettings(s);
+  });
 
   const loop = new RenderLoop(r, builder, () => globals);
   loop.run();
