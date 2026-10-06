@@ -1,0 +1,208 @@
+{
+  "schema": 1,
+  "name": "Nightshift Megademo",
+  "category": "Real 90s",
+  "tags": [
+    "demoscene",
+    "dark synth",
+    "copper bars",
+    "pixel",
+    "moody"
+  ],
+  "energy": 3,
+  "palette": "Nightshift",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "demo",
+      "name": "Megademo",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "demoParts",
+        "params": {
+          "text": "BOOFVIZ",
+          "part": "sequence",
+          "partPhrases": 1,
+          "wipeBeats": 4,
+          "scroller": "band",
+          "scrollSpeed": 32,
+          "wave": 0.8,
+          "bars": 9,
+          "copperSpeed": 0.75,
+          "jump": 1.2,
+          "rainbow": 0,
+          "copperGlow": 1.1,
+          "cycleStep": 1,
+          "cycleRate": 4,
+          "stars": 0.7,
+          "pump": 1.25,
+          "explode": 1.25,
+          "shake": 1,
+          "border": 0.05,
+          "scanlines": 0.45
+        }
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.35,
+            "scanlines": 0.2,
+            "mask": 0.4,
+            "vignette": 0.6
+          }
+        },
+        {
+          "type": "rgbSplit",
+          "enabled": true,
+          "params": {
+            "amount": 0.0015,
+            "angle": 0,
+            "radial": 0.6
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.64,
+            "threshold": 0.75,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Copper bars",
+      "value": 0.6667,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bars",
+          "range": [
+            1,
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Copper swing",
+      "value": 0.375,
+      "targets": [
+        {
+          "path": "layers.0.source.params.copperSpeed",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick jump",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.jump",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scroll speed",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.scrollSpeed",
+          "range": [
+            0,
+            80
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scroller wave",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.wave",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cycle drift",
+      "value": 0.125,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycleRate",
+          "range": [
+            0,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drop burst",
+      "value": 0.625,
+      "targets": [
+        {
+          "path": "layers.0.source.params.explode",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Nightshift": [
+      "#030108",
+      "#1c0b3f",
+      "#6a1b9a",
+      "#ff2fa0",
+      "#8ff6ff"
+    ]
+  },
+  "description": "The same four-part demo after midnight: indigo-to-magenta plasma, tunnel and vector balls with violet copper bars sliding through the borders, slower four-beat raster wipes and a pink-to-ice sine scroller over a dim starfield, all pulsing on the kick."
+}

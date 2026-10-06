@@ -1,6 +1,7 @@
 import { Background } from './Background';
 import { BarCity } from './BarCity';
 import { CodeRain } from './CodeRain';
+import { DemoParts } from './DemoParts';
 import { DeStijl } from './DeStijl';
 import { Dots } from './Dots';
 import type { Generator } from './Generator';
@@ -43,6 +44,7 @@ const FACTORIES: Record<string, () => Generator> = {
   dots: () => new Dots(),
   deStijl: () => new DeStijl(),
   pixelArcade: () => new PixelArcade(),
+  demoParts: () => new DemoParts(),
   codeRain: () => new CodeRain(),
   warp: () => new Warp(),
   orb: () => new Orb(),

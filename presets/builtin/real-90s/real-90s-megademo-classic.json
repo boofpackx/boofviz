@@ -1,0 +1,200 @@
+{
+  "schema": 1,
+  "name": "Copperline Megademo",
+  "category": "Real 90s",
+  "tags": [
+    "demoscene",
+    "copper bars",
+    "plasma",
+    "scroller",
+    "pixel",
+    "90s"
+  ],
+  "energy": 4,
+  "palette": "Copperline",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "demo",
+      "name": "Megademo",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "demoParts",
+        "params": {
+          "text": "BOOFVIZ",
+          "part": "sequence",
+          "partPhrases": 1,
+          "wipeBeats": 2,
+          "scroller": "band",
+          "scrollSpeed": 40,
+          "wave": 1,
+          "bars": 7,
+          "copperSpeed": 1,
+          "jump": 1,
+          "rainbow": 1,
+          "copperGlow": 1,
+          "cycleStep": 2,
+          "cycleRate": 8,
+          "stars": 1,
+          "pump": 1,
+          "explode": 1,
+          "shake": 1,
+          "border": 0.04,
+          "scanlines": 0.35
+        }
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.2,
+            "scanlines": 0.15,
+            "mask": 0.3,
+            "vignette": 0.4
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.4,
+            "threshold": 0.9,
+            "radius": 0.5,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Copper bars",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bars",
+          "range": [
+            1,
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Copper swing",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.copperSpeed",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick jump",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.jump",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scroll speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.scrollSpeed",
+          "range": [
+            0,
+            80
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scroller wave",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.wave",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cycle drift",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycleRate",
+          "range": [
+            0,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drop burst",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.explode",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Copperline": [
+      "#000000",
+      "#1b1464",
+      "#c2185b",
+      "#ff9800",
+      "#fff59d"
+    ]
+  },
+  "description": "A true 320×256, 32-colour megademo: colour-cycled plasma, a rotozoomer, a textured tunnel and shaded vector balls take one phrase each and raster-wipe in on the downbeat, while rainbow copper bars kick-jump through the borders and a bitmap sine scroller changes its wave on every bar."
+}
