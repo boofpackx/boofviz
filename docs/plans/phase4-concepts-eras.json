@@ -1,0 +1,547 @@
+{
+  "concepts": [
+    {
+      "name": "Copperline Megademo",
+      "group": "Real 90s",
+      "inspiration": "1989–1994 home-computer demoscene megademos and cracktros: copper/raster bars that run into the borders, sine scrollers, plasma with palette cycling, rotozoomers, textured tunnels, shaded vector balls, parallax starfields, raster-wipe transitions.",
+      "look": "A 4:3 'playfield' sits in the centre of the 16:9 frame. The side borders are not empty: rainbow copper bars run horizontally through them, as they did when coders opened the border. Internally it renders at 320×256 and is upscaled with nearest filtering, so pixels stay crisp. The colours are held to a 32-entry ramp built from the preset palette with 4×4 Bayer dithering. It plays as a demo in parts: (a) a sinusoidal plasma animated by true colour cycling (the palette index rotates, not a hue shift); (b) a rotozoomer spinning and zooming a procedurally drawn 64×64 tile (the user's logo when one is supplied); (c) a polar-mapped textured tunnel with depth falloff; (d) 64 pre-shaded vector balls (specular dot, outline) forming a cube, then a sphere, a torus and the letters of the user's text, depth-sorted and shadowed on a checker floor. A chunky 16×16 bitmap-font sine scroller with per-letter rainbow gradients rides the bottom of every part, over a three-plane dot starfield.",
+      "beat_mapping": "Kick: copper bars jump (each bar is a damped sine whose phase restarts on the beat grid) and the vector-ball formation pumps 4%. Hat: starfield speed ticks. Beat: palette cycling advances one stepped notch, as real colour cycling did. Bar: on the downbeat the scroller's wave amplitude and frequency switch, and the vector balls morph to the next formation over 1 beat. Phrase: the next part (plasma → rotozoom → tunnel → vector balls), using a raster-line wipe timed to finish exactly on the phrase downbeat. Build (energyTrend 'building'): copper bars multiply and speed up. Drop: integer-pixel playfield shake that decays over 1 bar, and the vector balls explode outward and re-form on the next downbeat.",
+      "technique": "New generator 'demoParts': a ShaderGenerator-style fragment shader that renders into a generator-owned 320×256 target and is then blitted to the layer target with nearest filtering. The part comes from floor(ctx.beat / beatsPerPhrase) % 4, a pure function of the phrase-aligned beat, so preview and output agree, and uPartT gives the wipe. Plasma, rotozoom, tunnel and copper bars are closed-form functions of uBeat/uTime using UTIL_GLSL hash and rot2. Vector balls: TS computes the 64 positions each frame as formation lerps from the beat, sorts them by z, and uploads a vec4[64] uniform. At 82k pixels a 64-iteration ball loop is trivial. Bitmap font: render the 'mono' font at 16 px to a canvas once and threshold it to 1 bit. Final colour is mapped onto a 32-step ramp of palette() with Bayer dither.",
+      "new_engine_pieces": [
+        "Fixed low internal resolution path for generators (owned small target + nearest upscale)",
+        "1-bit bitmap font atlas helper (canvas → threshold)",
+        "Palette-quantize + ordered (Bayer) dither GLSL, shared with the lowFi FX",
+        "Phrase 'part sequencer' + raster-wipe transition helper"
+      ],
+      "perf_risk": "low",
+      "why_special": "It is not a retro filter. It reproduces the real constraints (fixed resolution, 32 colours, colour cycling, raster tricks) and the structure of a demo (parts, transitions, scroller), so it reads as the actual artefact. The part sequencer gives you a 4-phrase show without autopilot.",
+      "effects": [
+        "crt (curvature 0.2, mask 0.3, scanlines 0.4)",
+        "bloom (threshold 0.9, strength 0.4)"
+      ],
+      "palette": [
+        "#000000",
+        "#1b1464",
+        "#c2185b",
+        "#ff9800",
+        "#fff59d"
+      ],
+      "songs": [
+        "I Ran (So Far Away)",
+        "Space Age Love Song",
+        "Eighties"
+      ],
+      "ip_notes": "Techniques are generic. Do not recreate named demos, group logos or the famous bouncing chequered-ball mascot. Scroller text defaults to generic greetings and is user-editable. The rotozoom texture and the vector-ball formation can take the user's own logo or trademark."
+    },
+    {
+      "name": "Checkerfloor Raytrace Reel",
+      "group": "Real 90s",
+      "inspiration": "1986–1995 ray-traced CGI demo reels from workstation and early freeware ray tracers: mirrored spheres on infinite chequerboards, a glass ball refracting the floor, primary-colour plastic, hard shadows, gradient skies.",
+      "look": "An infinite oxblood/cream chequerboard floor recedes to a hazy horizon under a cobalt-to-cyan gradient sky with a soft sun. At centre: a cluster of perfect chrome spheres in different sizes reflecting each other two bounces deep, one clear glass sphere showing the chequerboard inverted inside it, and a glossy red plastic torus slowly turning. Single sharp key light, crisp hard shadows, clean 2×2 supersampled edges. Shots are locked-off tripod angles with a slow push-in, like a reel 'rendered overnight'. Pristine, not grungy. A variant swaps the glass ball for a bobbing glass bottle with a rolled note inside.",
+      "beat_mapping": "Beat: spheres hop in a beat-locked parabola (height = 4·φ·(1−φ) of beatPhase, a 60 ms squash on landing), alternating spheres in a 1-3-2-4 pattern. Kick: small camera dip and contact shadows tighten. Snare: the torus flips 90° with easeOutBack. Bar: hard cut on the downbeat to one of 6 authored tripod angles chosen by hash01(barIndex). Phrase: floor material switches (chequer → mirror tiles → still water). Build: hop height grows, cuts every 2 beats. Drop: the glass sphere swells to fill the frame and the camera passes through it (refraction fills the screen) for 1 bar, then cuts back wide.",
+      "technique": "Fullscreen analytic ray tracer as a ShaderGenerator: exact ray–sphere and ray–plane intersections plus an analytic torus (quartic) or a short SDF march. Two reflection bounces, and one Fresnel-weighted refraction for the glass object. One shadow ray per hit. TS computes sphere centres and squash per frame as pure functions of ctx.beat (vec4[8] uniforms), and the camera from a keyframe list with an eased dolly per bar. A quality parameter selects 1 or 4 samples per pixel and an optional 0.75× internal scale.",
+      "new_engine_pieces": [
+        "Shared GLSL ray library (camera ray from matrix uniforms, analytic sphere/plane/box/torus, Fresnel, procedural sky env)",
+        "Generator quality uniform (spp, bounces, internal scale)",
+        "Choreography helper: beat-locked hop arcs, cut-on-bar camera lists"
+      ],
+      "perf_risk": "medium",
+      "why_special": "The bounces are choreographed to the beat with real physical arcs, and the camera cuts like a period showreel, so it feels like a computer-graphics reel rather than a shader toy. Exact analytic tracing keeps it razor sharp at 1080p.",
+      "effects": [
+        "bloom (threshold 1.2, strength 0.3)",
+        "vignette (0.25)",
+        "grade (contrast 1.05)"
+      ],
+      "palette": [
+        "#0a1a3f",
+        "#1f4fa3",
+        "#d7261e",
+        "#6fc3ff",
+        "#f4ecd8"
+      ],
+      "songs": [
+        "Age of Consent",
+        "Message in a Bottle"
+      ],
+      "ip_notes": "Generic primitives only. No juggler figure or any famous historical render recreated."
+    },
+    {
+      "name": "Haunted Polygon Keep",
+      "group": "Real 90s",
+      "inspiration": "1996–1999 32-bit console gothic dungeon crawlers and survival horror: low-poly stone halls, wobbling vertices, warping affine textures, dithered 15-bit colour, pitch-black fog, flickering torchlight. A crossover with dark fantasy.",
+      "look": "A first-person march through a gothic keep as 1997 console hardware would draw it: 320×240 internal resolution, low-poly arches and pillars, chunky 64×64 stone, flagstone and oak textures that warp diagonally across each polygon, vertices that jitter to the pixel grid as the camera moves, and a short draw distance swallowed by black fog. Torches throw orange per-vertex light pools. Stained-glass windows (lead lines, saturated panes) cast coloured shafts. Iron chandeliers, banners, candelabras. Dither is visible in the gradients. Wings change: crypt (bone-white), chapel (red velvet), and an outdoor midnight forest path of low-poly pines under a fog moon. An optional user title sits in a serif 'save screen' style.",
+      "beat_mapping": "Beat: the camera steps forward one corridor module with an ease-out 'tank' step and holds between beats, so it literally walks on the beat. Kick: torches flare and light radius pumps. Hat: candle flicker noise. Bar: on beat 4 the camera snaps 90° into the next corridor (small overshoot) whenever the seeded layout says 'corner'. Phrase: new wing, so the texture set and stained-glass colours swap. Build: fog closes in and steps go to half-beats. Drop: one capped lightning flash through the windows (window areas plus at most a 30% global lift, never more than 1 per beat) reveals gargoyle and bat silhouettes, then the camera runs at 2 steps per beat for 1 bar.",
+      "technique": "Three.js scene generator in the BarCity pattern (RawShaderMaterial, instanced modules, depth). Corridor modules (straight, corner, arch, window, stair, forest) are laid out by a deterministic path seeded by hash01(phraseIndex). Camera position and yaw are pure functions of ctx.beat: completed steps plus the eased current step. PSX material: the vertex shader snaps clip-space xy to a 320×240 grid. It passes uv·w and w so the fragment shader can divide them back for affine texture warp (GLSL ES 3.00 has no noperspective). Gouraud lighting from up to 8 torch point lights, linear fog to black. Textures are baked once into 64×64 NearestFilter DataTextures. Render to a 320×240 target with depth, then lowFi (15-bit quantize + Bayer), then nearest upscale.",
+      "new_engine_pieces": [
+        "SceneGenerator base (Three scene + beat camera rig + fixed internal res + depth)",
+        "PSX material (vertex snap, affine UV trick, Gouraud, fog)",
+        "Procedural texture baker (stone/brick/wood/stained glass DataTextures)",
+        "Deterministic seeded path/level layout",
+        "lowFi FX (pixelate + colour-depth quantize + ordered dither)",
+        "Flash-budget helper (local photosensitivity cap)"
+      ],
+      "perf_risk": "low",
+      "why_special": "The period artefacts (vertex jitter, affine warp, dither) are what make it read as genuine 32-bit rather than 'low-poly art'. Walking exactly on the beat is hypnotic, and it delivers the user's dark-fantasy wish through real 90s authenticity.",
+      "effects": [
+        "lowFi (new)",
+        "crt (subtle, optional)",
+        "grain (0.03)",
+        "vignette (0.5)"
+      ],
+      "palette": [
+        "#050407",
+        "#2b1d2e",
+        "#6e2a1f",
+        "#d9822b",
+        "#f6d8a8"
+      ],
+      "songs": [
+        "Bela Lugosi's Dead",
+        "Lullaby",
+        "A Forest",
+        "Never Let Me Down Again"
+      ],
+      "ip_notes": "Generic gothic architecture. No levels, characters, HUDs, menus or fonts from specific games."
+    },
+    {
+      "name": "Suburban Night Tape",
+      "group": "Real 90s",
+      "inspiration": "Mid-90s VHS-C camcorder footage shot from a moving car or train at night, as in the home-video look of 90s alt-rock videos: sodium streetlights, tape wobble, timestamp OSD, auto-focus hunting.",
+      "look": "Point of view from a passenger window at night, shot on a camcorder. Sodium-orange streetlights sweep overhead and past as big soft bokeh discs with hexagonal aperture edges when out of focus. Suburban house silhouettes with warm lit windows, an all-night store glow, power lines swooping pole to pole, a wet road mirroring it all. The image runs through a real VHS signal model: chroma bleeding right, smeared reds, luma ringing on edges, line-by-line time-base wobble, a head-switching noise band in the bottom 6 lines, dropout specks, lifted noisy blacks and magenta white-balance drift. Blocky camcorder OSD: 'PLAY ▶', a generic date, running timecode, and 'REC ●' blinking on builds. Modes: car; train (platform lights and station canopies through a rain-streaked window); night tram past concrete panel-block estates.",
+      "beat_mapping": "Beat: one streetlight (or platform lamp) passes per beat. Light spacing is derived from the BPM, so each crosses frame centre exactly on the beat, as a visual kick. Kick: the passing light blooms. Snare: auto-focus 'hunt' (bokeh radius breathes over half a beat). Bar: a utility pole passes on the downbeat. Phrase: scene changes (houses → shop strip → overpass → open road) through a 3-frame VHS edit glitch with a tracking roll. Build: a tracking-error band creeps up the frame and the timecode flickers. Drop: 1 bar of 'rewind' scan-line tearing, then lights resume at double rate.",
+      "technique": "New generator 'nightDrive': a 2.5D parallax fullscreen shader. Each depth layer (sky, far houses, wires and poles, lamps, road reflection) is a pure function of travelled distance d = ctx.beat × spacing, so it is beat-locked and identical in every window. Bokeh is analytic hexagonal SDF discs with a focus-radius uniform. The wet road is a mirrored lookup with ripple noise. New 'vhs' FX: convert to YIQ, horizontally low-pass I/Q (~20 px), apply a sharpen-with-ringing kernel to Y, per-line wobble from hash(line, quantized beat time) so the windows match, then the head-switch band, dropouts and a tracking-band parameter. OSD comes from the type atlas (mono), as KineticType does.",
+      "new_engine_pieces": [
+        "vhs FX (YIQ chroma bleed, ringing, time-base wobble, head-switch, dropouts, tracking band)",
+        "Camcorder OSD helper (date/timecode strings from frame time)",
+        "Hexagonal bokeh SDF utility",
+        "Beat-locked travel-distance helper for parallax worlds"
+      ],
+      "perf_risk": "low",
+      "why_special": "VHS is modelled as a signal (chroma bandwidth, time-base error, head switching) instead of a scanline overlay. Lights passing exactly on the beat make the tape itself groove. It is cinematic and emotional, built for the playlist's melancholy anthems.",
+      "effects": [
+        "vhs (new)",
+        "bloom (threshold 0.7)",
+        "grain (0.05)",
+        "vignette (0.45)"
+      ],
+      "palette": [
+        "#05060c",
+        "#1b2340",
+        "#d0611c",
+        "#ffb347",
+        "#fff1d6"
+      ],
+      "songs": [
+        "1979",
+        "Smalltown Boy",
+        "Sudno (Судно)",
+        "Heaven Knows I'm Miserable Now"
+      ],
+      "ip_notes": "Generic suburbs and estates. Do not restage a specific music video's shots. No camcorder, tape or store brand names; the OSD is generic."
+    },
+    {
+      "name": "Rave Flyer Systems",
+      "group": "Real 90s",
+      "inspiration": "Mid-90s UK techno and rave graphic design and sleeve design studios: technical pictograms, isometric wireframes, barcodes, Swiss grids, fluoro spot inks, overprint, cropped condensed type, fake technical labels. Also period broadcast idents with stepped animation.",
+      "look": "A designed poster that moves like a 1996 ident. A strict 12-column grid of hairline rules holds giant condensed numerals (the live BPM) cropped by the frame edge, plus small technical labels ('SYS.04 / FREQ 128.0 / PHASE 3:4' using live beat and bar values). Around them: pictograms (arrows, crosshairs, chevrons, registration marks), an isometric wireframe object (cube stack, speaker cone, torus) turning in 90° snaps, barcodes that encode the beat counter, and halftone dot fields. It looks printed: two fluoro spot inks (signal orange, acid lime or cyan), silver-grey and black on off-white paper, or inverted on black. Overlaps overprint (multiply) and the plates sit 1–3 px out of register. Motion is stepped 'on twos' (12 updates per second) with snappy holds.",
+      "beat_mapping": "Beat: a new module slams into the next grid slot with a 3-step wipe and the oldest wipes off. Hat: readout digits tick. Kick: the giant numeral jumps one grid unit, and the isometric object snaps 90° with zero easing and a 2-frame smear. Snare: misregistration pulses. Bar: the whole layout re-composes from a seeded template (as DeStijl rebuilds per bar). Phrase: ink pair swaps (orange/black → lime/silver → cyan/red), with paper ↔ black inversion every second phrase. Drop: a full-frame barcode wipe, then the layout returns denser.",
+      "technique": "New 2D 'layout engine' generator. A seeded grid composer in TS (hash01(barIndex, seed)) assigns modules from a library to slots. Each module is a small draw routine: rules, arrows and isometric wireframes via StrokeBatch (3D points projected in TS, like Ricochet's pure-function geometry), solids and halftones via a fill shader, text via the type atlas (condensed + mono). Stepped motion: animation time = floor(seconds × 12)/12, derived from beat time. Ink plates are rendered into separate channels of one RGBA target, then a composite pass multiplies each ink onto paper with its own sub-pixel offset.",
+      "new_engine_pieces": [
+        "Graphic layout engine + module library (rules, pictograms, barcodes, labels, isometric wireframes)",
+        "SDF type atlas with multiple fonts/sizes and live-data strings (BPM/beat/bar)",
+        "printPlates FX (spot inks, overprint, misregistration)",
+        "Stepped-time ('animate on twos') helper"
+      ],
+      "perf_risk": "low",
+      "why_special": "It is graphic design, not a glow effect: information-dense, typographic, grid-disciplined, driven by real live data. The stepped motion and overprinted inks are exactly what period work looked like, unlike anything else in the library.",
+      "effects": [
+        "printPlates (new) or rgbSplit (amount 0.002)",
+        "grain (0.04, paper tooth)",
+        "halftone (ink mode, mix 0.3) optional"
+      ],
+      "palette": [
+        "#0d0d0d",
+        "#5c5f66",
+        "#ff5a1f",
+        "#c6ff00",
+        "#efece4"
+      ],
+      "songs": [
+        "Damaged Goods",
+        "Psycho Killer",
+        "Disorder",
+        "Personal Jesus"
+      ],
+      "ip_notes": "An homage to the era's design language only. Do not reproduce any studio's logos, sleeves, pictogram sets or label art; all pictograms are drawn fresh. The label system has slots for the user's own marks."
+    },
+    {
+      "name": "Station Ident '93",
+      "group": "Real 90s",
+      "inspiration": "Early-90s TV network and station idents and sports-show openers: extruded chrome/gold logos, orbiting translucent rings, light sweeps across bevels, wireframe globe, lens flare, deep royal-blue gradients.",
+      "look": "A heavy extruded, bevelled logo (the user's text or uploaded logo) in polished gold or chrome floats centre frame against a navy-to-royal-blue gradient, with a faint latitude/longitude wireframe globe turning behind it. Three translucent tinted glass rings orbit on tilted axes, catching speculars. Thin light sweeps glide across the bevel faces. A clean lens flare blooms when a ring crosses the key light, and dust motes drift through the beam. It reads as a 1993 workstation-rendered station ID: glossy, earnest, expensive.",
+      "beat_mapping": "Beat: the rings advance one clockwork tick (each turns 45° with ease-out, staggered 1/8 beat ring to ring). Kick: the logo pushes 2% toward camera and rebounds. Bar: a light sweep starts on the downbeat and crosses the face in 1 beat. Phrase: the logo makes a 360° Y spin with anticipation (pulls back 10° first) and the camera cuts to a new hero angle. Build: the rings speed up and converge. Drop: the rings lock into a gyroscope around the logo, the flare pops, and the globe lines brighten (local, not full-frame).",
+      "technique": "Three.js scene generator. The logo mesh is extruded from contours (text atlas or user SVG via SVGLoader → THREE.Shape → ExtrudeGeometry with bevel) and cached until the text or logo changes. A custom shader reflects a procedural studio environment (analytic softboxes + horizon gradient) for chrome and gold, with a moving specular band term for the sweeps. Rings: TorusGeometry with a glass shader (Fresnel + env + tint, additive). Globe: LineSegments. Dust: stateless instanced sprites. The camera is a keyframe rig evaluated from ctx.beat.",
+      "new_engine_pieces": [
+        "Extruded text/logo mesh builder (atlas contours or user SVG → ExtrudeGeometry)",
+        "Procedural studio-environment GLSL shared by chrome/gold/glass looks",
+        "lensFlare FX (ghosts, halo, anamorphic streak)",
+        "SceneGenerator keyframe camera rig with cut-on-phrase"
+      ],
+      "perf_risk": "medium",
+      "why_special": "It gives the user's own trademarks a premium broadcast-package moment in every set, and doubles as the hero of the Logo/Branding category. Extrusion, bevels and environment reflections are the authentic period treatment.",
+      "effects": [
+        "lensFlare (new)",
+        "bloom (threshold 0.9, strength 0.6)",
+        "vignette (0.35)",
+        "grain (0.02)"
+      ],
+      "palette": [
+        "#030b2a",
+        "#0b2f7a",
+        "#2f6bd8",
+        "#e0b24a",
+        "#fff6dc"
+      ],
+      "songs": [
+        "Don't You (Forget About Me)",
+        "Girls on Film"
+      ],
+      "ip_notes": "The logo is user-supplied (their own marks), defaulting to their DJ name. No network, channel or sports-show marks or globe idents reproduced."
+    },
+    {
+      "name": "Liquid Chrome Coalesce",
+      "group": "Y2K",
+      "inspiration": "1998–2002 millennium CGI: liquid-mercury metaballs, holographic foil sheen, silver cyber grids, baby-blue/lilac studio gradients, as in turn-of-the-millennium music videos, phone adverts and CD-ROM menus.",
+      "look": "Liquid-mercury blobs float in a pale icy studio (lilac-to-baby-blue gradient with bright white softbox reflections), merging and splitting through gooey necks. Surfaces are perfect mirrors with an oil-on-water thin-film rainbow at grazing angles. Below, a silver wireframe cyber-grid floor fades into white haze, and small chrome droplets orbit the cluster. The blobs can reflect a slowly turning starburst and the user's text placed behind the camera, so the brand appears mirrored in the metal.",
+      "beat_mapping": "Kick: the main blob pulses (+6% radius with a damped-sine jelly wobble started on the kick's beat grid position), and on every second kick a droplet pinches off and joins the orbit. Snare: ripple bands run around the surface. Beat: the orbiting droplets advance one step. Bar: the cluster coalesces into one sphere by beat 4 and bursts into N blobs on the downbeat (N cycles 3 → 5 → 8). Phrase: the arrangement morphs (cluster → ring → vertical stack) and the environment's colour temperature shifts. Build: the smooth-min radius grows, so blobs get stickier. Drop: full holographic mode for 2 bars (thin-film thickness sweeps so the chrome becomes rainbow foil) and the grid lights up.",
+      "technique": "Fullscreen raymarched SDF as a ShaderGenerator: 6–10 spheres joined by polynomial smooth-min with animated k. TS computes blob centres in closed form from ctx.beat (formation lerps, droplet orbits) and passes them as vec4 uniforms. 48–80 steps with a bounding-sphere early-out; tetrahedral normals. Shading: the procedural studio env sampled along reflect(v, n), Schlick Fresnel, and a wavelength-based thin-film interference term. The floor is seen only in the env reflection (no second march). The quality uniform sets step count and a 0.75× internal scale for integrated GPUs.",
+      "new_engine_pieces": [
+        "SDF3/raymarch GLSL library (smin, sphere tracing, normals, bounding volumes)",
+        "Procedural studio environment GLSL",
+        "Thin-film iridescence GLSL",
+        "Per-generator quality / internal-scale uniform"
+      ],
+      "perf_risk": "medium",
+      "why_special": "Real ray-marched liquid metal with physically motivated iridescence looks expensive. The coalesce/burst cycle gives clear bar-level structure, and merge-split timed to kicks satisfies in a way loudness wobble never does.",
+      "effects": [
+        "bloom (threshold 1.0, strength 0.5)",
+        "starGlint (new, subtle on speculars)",
+        "grade (temperature -0.15)"
+      ],
+      "palette": [
+        "#1a1830",
+        "#6d6fa8",
+        "#a9c6ff",
+        "#e7d6ff",
+        "#ffffff"
+      ],
+      "songs": [
+        "Space Age Love Song",
+        "The Perfect Girl",
+        "Age of Consent"
+      ],
+      "ip_notes": "A generic aesthetic. No product shots, phone or device shapes, or ad compositions."
+    },
+    {
+      "name": "Jelly Plastic Twist Cube",
+      "group": "Y2K",
+      "inspiration": "Translucent candy-coloured hardware and accessories of 1998–2001 with Y2K product-photo lighting, applied to the twisting puzzle cube the user asked for.",
+      "look": "A 3×3×3 twisting puzzle cube made of translucent jelly plastic in six candy colours (tangerine, grape, lime, strawberry, blueberry, ice-clear). Each cubie is rounded and glossy, and the frosted inner core and cross-shaped mechanism show through the shell. Colour deepens with thickness (Beer's law), and crisp white softbox glints sit on the edges. It floats on a seamless white-to-pale-aqua product backdrop above a soft coloured caustic shadow, while the camera orbits slowly like a turntable product shot.",
+      "beat_mapping": "Beat: one slice quarter-turn (easeOutBack overshoot over ~0.35 beat, then a hold, so the click lands on the beat); the move list is a deterministic scramble seeded by the phrase index. Bar: on the downbeat the whole cube tumbles 90° on a hashed axis. Snare: the turning slice glints. Phrase: the second half of the phrase plays the moves in reverse, so the cube is solved exactly on the next phrase downbeat, with a gloss sweep across the solid faces. Build: turns go to eighth notes. Drop: the cube explodes into 27 cubies along radial vectors, spins, and re-assembles on the next downbeat.",
+      "technique": "Three.js scene generator. The 27 cubies are an InstancedMesh with rounded-box geometry, and an inner dark core mesh is drawn first. State is recomputed from scratch every frame, PixelArcade-style: start solved, apply the first k moves of the phrase's list (k from ctx.beat), then rotate the in-progress slice by the eased fraction. That is ≤32 integer moves × 27 cubies, trivial and identical in every window. Material: analytic rounded-box thickness along the view ray (object-space slab test) drives Beer absorption; refraction samples the procedural studio env along the refracted direction, plus Fresnel reflection. The floor shadow is a blurred projected footprint.",
+      "new_engine_pieces": [
+        "Puzzle-cube state engine (move lists, permutation, eased slice turns, solve-on-phrase) shareable with other cube concepts",
+        "Translucent plastic material (thickness absorption + env refraction)",
+        "Procedural studio environment GLSL",
+        "Beat choreography helper (step/hold/overshoot)"
+      ],
+      "perf_risk": "low",
+      "why_special": "It answers the twisting-cube request with real choreography (scramble, then solved exactly on the phrase) instead of random spinning. The jelly material makes it unmistakably turn-of-the-millennium.",
+      "effects": [
+        "bloom (threshold 1.1, strength 0.3)",
+        "starGlint (new, tiny)",
+        "vignette (0.2)"
+      ],
+      "palette": [
+        "#2a2440",
+        "#7b3fe4",
+        "#ff7a1a",
+        "#7ee36b",
+        "#f4fbff"
+      ],
+      "songs": [
+        "Close to Me",
+        "In Between Days",
+        "Just Like Heaven"
+      ],
+      "ip_notes": "Never use the puzzle's trademarked name, logo, or branded centre sticker. Jelly colours are generic. No recognisable computer product silhouettes."
+    },
+    {
+      "name": "Inflatable Bubble Type",
+      "group": "Bouncy",
+      "inspiration": "Y2K inflatable furniture and bubble lettering, holographic vinyl, pool toys, millennium pop graphics.",
+      "look": "The user's words become huge inflated vinyl balloon letters: pillowy, pinched into seams at the glyph edges, made of translucent pastel-holographic vinyl that shifts pink → cyan → lilac with angle, with strong white specular highlights and a soft inner glow. They stand on a pale glossy floor that reflects them, against a soft gradient with a slowly turning silver starburst and a few floating chrome stars. They squash and wobble like real inflatables.",
+      "beat_mapping": "Beat: a bounce wave travels across the word (each letter hops 1/16 beat after the previous one, stretches at the apex, squashes on landing, then settles with a damped wobble). Kick: the whole word squashes 8%. Hat: speculars twinkle. Bar: the holographic colourway steps along the letters. Phrase: the next word in the list inflates in (easeOutElastic over 1 beat) as the old one deflates. Drop: the letters over-inflate to 130% and pop into chrome confetti, re-inflating on the next downbeat.",
+      "technique": "Fully 2D ShaderGenerator. A shared SDF type atlas (CPU Euclidean distance transform of the canvas glyphs, glyph id in a second channel) feeds an 'inflate' shader: the inside distance becomes a height field h = sqrt(1 − (1 − d/r)²), whose gradient gives a pillow normal. TS computes per-letter offset and squash/stretch from ctx.beat with closed-form damped springs (A·e^(−ζt)·sin ωt from the latest beat-grid event) and uploads them as uniform arrays indexed by glyph id. Shading: procedural env reflection, thin-film tint and rim light. The floor reflection mirrors the glyph lookup.",
+      "new_engine_pieces": [
+        "SDF type/logo atlas (EDT, per-glyph ids and bounds, bundled open-licence fonts)",
+        "Closed-form spring/bounce helper on the beat grid",
+        "Thin-film iridescence GLSL",
+        "Procedural env GLSL"
+      ],
+      "perf_risk": "low",
+      "why_special": "Type gets physical character: squash and stretch timed to the groove turns the user's name or brand into a pop object. The SDF-pillow trick gives a convincing inflated 3D look at 2D cost.",
+      "effects": [
+        "bloom (threshold 0.9, strength 0.4)",
+        "starGlint (new, subtle)",
+        "grain (0.015)"
+      ],
+      "palette": [
+        "#2b1f3a",
+        "#8a7dff",
+        "#ff8fd0",
+        "#8ff3ff",
+        "#fff9fe"
+      ],
+      "songs": [
+        "Close to Me",
+        "Call Me",
+        "This Charming Man"
+      ],
+      "ip_notes": "User text or logo only. Do not name display typefaces in presets; ship an open-licence rounded heavy font or fall back to system heavy weights as KineticType does."
+    },
+    {
+      "name": "Morning Glass Meadow",
+      "group": "Glossy Aero",
+      "inspiration": "The glossy 'aero' desktop and advertising aesthetic of 2004–2012: green rolling hills, deep blue sky, glass orbs and bubbles, water droplets, aurora swooshes, lens flares.",
+      "look": "A bright, impossibly green rolling hill of individually swaying grass blades under a saturated blue sky with cumulus and a low sun throwing a clean lens flare. Glossy glass orbs of many sizes drift upward, each refracting the world behind it upside-down, with a bright window-shaped specular and a soft caustic. Tiny bubbles. Two luminous aurora ribbons (green-to-cyan light, soft edges) arc across the sky, and dew droplets on an invisible glass pane in front of the lens catch the light. Clean, optimistic, glossy.",
+      "beat_mapping": "Downbeat: one large glass orb bounces up from below with easeOutBack while the others drift. Kick: orb caustics pulse, and the grass sways one notch (wind phase locked to the beat). Hat: bubbles twinkle. Bar: an aurora ribbon sweeps across the sky over the bar (head on beat 1, tail by beat 4). Phrase: time of day steps morning → noon → golden hour → twilight with stars, crossfading over 1 bar. Build: orbs rise faster and the flare intensifies. Drop: every orb bursts into droplets that land on the glass pane, and the sun gives a star-filter flare: glossy, not a strobe.",
+      "technique": "Fullscreen ShaderGenerator. Sky is gradient + fbm clouds. The hill is a 1D noise ridge with per-pixel grass blades (hashed columns, sway from sin(uBeat)). Orbs are up to 24 analytic screen-space spheres on hashed lanes, with positions in closed form from beat. Refraction re-evaluates the procedural background function at a refracted offset, which is cheap because nothing is a texture. Ribbons are sum-of-sines curves with Gaussian falloff. Droplets-on-glass is a separate new FX so any layer can use it.",
+      "new_engine_pieces": [
+        "droplets FX (glass-pane dew and rain with refraction, beat-hashed deterministic spawns)",
+        "lensFlare FX",
+        "'Procedural background function' shader pattern for in-shader refraction"
+      ],
+      "perf_risk": "low",
+      "why_special": "A believable aero world with real optics (refraction, caustics, droplets) instead of a wallpaper. The phrase-stepped time of day gives mellow sets a long arc.",
+      "effects": [
+        "lensFlare (new)",
+        "droplets (new)",
+        "bloom (threshold 0.8, strength 0.5)",
+        "grade (saturation 1.15)"
+      ],
+      "palette": [
+        "#06264d",
+        "#1067c9",
+        "#3fbf3f",
+        "#9ff0ff",
+        "#ffffff"
+      ],
+      "songs": [
+        "Just Like Heaven",
+        "Lovesong",
+        "In Between Days"
+      ],
+      "ip_notes": "Do not recreate any operating-system default wallpaper composition or logo-shaped orbs or flags. Compositions stay original."
+    },
+    {
+      "name": "Koi Glass Pond",
+      "group": "Glossy Aero",
+      "inspiration": "Aero-era screensavers and adverts: glossy koi ponds, dancing caustics, ripples, lily pads, cherry petals, sky reflections.",
+      "look": "Top-down into a crystal-clear pond: glossy orange, white and black koi glide over smooth pebbles lit by dancing caustics. The surface is glass-smooth, with sky reflection toward the edges, a few lily pads and drifting pink petals. Ripples refract the pebbles, and specular sky streaks travel along their crests. Moonlit variant: floating paper lanterns and silver caustics. Calm, glossy, gently vignetted.",
+      "beat_mapping": "Kick: a ripple ring is born at a beat-hashed position; each beat's ripple ages deterministically, with about 8 alive, and 3 at once on drops. Snare: the nearest koi darts (speed burst, then glide). Beat: the caustic phase steps. Bar: a petal lands with its own ripple. Phrase: the camera rotates 45° and the light shifts (day → sunset → moonlit lanterns). Build: the koi gather into a slow spiral. Drop: the koi scatter radially from centre behind one big ripple.",
+      "technique": "Fullscreen ShaderGenerator. Water height is the sum of the last N ripples, each from beat index n at position hash22(n) with age ctx.beat − n (a damped radial sine), so the field is identical in every window. Its normal refracts a Voronoi pebble floor plus layered warped-Voronoi caustics, with an env-sky specular on top. Koi are 2D SDF capsule chains (5 segments, sinusoidal tail wiggle) on closed-form Lissajous paths parameterised by beat. Darts are phase offsets from a beat-indexed pattern, not onset state. Koi are drawn under the surface with the same refraction and a soft floor shadow.",
+      "new_engine_pieces": [
+        "Beat-indexed event-list helper (ripples, pops, emissions) for deterministic 'event' visuals",
+        "Voronoi/caustics GLSL utilities",
+        "2D creature skeleton SDF helper (capsule chains with wiggle)"
+      ],
+      "perf_risk": "low",
+      "why_special": "Ripples landing on the beat grid make the music feel like it is dropping into the water. A calm, beautiful piece with real optics, ideal for openers and breakdowns.",
+      "effects": [
+        "bloom (threshold 0.9, strength 0.3)",
+        "grade (saturation 1.1)",
+        "vignette (0.35)"
+      ],
+      "palette": [
+        "#04202a",
+        "#0e5c66",
+        "#f26b1d",
+        "#ffd2a6",
+        "#f8fbff"
+      ],
+      "songs": [
+        "Anenome",
+        "This Night Has Opened My Eyes",
+        "Lullaby"
+      ],
+      "ip_notes": "A generic nature scene. No recreation of specific commercial screensavers."
+    },
+    {
+      "name": "Flat Tile Hub",
+      "group": "Tile Motion",
+      "inspiration": "Flat tile UI motion design on phones and media players, around 2010–2014: bold flat colour tiles, giant lowercase light typography cropped by the screen edge, panoramic parallax, live tiles that flip and peek, turnstile transitions.",
+      "look": "A wide panorama of flat square and wide tiles (cobalt, magenta, lime, orange, teal, crimson) on pure black, in a 6-row grid. A giant thin lowercase header ('tonight', 'music', or user text) bleeds off the left edge, with sub-headers in light weight. Tiles carry live content: the BPM in huge thin numerals, a white mini spectrum, a beat counter like '3/4', a 'now playing' tile with user text, a clock, and a picture tile showing a downscaled feed of another layer. Completely flat (no gradients, no shadows); the motion does all the work.",
+      "beat_mapping": "Beat: 1–2 live tiles flip about their horizontal axis (ease-out cubic, 0.4 beat) to the next face, in an order seeded by the beat index. Hat: small 'peek' nudges (content slides up 15% and back). Kick: the BPM numeral weight steps. Bar: the panorama pans one section left with the signature fast-out/slow-in ease, the header moving at 0.35× for parallax. Phrase: the accent colour changes and tiles re-flow. Build: flips every eighth note and headers cycle. Drop: turnstile exit, with all tiles swinging away around the left edge in a column-by-column cascade (30 ms stagger), then turnstiling back in with the new accent on the next downbeat.",
+      "technique": "Three.js scene generator with a perspective camera (~35° fov). Tiles are an InstancedMesh of planes with per-instance face index and pivot. All flip, peek and turnstile angles are pure functions of ctx.beat (staggered eased steps). One fragment shader draws each tile face procedurally: numerals and labels from the type atlas, spectrum from bands32 uniforms, clock from beat. The picture tile samples another layer's output texture. Headers are large text quads in a light geometric sans (system light weights with fallbacks).",
+      "new_engine_pieces": [
+        "Generator input from another layer's rendered texture (extend the compositor's luma-mask copies to generator inputs)",
+        "SDF type atlas with light weights",
+        "Tile choreography helper (staggered flips, peeks, turnstiles)"
+      ],
+      "perf_risk": "low",
+      "why_special": "A completely different visual grammar from the rest of the app: flat, typographic and data-driven, with period-signature motion (parallax pans, turnstiles, staggered flips). It also doubles as a slick booth info display for BPM, track and branding.",
+      "effects": [
+        "bloom (strength 0.15) optional",
+        "grade (contrast 1.05)"
+      ],
+      "palette": [
+        "#000000",
+        "#1b58b8",
+        "#d80073",
+        "#f09609",
+        "#ffffff"
+      ],
+      "songs": [
+        "Call Me",
+        "Girls on Film",
+        "Age of Consent"
+      ],
+      "ip_notes": "No OS or device logos and no named UI typeface; use a generic light sans. Accent colours are generic. Branded tiles are reserved for the user's own marks."
+    },
+    {
+      "name": "Glitter Wand Bumper",
+      "group": "2000s Kids-TV Gloss",
+      "inspiration": "Early-2000s kids/teen TV channel idents and bumpers: sparkle-wand trails, swooshes, starbursts, glossy bubble logos, bright gradient swirls.",
+      "look": "A saturated glossy swirl background (spiral bands of magenta → violet → cyan with soft glow and a radial highlight). A sparkle wand crosses it: a bright white star head trailing a tapering glowing ribbon that sheds glitter stars, which twinkle as they fall. The trail writes a looping swoosh around the centre and ends by tapping a glossy inflated bubble logo (user text or logo). The logo pops in with a white rim and soft drop shadow, backed by rotating sunburst rays and rings of small four-point stars. Clean and expensive, like a real channel package.",
+      "beat_mapping": "Bar: one wand stroke per bar along one of 6 authored swoosh curves (chosen by bar index), with the head reaching the logo exactly on the next downbeat. Downbeat: the tap fires a starburst ring and 8 star sparks, and the logo squashes and stretches. Hat: glitter twinkles. Beat: the background swirl turns a quarter step with ease. Phrase: colourway switches (berry, ocean, lime sherbet, sunset). Drop: the logo grows behind a giant starburst while confetti stars rain for 2 bars.",
+      "technique": "A composite generator: (a) the swirl background is polar bands + glow in shader; (b) the wand ribbon uses StrokeBatch, sampling the parametric path backwards in time as Ricochet's echo trail does (a pure function of beat), with tapered width and an additive glow pass; (c) glitter is stateless particles, each spawned at a scheduled path time t_i with closed-form gravity, drift and twinkle, drawn as instanced four-point star sprites; (d) the logo uses inflated SDF shading shared with Inflatable Bubble Type; (e) the starburst is polar SDF rays.",
+      "new_engine_pieces": [
+        "Stateless instanced particle/sprite system (closed-form trajectories; star, circle, sparkle shapes)",
+        "StrokeBatch extension: per-vertex width (taper) and colour",
+        "Parametric swoosh-path library",
+        "SDF type/logo atlas (inflate shading)"
+      ],
+      "perf_risk": "low",
+      "why_special": "Musically timed ident motion design (one stroke per bar, tap on the downbeat) that turns the user's brand into a broadcast-quality bumper, not a particle toy.",
+      "effects": [
+        "bloom (threshold 0.7, strength 0.7)",
+        "starGlint (new, subtle)"
+      ],
+      "palette": [
+        "#2a0845",
+        "#7a1fa2",
+        "#ff2fa0",
+        "#28d7ff",
+        "#fff8ff"
+      ],
+      "songs": [
+        "Close to Me",
+        "Just Like Heaven",
+        "Call Me"
+      ],
+      "ip_notes": "No channel logos, mascots, castle or wand marks, or ident audio cues. Swoosh paths and starbursts are generic. The logo slot is for the user's own marks."
+    },
+    {
+      "name": "Two-Step Platinum",
+      "group": "UK Garage",
+      "inspiration": "2000–2003 UK garage/two-step music-TV graphics: chrome 'bling' lettering, diamond glints and star-filter flares, spinning chrome rings, champagne fizz, glossy music-channel tickers, velvet-purple club light.",
+      "look": "The user's name in heavy bevelled platinum-chrome lettering over a deep velvet purple-to-black gradient crossed by slow club light beams. Behind the type, two thin spinning chrome rings (a platter rim and a halo) at different tilts reflect the lights. Diamond glints pop on the letter edges as 6- and 8-point star-filter flares. A column of champagne bubbles fizzes up from the bottom, catching light. Along the bottom, a glossy silver-blue gradient ticker bar with a bevelled edge scrolls shout-outs and track text.",
+      "beat_mapping": "Everything sits on a swung grid (swing parameter 0.5–0.7 on the 16ths). Glints fire on the two-step accent pattern (beat 1, the swung 'and' of 2, the skipped 3...), not on every kick. Pattern kicks: the rings jerk forward 30° in a quick ease-out stutter. Snare (2 and 4): a light sweep crosses the chrome letters. Swung hats: champagne bubbles release in clusters. Bar: the camera tilt sways on a two-bar shuffle. Phrase: the text and ticker message switch. Drop: a diamond burst (≈20 star flares across the letters within 1 beat, then decay), a 180° ring flip and a fizz burst.",
+      "technique": "Text uses the shared SDF atlas with bevel shading: the normal comes from the SDF gradient through a bevel profile, and the chrome reflects a procedural 'club' environment of bright strips and coloured gels. Rings are Three.js tori or an SDF march with an anisotropic brushed highlight from the same env. The generator emits sparse bright points at hashed SDF-edge positions selected on the swing grid. A new starGlint FX turns them into 4/6/8-ray streaks (a 1/4-resolution bright pass blurred directionally along N angles). Fizz is stateless rising particles with sine wobble. The ticker is a KineticType 'marquee' layer with a rect shape mask over a glossy bar.",
+      "new_engine_pieces": [
+        "Swing/groove clock (swung 16th grid; pattern tables for two-step, shuffle, straight; optional swing estimate from hat-onset timing)",
+        "starGlint FX (star filter)",
+        "SDF bevel/chrome text shading",
+        "Procedural club-environment GLSL",
+        "Stateless particles"
+      ],
+      "perf_risk": "medium",
+      "why_special": "The motion grooves with the swing: glints and ring stutters sit on the two-step pattern, which no loudness-reactive visual can do. The chrome-and-diamond treatment is the genuine period look, rendered premium.",
+      "effects": [
+        "starGlint (new)",
+        "bloom (threshold 0.9, strength 0.6)",
+        "lensFlare (new, subtle)",
+        "grade (temperature -0.1)"
+      ],
+      "palette": [
+        "#07020f",
+        "#2a0b4a",
+        "#6a2fd1",
+        "#9fd3ff",
+        "#f5f7ff"
+      ],
+      "songs": [
+        "Flesh for Fantasy",
+        "Girls on Film"
+      ],
+      "ip_notes": "No music-channel logos and no jewellery or champagne brand labels. Ticker text is user-defined. The chrome text is the natural slot for the user's own trademark."
+    },
+    {
+      "name": "Rooftop Pirate Signal",
+      "group": "UK Garage",
+      "inspiration": "Early-2000s London pirate-radio culture: tower-block rooftops at night, transmitter masts, sodium-lit estates, FM frequency readouts, SMS shout-outs on monochrome phone screens.",
+      "look": "A night skyline of tower blocks (stacked lit windows, some flickering) with a rooftop transmitter mast in the foreground and its blinking red aviation light. Sodium-orange haze rises from the streets below under a thin moon. Faint concentric light rings radiate from the mast as radio waves. In one corner, a seven-segment LCD frequency readout glows; across the bottom, shout-outs scroll in a dot-matrix phone font on a green monochrome LCD strip. Cinematic and moody: cool blues against sodium orange.",
+      "beat_mapping": "Two-step pattern: transmitter rings are emitted on the swung pattern. Beat: the mast light blinks on the 'and'. Swung hats: windows toggle in a shuffle pattern (deterministic per window and step). Bar: the camera trucks along the skyline one block per bar, eased. Phrase: the frequency readout re-tunes (digits roll) and the shout-out changes. Build: rings densify and static creeps into the LCD. Drop: every window lights in a cascade from bottom to top across 1 beat as the rings blast outward.",
+      "technique": "Fullscreen ShaderGenerator. Parallax silhouettes are procedural tower blocks: rectangles with window grids whose lit state = hash(windowId, swungStepIndex), a 2D take on BarCity's window logic. The mast is SDF line segments. Rings are radial bands from an emission list computed in TS on the swing grid (pure function of beat). Seven-segment digits are SDF segments. The dot-matrix ticker is a KineticType marquee layer through ledScreen with a rect shape mask, which already exists.",
+      "new_engine_pieces": [
+        "Swing/groove clock (shared with Two-Step Platinum)",
+        "Seven-segment SDF digit helper",
+        "Beat-indexed event-list helper for emissions"
+      ],
+      "perf_risk": "low",
+      "why_special": "It tells a real cultural story (pirate radio, estates, SMS shout-outs) instead of the 'garage = bling' cliché alone. The swing-locked window flicker turns the city into a step sequencer: moody, beautiful, unique.",
+      "effects": [
+        "bloom (threshold 0.7, strength 0.5)",
+        "grain (0.04)",
+        "ledScreen (ticker layer only)",
+        "vignette (0.4)"
+      ],
+      "palette": [
+        "#03050d",
+        "#0f1f3d",
+        "#d8641e",
+        "#9be564",
+        "#f2f5ff"
+      ],
+      "songs": [
+        "Love Will Tear Us Apart",
+        "Smalltown Boy",
+        "The Perfect Girl"
+      ],
+      "ip_notes": "Generic frequency and generic London-style architecture. No real station names or call signs. Shout-outs are user-defined."
+    },
+    {
+      "name": "Liquid Gel Meters",
+      "group": "Glossy Aero",
+      "inspiration": "2005–2010 glossy media-player skins and aero 'glass gel' buttons: aqua and lime pill capsules, top-half glass highlights, reflective black glass floors.",
+      "look": "An equalizer of tall glass gel capsules (rounded pills) on a mirror-black glass floor. Each capsule is a clear glass tube partly filled with glowing liquid (aqua, lime, tangerine), filled to the band level. The liquid surface tilts and sloshes, small bubbles rise inside, and a bright curved highlight sits across the upper half of each tube in the classic gel-button look. A floating glass bead marks each peak, and the floor shows a crisp gradient-faded reflection. Behind it, a soft cyan aurora glow and a slow light streak.",
+      "beat_mapping": "Kick: the liquid sloshes (surface tilt from a damped spring started on the beat grid; adjacent tubes alternate direction like a wave). Hat: bubble clusters release. Beat: the light streak behind steps across. Bar: liquid colours step one notch along the palette. Phrase: the layout alternates single row → mirrored centre → arc. Build: the liquid starts to boil (dense bubbles, surface jitter). Drop: every peak bead launches and falls back in a bounce over 1 bar, and the glass flashes a highlight sweep (local, no strobe).",
+      "technique": "Extends the SpectrumBars approach (BarAnalyzer bands, roundness, reflection, floor) as a new ShaderGenerator. Capsules are 2D rounded-box SDFs shaded as glass cylinders (normal from horizontal position: Fresnel edge, refracted background offset, curved top highlight). The liquid fill is the band height plus a tilt line h + tilt·x from a closed-form spring per beat. Bubbles are hashed per tube with rise phase from time. The reflection mirrors the lookup below the floor line with a fade.",
+      "new_engine_pieces": [
+        "Closed-form spring/slosh helper on the beat grid",
+        "Glass-cylinder 2D shading utility (shared with aero orbs)"
+      ],
+      "perf_risk": "low",
+      "why_special": "Brings an era-authentic, physically shaded equalizer to a category that is otherwise all neon bars. The liquid slosh on the kick makes it feel alive rather than meter-like.",
+      "effects": [
+        "bloom (threshold 0.8, strength 0.5)",
+        "lensFlare (new, very subtle streak)",
+        "vignette (0.3)"
+      ],
+      "palette": [
+        "#020a12",
+        "#0b3d4f",
+        "#18c3d6",
+        "#9ef01a",
+        "#f3fdff"
+      ],
+      "songs": [
+        "Message in a Bottle",
+        "Lovesong"
+      ],
+      "ip_notes": "No media-player skins, logos or button iconography copied. Capsule shapes are generic."
+    }
+  ],
+  "engine_notes": "Notes from reading the Phase 1–3 code (read-only, nothing changed):\n\n1) Determinism risks in existing generators. New concepts must avoid these patterns.\n- Tiles.ts picks cells with hash01(this.triggers…). That is an onset count since the generator was created, so preview and output diverge whenever one window opened later; its cell state also accumulates history.\n- Warp.ts integrates t from the first frame with energy/drop-dependent speed, so windows drift apart.\n- BarCity pushes spectrum rows from whatever frame each window samples.\n- KineticType's bounce flash decays with dt (minor).\n- Rule for all new work: discrete events (moves, flips, ripples, glints, emissions) come from beat indices via hash01(beatIndex, seed), and CPU state is replayed from a cycle start (the PixelArcade/DeStijl pattern). Onsets only drive decaying envelopes (env.kick and friends).\n\n2) A shared 'choreo' module of pure functions of ctx.beat is the most reused new piece:\n- stepAt(beat, every, dur, ease) → {index, t}\n- hold/overshoot steps\n- hop arcs\n- damped springs started at grid events\n- staggered cascades\n- cut-on-bar camera lists\n- phrase part sequencer\n- 'animate on twos' stepped time\n\n3) Swing/groove: AudioFrame has no swing or groove information. The UK garage looks need a swung 16th grid with pattern tables (two-step, shuffle, straight), set per preset at first. Later, swing could be estimated in the tempo worker from a histogram of hat-onset timing against the 16th grid.\n\n4) SceneGenerator base: generalise BarCity into Three.Scene + beat camera rig (orbit, dolly, cut, FOV punch from env.kick) + compileTargets.\n- Optional generator-owned fixed internal resolution (320×240 / 320×256 for authentic 90s) with a nearest upscale.\n- Layer targets are already full-res half-float with depth, so 3D scenes drop straight in.\n\n5) Quality: only renderScale reaches the engine today.\n- Add globals.quality (low/med/high/ultra) plus a per-generator internalScale, so raymarchers and ray tracers pick steps, bounces and spp.\n- The Phase 7 auto-quality controller should lower quality tiers before render scale.\n- Targets for a 3060 at 1080p60:\n  - SDF blobs: ~64 steps at 1.0×\n  - Ray-trace reel: 4 spp, 3 bounces\n- Integrated-GPU path: 0.5–0.75× internal scale, 1 spp, 32 steps.\n\n6) GLSL libraries to add beside shaders/common.ts:\n- SDF3 + sphere-trace loop\n- Analytic ray intersections\n- Procedural environments (studio softboxes, club gels, sky), shared by every chrome/glass/plastic look; the env lives in the shader, so no texture assets are needed\n- Thin-film iridescence\n- Bayer dither + palette quantize\n- Voronoi/caustics\n- Seven-segment and starburst SDFs\n- PSX vertex snap + affine UV. GLSL ES 3.00 has no noperspective, so pass uv·w and w and divide in the fragment shader.\n\n7) Type and logos: KineticType's atlas is coverage (R fill / G outline, re-thresholded), not a true SDF.\n- A shared SDF atlas (CPU EDT, glyph ids and bounds, bundled open-licence fonts, no typeface names in presets) unlocks bevel chrome, inflated, extruded, bitmap and light-weight type.\n- The same path should take user PNG/SVG logos (SVG → contours → ExtrudeGeometry). That is the Logo/Branding category and leaves room for the user's own trademarks in every text-bearing preset.\n\n8) New FX to register in registry.EFFECTS and createEffect (warmup then compiles them automatically):\n- vhs (YIQ chroma bleed, ringing, time-base wobble, head-switch band, dropouts, tracking band)\n- lowFi (pixelate + quantize + ordered dither)\n- starGlint (star filter: 1/4-res bright pass streaked along N angles)\n- lensFlare (ghosts, halo, anamorphic streak)\n- droplets (glass-pane refraction, beat-hashed spawns)\n- printPlates (spot inks, overprint, misregistration)\n- Any per-frame noise must be seeded from beat or time, not frameIndex: Grain currently uses ctx.frameIndex % 97, which differs between windows. Harmless for grain, but not for tracking glitches.\n\n9) Particles: use stateless instanced sprites with closed-form trajectories from (spawn beat, seed, age). They are deterministic and memory-flat for 4-hour sets. The planned 500k curl-noise ping-pong particle system won't match across windows unless it is stepped on a fixed beat clock from a phrase-aligned reset. Flag that before Phase 4 builds it.\n\n10) Generator inputs: tile thumbnails and in-scene screens need another layer's texture. The compositor already copies lower-layer outputs for luma masks (the masks map); expose them as an 'inputLayer' parameter.\n\n11) StrokeBatch has a constant halfWidth and colour per stroke. Ribbons and wand trails need per-vertex width (taper) and colour, which is a small extension.\n\n12) ShaderWarmup keeps one instance of every generator alive for the whole session. Heavy new generators (baked textures, big instanced buffers, extruded meshes) must allocate on first update, not in the constructor, or VRAM grows with every module added.\n\n13) Photosensitivity: the limiter is still Phase 7.\n- Until then, each concept self-caps: ≤3 large-area luminance jumps per second, limited saturated-red flashes, local glints preferred over full-frame flashes, lightning budgeted to 1 per beat with partial lift.\n- Suggested design: the output pass measures mean luma from a tiny downsample and clamps frame-to-frame deltas, and exposes a 'flash budget' API that generators can query.\n\n14) Palettes: era materials (chrome, gold, glass, sky, grass) shouldn't be fully palette-driven. Follow the Prism/PixelArcade paletteMix convention so palette cycling tints accents without breaking the period look. The output pass's IGN dither already handles banding on aero and Y2K gradients.\n\n15) Fonts: KineticType depends on system fonts (Segoe/Impact/Consolas), so macOS falls back. Bundling a few open-licence fonts (rounded heavy, condensed, light geometric sans, pixel/bitmap, serif) keeps looks consistent across machines."
+}
