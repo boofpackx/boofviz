@@ -34,6 +34,7 @@
         "kind": "kineticType",
         "params": {
           "text": "THE / UPSIDE / DROP",
+          "source": "text",
           "mode": "words",
           "font": "serif",
           "rows": 5,

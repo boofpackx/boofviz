@@ -58,6 +58,7 @@
         "kind": "kineticType",
         "params": {
           "text": "HUMAN / MACHINE",
+          "source": "text",
           "mode": "words",
           "font": "condensed",
           "rows": 5,

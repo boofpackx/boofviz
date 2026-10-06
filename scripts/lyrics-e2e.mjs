@@ -122,6 +122,20 @@ try {
   await output.screenshot({ path: join(outDir, 'lyrics.png') });
   await control.screenshot({ path: join(outDir, 'lyrics-control.png') });
 
+  // ---- Text looks sing along ------------------------------------------------------
+  await control.getByRole('button', { name: /Show lyrics over every look/ }).click();
+  check((await dbg(output, () => window.__BOOFVIZ_DEBUG__.liveText('text'))).kind === 'text', 'text looks keep their own words by default');
+  await control.getByRole('button', { name: /Put lyrics into text looks/ }).click();
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.load('builtin:space-crawl'));
+  await sleep(2500);
+  const sung = await dbg(output, () => ({ live: window.__BOOFVIZ_DEBUG__.liveText('text'), at: window.__BOOFVIZ_DEBUG__.lyricsAt(Date.now()) }));
+  const singing = sung.live.kind === 'lyrics' && sung.live.lines[sung.live.current] === (sung.at.text || '♪');
+  check(singing, `text looks show the line being sung ("${sung.live.lines[sung.live.current] ?? ''}", ${sung.live.lines.length} lines in the crawl window)`);
+  await output.screenshot({ path: join(outDir, 'lyrics-crawl.png') });
+  await control.getByRole('button', { name: /Put lyrics into text looks/ }).click();
+  await control.getByRole('button', { name: /Show lyrics over every look/ }).click();
+  await waitFor(output, () => window.__BOOFVIZ_DEBUG__.lyricsOverlay(), 8000);
+
   // ---- Pause freezes the position ---------------------------------------------
   await button('Pause').click();
   await waitFor(control, () => !window.__BOOFVIZ_DEBUG__.nowPlaying().playing, 5000);

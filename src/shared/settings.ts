@@ -40,6 +40,8 @@ export interface LyricsSettings {
   online: boolean;
   /** Lyrics drawn over every look (on top of the scene, not one of its layers). */
   overlay: { enabled: boolean; params: ParamBag };
+  /** Text looks set to "Text from: text" show the sung line instead (their own text when there are no lyrics). */
+  textLooks: boolean;
 }
 
 export interface Settings {
@@ -64,7 +66,7 @@ export const DEFAULT_SETTINGS: Settings = {
   library: { favorites: [], quantize: 'bar', autoShuffle: false, shuffleBars: 16, shufflePool: 'favorites' },
   spotify: { clientId: '' },
   // Overlay params are a partial bag: the lyrics generator's defaults fill the rest.
-  lyrics: { offsetMs: 0, online: true, overlay: { enabled: false, params: { mode: 'karaoke', position: 'lower', size: 0.7, backdrop: 0.45 } } },
+  lyrics: { offsetMs: 0, online: true, textLooks: false, overlay: { enabled: false, params: { mode: 'karaoke', position: 'lower', size: 0.7, backdrop: 0.45 } } },
 };
 
 type DeepPartial<T> = T extends readonly unknown[] ? T : T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;

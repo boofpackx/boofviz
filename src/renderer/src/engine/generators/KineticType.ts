@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GEN_HEADER } from '../shaders/common';
 import type { GenContext } from './Generator';
+import { liveText, type TextSource } from '../lyricsFeed';
 import { num, ShaderGenerator } from './ShaderGenerator';
 
 const ATLAS_W = 2048;
@@ -75,7 +76,7 @@ void main() {
   } else if (uMode == 4) {
     // Bouncing logo: changes colour on every wall hit, flashes on a corner hit.
     float w = uWidths[0] * ${ATLAS_W}.0 / ${ROW_H}.0;
-    float emPx = uRes.y * 0.16 * uSize;
+    float emPx = min(uRes.y * 0.16 * uSize, uRes.x * 0.9 / max(w, 0.1));
     vec2 box = vec2(w * emPx, emPx * uCapFrac * 1.4);
     vec2 pos = uBounce * (uRes - box);
     vec2 q = p - pos;
@@ -219,7 +220,11 @@ export class KineticType extends ShaderGenerator {
   update(ctx: GenContext): void {
     super.update(ctx);
     const p = ctx.params;
-    const text = String(p.text ?? 'BOOFVIZ');
+    const mode = String(p.mode ?? 'stack');
+    // Text from the preset, or live from the song: crawl shows a window of lines, the rest the current line.
+    const crawl = mode === 'crawl';
+    const live = liveText(String(p.source ?? 'text') as TextSource, Date.now(), 150, crawl ? 3 : 0, crawl ? 4 : 0);
+    const text = live.kind === 'text' ? String(p.text ?? 'BOOFVIZ') : crawl ? live.lines.join(' / ') : live.kind === 'title' ? live.lines.join(' / ') : live.lines[live.current];
     const font = String(p.font ?? 'heavy');
     const key = `${font}|${text}`;
     if (key !== this.key) {
@@ -227,7 +232,6 @@ export class KineticType extends ShaderGenerator {
       this.draw(text, font);
     }
     const u = this.u;
-    const mode = String(p.mode ?? 'stack');
     u.uMode.value = mode === 'punch' ? 1 : mode === 'words' ? 2 : mode === 'marquee' ? 3 : mode === 'bounce' ? 4 : mode === 'crawl' ? 5 : 0;
     if (mode === 'bounce') {
       // Pure function of time: x and y are triangle waves, each wall hit bumps the colour.
@@ -245,7 +249,10 @@ export class KineticType extends ShaderGenerator {
       u.uFlash.value = corner ? 1 : Math.max(0, (u.uFlash.value as number) - ctx.dt * 1.5);
     }
     u.uLines.value = this.words.length;
-    u.uCrawl.value = (ctx.time * num(p.speed, 1) * 0.08) % (this.words.length * 0.32 * num(p.size, 0.8) + 3);
+    if (crawl && live.kind === 'lyrics') {
+      // Sung lines recede into the distance over their own duration: the current line sits just above the bottom edge.
+      u.uCrawl.value = 0.35 + (live.current + live.progress) * 0.32 * num(p.size, 0.8);
+    } else u.uCrawl.value = (ctx.time * num(p.speed, 1) * 0.08) % (this.words.length * 0.32 * num(p.size, 0.8) + 3);
     u.uRowsN.value = Math.round(num(p.rows, 5));
     u.uScroll.value = (num(p.speed, 1) * ctx.beat) / 4;
     u.uSize.value = num(p.size, 0.8);

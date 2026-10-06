@@ -2,7 +2,8 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync, existsSync
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { lineIndexAt, lrcFileName, normalizeTitle, parseLrc, positionAt } from '@shared/lyrics';
+import { EMPTY_LYRICS, EMPTY_NOW_PLAYING, lineIndexAt, lrcFileName, normalizeTitle, parseLrc, positionAt } from '@shared/lyrics';
+import { liveText, lyricsFeed, setNowPlaying, setTrackLyrics } from '@/engine/lyricsFeed';
 import { LRCLIB_USER_AGENT, LyricsService, type TrackInfo } from '../src/main/lyrics';
 import { authorizeUrl, createPkce, pickArt, pkceChallenge, SpotifyClient, type SpotifyDeps, type TokenStore } from '../src/main/spotify';
 
@@ -386,5 +387,46 @@ describe('Spotify client', () => {
     expect(pickArt([img(640), img(300), img(64)])).toBe('u300');
     expect(pickArt([img(64), img(200)])).toBe('u200');
     expect(pickArt([])).toBeNull();
+  });
+});
+
+describe('text looks', () => {
+  const lines = [
+    { t: 1000, text: 'first line' },
+    { t: 3000, text: 'second line' },
+    { t: 5000, text: '' },
+    { t: 6000, text: 'third line' },
+  ];
+  const play = (progressMs: number): void => {
+    setNowPlaying({ ...EMPTY_NOW_PLAYING, connected: true, playing: false, trackId: 't1', title: 'A Song', artists: ['An Artist'], progressMs, sampleEpochMs: 0, durationMs: 60000 });
+    setTrackLyrics({ ...EMPTY_LYRICS, trackId: 't1', source: 'file', synced: lines });
+  };
+  beforeEach(() => {
+    lyricsFeed.offsetMs = 0;
+    lyricsFeed.textLooks = false;
+  });
+
+  it("keeps the look's own text unless asked, and when nothing plays", () => {
+    play(2000);
+    expect(liveText('text', 0, 0).kind).toBe('text');
+    lyricsFeed.textLooks = true;
+    expect(liveText('text', 0, 0).kind).toBe('lyrics');
+    setNowPlaying({ ...EMPTY_NOW_PLAYING });
+    expect(liveText('lyrics', 0, 0).kind).toBe('text');
+  });
+
+  it('shows the title before the first line and for title looks', () => {
+    play(500);
+    expect(liveText('lyrics', 0, 0)).toMatchObject({ kind: 'title', lines: ['A Song', 'An Artist'] });
+    play(2000);
+    expect(liveText('title', 0, 0).kind).toBe('title');
+  });
+
+  it('gives the current line, its progress and a window for the crawl', () => {
+    play(4000);
+    expect(liveText('lyrics', 0, 0)).toMatchObject({ kind: 'lyrics', lines: ['second line'], current: 0, progress: 0.5 });
+    const w = liveText('lyrics', 0, 0, 3, 4);
+    expect(w.lines).toEqual(['first line', 'second line', '♪', 'third line']);
+    expect(w.current).toBe(1);
   });
 });

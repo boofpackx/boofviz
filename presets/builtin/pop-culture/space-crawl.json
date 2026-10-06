@@ -53,6 +53,7 @@
         "kind": "kineticType",
         "params": {
           "text": "EPISODE 128 / THE LONG DROP / The dancefloor is restless. / Far away, in a dark warehouse, / a lone DJ guards the last / bassline in the galaxy. / Tonight the lights go down, / the speakers wake, / an",
+          "source": "text",
           "mode": "crawl",
           "font": "condensed",
           "rows": 5,

@@ -197,6 +197,7 @@ export const GENERATORS: ModuleDef[] = [
     description: 'Your text, animated to the beat: stacked marquees, punches, a word per beat, a corner-chasing bounce or a receding space crawl.',
     params: [
       t('text', 'Text', 'BOOFVIZ', 'Separate words with spaces or "/"'),
+      e('source', 'Text from', 'text', ['text', 'lyrics', 'title'], 'lyrics: the line being sung (Spotify) · title: song and artist · falls back to Text when nothing is playing'),
       e('mode', 'Mode', 'stack', ['stack', 'punch', 'words', 'marquee', 'bounce', 'crawl'], 'bounce: screensaver logo · crawl: lines split by "/" scroll into the distance'),
       e('font', 'Font', 'heavy', ['heavy', 'condensed', 'mono', 'serif']),
       i('rows', 'Rows', 5, 1, 12),

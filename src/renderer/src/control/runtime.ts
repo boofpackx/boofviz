@@ -49,7 +49,10 @@ function overlayLead(): number {
 
 // Now playing + lyrics from main (registered at load, so main's replay is never missed).
 connectLyricsFeed(window.boofviz, () => useControl.setState({ nowPlaying: lyricsFeed.now, trackLyrics: lyricsFeed.lyrics }));
-useControl.subscribe((s) => void (lyricsFeed.offsetMs = s.settings.lyrics.offsetMs));
+useControl.subscribe((s) => {
+  lyricsFeed.offsetMs = s.settings.lyrics.offsetMs;
+  lyricsFeed.textLooks = s.settings.lyrics.textLooks;
+});
 
 let ready = false;
 const pendingPorts: MessagePort[] = [];

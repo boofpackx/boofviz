@@ -31,6 +31,7 @@
         "kind": "kineticType",
         "params": {
           "text": "BOOFVIZ",
+          "source": "text",
           "mode": "punch",
           "font": "heavy",
           "rows": 5,

@@ -65,6 +65,7 @@
         "kind": "kineticType",
         "params": {
           "text": "POW / BAM / ZAP / WHAM / BOOM",
+          "source": "text",
           "mode": "words",
           "font": "heavy",
           "rows": 5,

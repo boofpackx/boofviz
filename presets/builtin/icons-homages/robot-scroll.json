@@ -33,6 +33,7 @@
         "kind": "kineticType",
         "params": {
           "text": "BEAT DETECTED · SYSTEM ONLINE ·",
+          "source": "text",
           "mode": "marquee",
           "font": "heavy",
           "rows": 5,

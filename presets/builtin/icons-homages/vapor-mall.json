@@ -82,6 +82,7 @@
         "kind": "kineticType",
         "params": {
           "text": "A E S T H E T I C / P L A Z A / 1 9 9 5",
+          "source": "text",
           "mode": "words",
           "font": "serif",
           "rows": 5,

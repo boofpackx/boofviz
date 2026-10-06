@@ -12,6 +12,8 @@ export const lyricsFeed = {
   lyrics: { ...EMPTY_LYRICS } as TrackLyrics,
   /** Settings offset (ms, positive = lyrics earlier). */
   offsetMs: 0,
+  /** Settings: text looks with "Text from: text" show lyrics too. */
+  textLooks: false,
   /** Bumped on every track / lyrics change. */
   version: 0,
 };
@@ -33,6 +35,48 @@ export function lyricAt(epochMs: number, leadMs = 0): { index: number; text: str
   const positionMs = songPositionMs(epochMs, leadMs);
   const index = lines ? lineIndexAt(lines, positionMs) : -1;
   return { index, text: lines?.[index]?.text ?? '', next: lines?.[index + 1]?.text ?? '', positionMs };
+}
+
+export type TextSource = 'text' | 'lyrics' | 'title';
+
+/** What a text look should show right now. */
+export interface LiveText {
+  /** 'text' means: use the look's own text. */
+  kind: 'text' | 'lyrics' | 'title';
+  /** Lines to show (lyrics: a window around the current line). */
+  lines: string[];
+  /** Index of the current line within `lines`. */
+  current: number;
+  /** 0..1 progress through the current line. */
+  progress: number;
+}
+
+const OWN_TEXT: LiveText = { kind: 'text', lines: [], current: 0, progress: 0 };
+
+/**
+ * Resolve a text look's source. Lyrics fall back to the song title (before
+ * the first line, or when the track has no synced lyrics), and both fall
+ * back to the look's own text when nothing is playing. `before`/`after` size
+ * the window of lines around the current one.
+ */
+export function liveText(source: TextSource, epochMs: number, leadMs = 150, before = 0, after = 0): LiveText {
+  const kind = source === 'text' && lyricsFeed.textLooks ? 'lyrics' : source;
+  const { now } = lyricsFeed;
+  if (kind === 'text' || !now.connected || !now.trackId) return OWN_TEXT;
+  const title: LiveText = { kind: 'title', lines: [now.title, now.artists.join(', ')].filter(Boolean), current: 0, progress: 0 };
+  if (kind === 'title') return title;
+  const lines = currentLines();
+  if (!lines?.length) return title;
+  const pos = songPositionMs(epochMs, leadMs);
+  const i = lineIndexAt(lines, pos);
+  if (i < 0) return title;
+  const first = Math.max(0, i - before);
+  const last = Math.min(lines.length - 1, i + after);
+  const t0 = lines[i].t;
+  const t1 = lines[i + 1]?.t ?? t0 + 4000;
+  // Instrumental gaps are empty lines: show the last sung words rather than nothing.
+  const window = lines.slice(first, last + 1).map((l) => l.text || '♪');
+  return { kind: 'lyrics', lines: window, current: i - first, progress: Math.min(1, Math.max(0, (pos - t0) / Math.max(1, t1 - t0))) };
 }
 
 export function setNowPlaying(s: NowPlaying): void {

@@ -240,12 +240,19 @@ function LyricsSection() {
 
 function OverlaySection() {
   const overlay = useControl((s) => s.settings.lyrics.overlay);
+  const textLooks = useControl((s) => s.settings.lyrics.textLooks);
   const update = useControl((s) => s.update);
   const p = overlay.params;
   const set = (params: Record<string, string | number>): void => update({ lyrics: { overlay: { params } } });
   return (
     <Section title="Overlay">
       <Toggle label="Show lyrics over every look" hint="Lyrics stay on top while presets change or shuffle" checked={overlay.enabled} onChange={(enabled) => update({ lyrics: { overlay: { enabled } } })} />
+      <Toggle
+        label="Put lyrics into text looks"
+        hint="Looks built from text (crawl, terminal, neon titles, word punches…) sing along in their own style; they show the song title before the first line and their own words when nothing is playing"
+        checked={textLooks}
+        onChange={(textLooks) => update({ lyrics: { textLooks } })}
+      />
       <Segmented
         value={String(p.mode ?? 'karaoke')}
         onChange={(mode) => set({ mode })}

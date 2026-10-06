@@ -5,7 +5,7 @@ import { DEFAULT_GLOBALS, type GlobalControls } from '@shared/types/engine';
 import { AudioFrameBuilder } from '@/audio/frameBuilder';
 import { ThreeRenderer } from '@/engine/three/ThreeRenderer';
 import { RenderLoop } from '@/engine/RenderLoop';
-import { connectLyricsFeed, lyricAt, lyricsFeed } from '@/engine/lyricsFeed';
+import { connectLyricsFeed, liveText, lyricAt, lyricsFeed, type TextSource } from '@/engine/lyricsFeed';
 import type { Settings } from '@shared/settings';
 import type { Scene } from '@shared/types/engine';
 
@@ -28,6 +28,7 @@ let renderer: ThreeRenderer | null = null;
   /** Current lyric line at an epoch time (with the overlay's lead), and what the overlay drew last frame. */
   lyricsAt: (ms: number) => lyricAt(ms, overlayLead()),
   lyricsOverlay: () => renderer?.lyricsInfo ?? null,
+  liveText: (source: TextSource) => liveText(source, Date.now(), 150, 3, 4),
   nowPlaying: () => ({ ...lyricsFeed.now, artDataUrl: lyricsFeed.now.artDataUrl ? '(data url)' : undefined }),
   trackLyrics: () => lyricsFeed.lyrics,
 };
@@ -40,6 +41,7 @@ const overlayLead = (): number => {
 const applyLyricsSettings = (s: Settings): void => {
   lyricsSettings = s.lyrics;
   lyricsFeed.offsetMs = s.lyrics.offsetMs;
+  lyricsFeed.textLooks = s.lyrics.textLooks;
   renderer?.setLyricsOverlay(s.lyrics.overlay);
 };
 
