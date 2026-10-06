@@ -171,7 +171,7 @@ function LyricsSection() {
       .then((text) => window.boofviz.saveLyricsForCurrentTrack(text))
       .then((e) => setDropMsg(e ?? `Attached ${file.name}`));
   };
-  const offset = (v: number): void => update({ lyrics: { offsetMs: Math.max(-2000, Math.min(2000, Math.round(v))) } });
+  const offset = (v: number): void => update({ lyrics: { offsetMs: Math.max(-10000, Math.min(10000, Math.round(v))) } });
 
   return (
     <Section title="Lyrics" right={<span className="text-[10px] text-ink-400">{status}</span>}>
@@ -181,15 +181,21 @@ function LyricsSection() {
         </div>
         <div className="min-h-[14px] truncate text-[11px] text-ink-400">{cur.next}</div>
       </div>
-      <Slider label="Offset" value={settings.offsetMs} min={-2000} max={2000} step={10} defaultValue={0} format={(v) => `${v > 0 ? '+' : ''}${v} ms`} onChange={offset} />
+      <Slider label="Offset" value={settings.offsetMs} min={-10000} max={10000} step={50} defaultValue={0} format={(v) => `${v > 0 ? '+' : ''}${(v / 1000).toFixed(2)} s`} onChange={offset} />
       <div className="flex items-center gap-1">
-        <Button onClick={() => offset(settings.offsetMs - 100)} title="Lyrics later">
-          −100 ms
+        <Button onClick={() => offset(settings.offsetMs - 1000)} title="Lyrics 1 s later">
+          −1 s
         </Button>
-        <Button onClick={() => offset(settings.offsetMs + 100)} title="Lyrics earlier">
-          +100 ms
+        <Button onClick={() => offset(settings.offsetMs - 100)} title="Lyrics 0.1 s later">
+          −0.1
         </Button>
-        <span className="ml-1 text-[10px] leading-tight text-ink-400">+ shows lines earlier</span>
+        <Button onClick={() => offset(settings.offsetMs + 100)} title="Lyrics 0.1 s earlier">
+          +0.1
+        </Button>
+        <Button onClick={() => offset(settings.offsetMs + 1000)} title="Lyrics 1 s earlier">
+          +1 s
+        </Button>
+        <span className="ml-1 text-[10px] leading-tight text-ink-400">− = later (more delay)</span>
       </div>
       <Toggle label="Search lyrics online" hint="Look up synced lyrics on LRCLIB when there's no local .lrc" checked={settings.online} onChange={(online) => update({ lyrics: { online } })} />
       <div
