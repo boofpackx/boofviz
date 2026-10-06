@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "name": "Op Waves",
+  "category": "Icons & Homages",
+  "tags": [
+    "op art",
+    "waves",
+    "monochrome",
+    "art",
+    "homage",
+    "trippy"
+  ],
+  "energy": 3,
+  "palette": "Mono",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "waves",
+      "name": "Waves",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "opArt",
+        "params": {
+          "mode": "waves",
+          "frequency": 1.1,
+          "amplitude": 0.6,
+          "contrast": 1.2,
+          "colorize": 0,
+          "motion": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.03,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Frequency",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.frequency",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Amplitude",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.amplitude",
+          "range": [
+            0.2,
+            1.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Motion",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.motion",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Colour",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.colorize",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Contrast",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.contrast",
+          "range": [
+            0.6,
+            1.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "description": "Black and white stripes rippling until they shimmer: the 1960s British op-art paintings that make your eyes buzz."
+}

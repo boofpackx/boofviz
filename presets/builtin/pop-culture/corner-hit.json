@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "name": "Corner Hit",
+  "category": "Pop Culture",
+  "tags": [
+    "screensaver",
+    "logo",
+    "bounce",
+    "retro",
+    "meme",
+    "internet"
+  ],
+  "energy": 2,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "logo",
+      "name": "Logo",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "BOOFVIZ",
+          "mode": "bounce",
+          "font": "heavy",
+          "rows": 5,
+          "speed": 1,
+          "size": 1.2,
+          "stretch": 0,
+          "outline": 0.5,
+          "wordBeats": 1,
+          "skew": -0.1,
+          "punch": 0.2
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.6,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.7,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.5,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.375,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lean",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.skew",
+          "range": [
+            -0.3,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "description": "Your logo drifting around and bouncing off the edges, changing colour on every hit and flashing when it nails a corner: the idle disc-player screensaver everyone stared at, waiting for the corner. Edit the text in the Inspector."
+}

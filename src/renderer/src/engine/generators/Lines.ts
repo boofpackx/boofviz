@@ -1,6 +1,6 @@
 import type * as THREE from 'three';
 import { StrokeBatch } from '../three/StrokeBatch';
-import type { GenContext, Generator } from './Generator';
+import type { CompileTarget, GenContext, Generator } from './Generator';
 import { num } from './ShaderGenerator';
 
 const PTS = 128;
@@ -8,7 +8,7 @@ const MAX_LINES = 80;
 
 /**
  * Minimal line work. "joy": stacked spectrum-history ridge lines with hidden-
- * line occlusion (the Unknown Pleasures look). "horizontal": lines displaced by
+ * line occlusion (the classic post-punk pulsar-plot sleeve). "horizontal": lines displaced by
  * the waveform. "radial": concentric rings deformed by the spectrum.
  */
 export class Lines implements Generator {
@@ -119,6 +119,40 @@ export class Lines implements Generator {
         if (glow > 0) b.stroke(this.pts, PTS, thick * 4, cr, cg, cb, 0.25 * glow, 1, false);
         b.stroke(this.pts, PTS, thick, cr * lift * (0.6 + tt * 0.6), cg * lift, cb * lift * (1.2 - tt * 0.4), 1, 0, false);
       }
+    } else if (mode === 'flow') {
+      // Streamlines of a uniform flow around a moving ball (potential flow past a
+      // cylinder): ψ = y·(1 − R²/r²). Each line keeps its ψ, so it bends around the ball.
+      b.setBlend('additive');
+      const R = H * (0.12 + 0.05 * ctx.env.bass) * (0.6 + amp);
+      const t = ctx.time * num(p.speed, 1) * 0.15;
+      const bx = W * (0.5 + 0.28 * Math.sin(t * 0.9));
+      const by = H * (0.5 + 0.22 * Math.sin(t * 1.3 + 1));
+      const pts = PTS;
+      for (let li = 0; li < count; li++) {
+        const psi = (li / (count - 1) - 0.5) * H * spread * 1.15;
+        for (let k = 0; k < pts; k++) {
+          const x = (k / (pts - 1)) * W * 1.1 - W * 0.05;
+          const dx = x - bx;
+          // Solve y·(1 − R²/(dx² + y²)) = ψ for y on the same side as ψ (a few Newton steps).
+          let y = psi + Math.sign(psi || 1) * R * 0.5;
+          for (let it = 0; it < 6; it++) {
+            const r2 = dx * dx + y * y;
+            const f = y * (1 - (R * R) / r2) - psi;
+            const df = 1 - (R * R) / r2 + (2 * R * R * y * y) / (r2 * r2);
+            y -= f / (Math.abs(df) > 1e-3 ? df : 1e-3);
+          }
+          if (Math.abs(y) < R * 1.01 && Math.sign(y) !== Math.sign(psi || 1)) y = Math.sign(psi || 1) * R * 1.01;
+          this.pts[k * 2] = x;
+          this.pts[k * 2 + 1] = by + y;
+        }
+        const tt = li / (count - 1);
+        const c0 = Math.min(3, Math.floor(tt * 3) + 1);
+        const f = tt * 3 - (c0 - 1);
+        const r = pal[c0 * 3] + (pal[Math.min(4, c0 + 1) * 3] - pal[c0 * 3]) * f;
+        const g = pal[c0 * 3 + 1] + (pal[Math.min(4, c0 + 1) * 3 + 1] - pal[c0 * 3 + 1]) * f;
+        const bl = pal[c0 * 3 + 2] + (pal[Math.min(4, c0 + 1) * 3 + 2] - pal[c0 * 3 + 2]) * f;
+        b.stroke(this.pts, pts, thick, r * lift, g * lift, bl * lift, 1, 0, false);
+      }
     } else {
       b.setBlend('additive');
       const maxR = H * 0.5 * spread;
@@ -139,6 +173,10 @@ export class Lines implements Generator {
       }
     }
     b.draw(renderer, target, true);
+  }
+
+  compileTargets(): CompileTarget[] {
+    return [this.batch.compileTarget];
   }
 
   dispose(): void {

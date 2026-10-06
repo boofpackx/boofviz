@@ -1,0 +1,250 @@
+{
+  "schema": 1,
+  "name": "56k Handshake",
+  "category": "Pop Culture",
+  "tags": [
+    "dial-up",
+    "modem",
+    "internet",
+    "90s",
+    "terminal",
+    "retro",
+    "computer"
+  ],
+  "energy": 3,
+  "palette": "Terminal",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "spec",
+      "name": "Handshake spectrum",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "spectrogram",
+        "params": {
+          "direction": "left",
+          "speed": 1.4,
+          "contrast": 2.4,
+          "floor": 0.1,
+          "glow": 1,
+          "perspective": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.6,
+            "scanlines": 0.7,
+            "mask": 0.45,
+            "vignette": 0.6
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "scope",
+      "name": "Line noise",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "scope",
+        "params": {
+          "mode": "wave",
+          "thickness": 2,
+          "gain": 1.6,
+          "glow": 1,
+          "smoothing": 0,
+          "color": 0.9,
+          "radius": 0.28,
+          "length": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.6,
+            "scanlines": 0.7,
+            "mask": 0.45,
+            "vignette": 0.6
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 0.8,
+      "modulators": []
+    },
+    {
+      "id": "term",
+      "name": "Terminal",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "ATDT 555 0156 / CARRIER 33600 / PROTOCOL: V.90 / COMPRESSION: V.42BIS / CONNECT 56000 / WELCOME!",
+          "mode": "words",
+          "font": "mono",
+          "rows": 5,
+          "speed": 1,
+          "size": 0.45,
+          "stretch": 0,
+          "outline": 0,
+          "wordBeats": 4,
+          "skew": 0,
+          "punch": 0.03
+        }
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.6,
+            "scanlines": 0.7,
+            "mask": 0.45,
+            "vignette": 0.6
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.7,
+            "threshold": 0.4,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.06,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Scroll",
+      "value": 0.307,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Contrast",
+      "value": 0.8,
+      "targets": [
+        {
+          "path": "layers.0.source.params.contrast",
+          "range": [
+            0.8,
+            2.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Noise",
+      "value": 0.8,
+      "targets": [
+        {
+          "path": "layers.1.opacity",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Terminal",
+      "value": 1,
+      "targets": [
+        {
+          "path": "layers.2.opacity",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Beats/line",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.2.source.params.wordBeats",
+          "range": [
+            1,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tube",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.curvature",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Terminal": [
+      "#000000",
+      "#002200",
+      "#00a83c",
+      "#33ff66",
+      "#d8ffe0"
+    ]
+  },
+  "description": "Screeching handshake tones painted as a green spectrogram behind modem line noise, while a CRT terminal dials, negotiates and finally connects: the sound of 90s internet."
+}

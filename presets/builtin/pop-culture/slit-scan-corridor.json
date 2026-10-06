@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "name": "Slit-Scan Corridor",
+  "category": "Pop Culture",
+  "tags": [
+    "space",
+    "corridor",
+    "psychedelic",
+    "film",
+    "sci-fi",
+    "trippy"
+  ],
+  "energy": 4,
+  "palette": "Slit-Scan",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "lfo",
+    "rate": 0.05,
+    "amount": 60
+  },
+  "layers": [
+    {
+      "id": "gate",
+      "name": "Corridor",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "warp",
+        "params": {
+          "mode": "corridor",
+          "speed": 1,
+          "density": 1,
+          "streak": 0.5,
+          "twist": 0.15
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.4,
+            "threshold": 0.8,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": -0.7,
+            "contrast": 1,
+            "saturation": 1.3,
+            "hue": 0,
+            "temperature": 0
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.04,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Twist",
+      "value": 0.575,
+      "targets": [
+        {
+          "path": "layers.0.source.params.twist",
+          "range": [
+            -1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Streak",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.streak",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.125,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0.2,
+            1.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Density",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.density",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Slit-Scan": [
+      "#050010",
+      "#3a0a6a",
+      "#ff3d00",
+      "#00c2ff",
+      "#fff2b0"
+    ]
+  },
+  "description": "Hurtling down a corridor of streaming coloured light between two infinite walls: the slit-scan sequence from the 1968 space odyssey."
+}

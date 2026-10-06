@@ -46,7 +46,7 @@ export interface FxInstance {
   params: ParamBag;
 }
 
-export type MaskShape = 'circle' | 'rect' | 'ring' | 'linear';
+export type MaskShape = 'circle' | 'rect' | 'ring' | 'linear' | 'triangle';
 
 export interface LayerMask {
   /** luma: use the brightness of a lower layer; shape: a procedural shape. */
@@ -204,6 +204,8 @@ export const PRESET_CATEGORIES = [
   'Retro / Glitch',
   'Club / Strobe',
   'Logo / Branding',
+  'Icons & Homages',
+  'Pop Culture',
 ] as const;
 export type PresetCategory = (typeof PRESET_CATEGORIES)[number];
 

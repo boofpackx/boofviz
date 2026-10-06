@@ -92,7 +92,7 @@ function normalizeMask(raw: unknown): LayerMask | undefined {
   const type = oneOf(raw.type, ['luma', 'shape'] as const, 'shape');
   const mask: LayerMask = { type, size: num(raw.size, 0.5, 0, 2), feather: num(raw.feather, 0.1, 0, 1), invert: raw.invert === true };
   if (type === 'luma') mask.layer = Math.round(num(raw.layer, 0, 0, MAX_LAYERS - 1));
-  else mask.shape = oneOf(raw.shape, ['circle', 'rect', 'ring', 'linear'] as const, 'circle');
+  else mask.shape = oneOf(raw.shape, ['circle', 'rect', 'ring', 'linear', 'triangle'] as const, 'circle');
   return mask;
 }
 

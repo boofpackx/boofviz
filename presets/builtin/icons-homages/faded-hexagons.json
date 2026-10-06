@@ -1,0 +1,226 @@
+{
+  "schema": 1,
+  "name": "Faded Hexagons",
+  "category": "Icons & Homages",
+  "tags": [
+    "polygon",
+    "hexagon",
+    "idm",
+    "nostalgic",
+    "film",
+    "mellow"
+  ],
+  "energy": 1,
+  "palette": "Film Stock",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "lfo",
+    "rate": 0.03,
+    "amount": 12
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Backdrop",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "radial",
+          "from": 0.45,
+          "to": 0,
+          "intensity": 0.5,
+          "motion": 0.15,
+          "pulse": 0.1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "hex",
+      "name": "Hexagons",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "polygon",
+        "params": {
+          "sides": 6,
+          "roundness": 0,
+          "beatMorph": 0,
+          "size": 0.34,
+          "copies": 1,
+          "spread": 0.25,
+          "nested": 7,
+          "nestScale": 0.8,
+          "nestOffset": 0,
+          "twist": 0.03,
+          "spin": 0.03,
+          "angle": 0,
+          "offsetY": 0,
+          "stroke": 0.005,
+          "fill": 0,
+          "glow": 0.9,
+          "pulse": 0.08,
+          "colorSpread": 0.7,
+          "background": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.75,
+            "zoom": 0.004,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.5,
+            "radius": 0.8,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.12,
+            "size": 1.6
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": -0.1,
+            "contrast": 0.9,
+            "saturation": 0.7,
+            "hue": 0,
+            "temperature": 0.35
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.6,
+            "size": 0.75,
+            "softness": 0.7
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Warmth",
+      "value": 0.7,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.amount",
+          "range": [
+            0.4,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.65,
+      "targets": [
+        {
+          "path": "layers.1.source.params.spin",
+          "range": [
+            -0.1,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rings",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.nested",
+          "range": [
+            3,
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.429,
+      "targets": [
+        {
+          "path": "layers.1.fx.1.params.strength",
+          "range": [
+            0,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.24,
+            0.44
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Twist",
+      "value": 0.688,
+      "targets": [
+        {
+          "path": "layers.1.source.params.twist",
+          "range": [
+            -0.08,
+            0.08
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "description": "Nested hexagons glowing through faded 70s film stock, warm and wobbly, for slow electronica and nostalgic downtempo."
+}

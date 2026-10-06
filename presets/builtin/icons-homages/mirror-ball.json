@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "name": "Mirror Ball",
+  "category": "Icons & Homages",
+  "tags": [
+    "disco",
+    "mirror ball",
+    "club",
+    "70s",
+    "sparkle",
+    "party"
+  ],
+  "energy": 4,
+  "palette": "Disco",
+  "paletteCycle": {
+    "mode": "bar",
+    "every": 2,
+    "fadeBeats": 1,
+    "list": [
+      "Disco",
+      "Sunset",
+      "Neon",
+      "Vaporwave"
+    ]
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "ball",
+      "name": "Mirror ball",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "orb",
+        "params": {
+          "mode": "mirrorball",
+          "size": 1,
+          "spin": 1,
+          "tilt": 0.3,
+          "beams": 1.2
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.75,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.35,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Spin",
+      "value": 0.75,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            -2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Beams",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.beams",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.6,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.188,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0.3,
+            1.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tilt",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.tilt",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Disco": [
+      "#05030a",
+      "#2a0f4a",
+      "#ff3cac",
+      "#2bd2ff",
+      "#fff6d5"
+    ]
+  },
+  "bpmHint": [
+    110,
+    128
+  ],
+  "description": "A spinning mirror ball throwing coloured beams and sparkles around the room, the colours changing every bar."
+}

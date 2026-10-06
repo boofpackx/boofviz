@@ -3,6 +3,11 @@ import type { Macro } from '@shared/types/engine';
 import { generatorDef, specForLayerPath } from '@/engine/registry';
 import { splitScenePath } from '@/engine/scenePlan';
 import { useShow } from '../show';
+import { useControl } from '../store';
+import { engine } from '../runtime';
+import { useTicker } from '../hooks';
+import { shuffleNow } from '../launcher';
+import type { LaunchQuantize } from '@shared/settings';
 import { contextMenu } from './ContextMenu';
 import { Button } from './ui';
 
@@ -153,7 +158,9 @@ export function MacroStrip() {
         ))}
       </div>
 
-      <div className="flex w-28 shrink-0 flex-col justify-center gap-1">
+      <LaunchControls />
+
+      <div className="flex w-20 shrink-0 flex-col justify-center gap-1">
         <Button onClick={undo} title="Undo (Ctrl+Z)" className={canUndo ? '' : 'opacity-40'}>
           ↶ Undo
         </Button>
@@ -164,6 +171,76 @@ export function MacroStrip() {
 
       {editing !== null && <MacroEditor index={editing} macro={doc.macros[editing]} onClose={() => setEditing(null)} />}
       {toast && <div className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 rounded-full border border-ink-600 bg-ink-850 px-3 py-1 text-[11px] text-ink-100 shadow-lg">{toast}</div>}
+    </div>
+  );
+}
+
+/** Launch quantize, shuffle and auto-shuffle, plus the queued-launch countdown. */
+function LaunchControls() {
+  useTicker(12);
+  const lib = useControl((s) => s.settings.library);
+  const update = useControl((s) => s.update);
+  const queued = useShow((s) => s.queued);
+  const cancel = useShow((s) => s.cancelQueued);
+  const favCount = lib.favorites.length;
+  const beatsLeft = queued ? Math.max(0, queued.atBeat - engine.builder.frame.beat) : 0;
+  const q: Array<[LaunchQuantize, string]> = [
+    ['now', 'Now'],
+    ['beat', 'Beat'],
+    ['bar', 'Bar'],
+    ['phrase', 'Phr'],
+  ];
+  return (
+    <div className="flex w-[196px] shrink-0 flex-col justify-center gap-1">
+      <div className="flex rounded border border-ink-600 bg-ink-850 p-0.5" title="When a picked preset goes live">
+        {q.map(([v, label]) => (
+          <button
+            key={v}
+            type="button"
+            onClick={() => update({ library: { quantize: v } })}
+            className={`flex-1 rounded-sm px-1 py-0.5 text-[10px] ${lib.quantize === v ? 'bg-ink-600 text-ink-100' : 'text-ink-400 hover:text-ink-200'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="flex gap-1">
+        <Button onClick={shuffleNow} title={`Shuffle (S) from ${lib.shufflePool === 'favorites' && favCount >= 2 ? `${favCount} favorites` : 'all presets'}`} className="flex-1">
+          ⤮ Shuffle
+        </Button>
+        <Button active={lib.autoShuffle} onClick={() => update({ library: { autoShuffle: !lib.autoShuffle } })} title="Auto-shuffle on the phrase">
+          Auto
+        </Button>
+        <select value={lib.shuffleBars} onChange={(e) => update({ library: { shuffleBars: Number(e.target.value) } })} className="text-[10px]" title="Auto-shuffle every N bars">
+          {[4, 8, 16, 32, 64].map((n) => (
+            <option key={n} value={n}>
+              {n} bars
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="flex h-4 items-center gap-1 text-[10px]">
+        {queued ? (
+          <>
+            <span className="truncate text-accent-2">
+              Next: {queued.entry.preset.name} in {beatsLeft.toFixed(1)} beats
+            </span>
+            <button type="button" onClick={cancel} className="text-ink-400 hover:text-bad" title="Cancel (Esc)">
+              ✕
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            className="truncate text-ink-500 hover:text-ink-300"
+            onClick={() => update({ library: { shufflePool: lib.shufflePool === 'favorites' ? 'all' : 'favorites' } })}
+            title="Click to switch the shuffle pool"
+          >
+            Pool: {lib.shufflePool === 'favorites' ? `★ favorites (${favCount})` : 'all presets'}
+            {lib.shufflePool === 'favorites' && favCount < 2 ? ' · star 2+ to use' : ''}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

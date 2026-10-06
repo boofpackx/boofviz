@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "name": "Prism Spectrum",
+  "category": "Icons & Homages",
+  "tags": [
+    "prism",
+    "rainbow",
+    "album art",
+    "homage",
+    "70s",
+    "prog"
+  ],
+  "energy": 2,
+  "palette": "Prism",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "prism",
+      "name": "Prism",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "prism",
+        "params": {
+          "size": 0.3,
+          "spread": 0.55,
+          "beam": 1,
+          "glow": 0.8,
+          "tilt": 0,
+          "paletteMix": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.7,
+            "threshold": 0.7,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.035,
+            "size": 1
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.3,
+            "size": 0.9,
+            "softness": 0.6
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Beam",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.beam",
+          "range": [
+            0.4,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spread",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spread",
+          "range": [
+            0.2,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.437,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.22,
+            0.38
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tilt",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.tilt",
+          "range": [
+            -0.15,
+            0.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tint",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.paletteMix",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grain",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.amount",
+          "range": [
+            0,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Prism": [
+      "#000000",
+      "#07070a",
+      "#30303a",
+      "#c9ccd6",
+      "#ffffff"
+    ]
+  },
+  "description": "A white beam through a glass prism fans out into a rainbow, each band lit by its slice of the spectrum: the classic 1973 prog-rock sleeve."
+}

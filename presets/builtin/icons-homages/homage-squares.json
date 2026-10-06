@@ -1,0 +1,221 @@
+{
+  "schema": 1,
+  "name": "Homage Squares",
+  "category": "Icons & Homages",
+  "tags": [
+    "squares",
+    "colour field",
+    "art",
+    "homage",
+    "minimal",
+    "mellow"
+  ],
+  "energy": 1,
+  "palette": "Glow Squares",
+  "paletteCycle": {
+    "mode": "phrase",
+    "every": 2,
+    "fadeBeats": 8,
+    "list": [
+      "Glow Squares",
+      "Grey Squares",
+      "Green Squares"
+    ]
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Wall",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "vertical",
+          "from": 0,
+          "to": 0.05,
+          "intensity": 0.35,
+          "motion": 0.05,
+          "pulse": 0.05
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "squares",
+      "name": "Squares",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "polygon",
+        "params": {
+          "sides": 4,
+          "roundness": 0,
+          "beatMorph": 0,
+          "size": 0.6,
+          "copies": 1,
+          "spread": 0.25,
+          "nested": 4,
+          "nestScale": 0.76,
+          "nestOffset": 0.22,
+          "twist": 0,
+          "spin": 0,
+          "angle": 45,
+          "offsetY": 0,
+          "stroke": 0,
+          "fill": 1,
+          "glow": 0,
+          "pulse": 0.02,
+          "colorSpread": 0.9,
+          "background": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.04,
+            "size": 1
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1.05,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Squares",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.nested",
+          "range": [
+            2,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sink",
+      "value": 0.489,
+      "targets": [
+        {
+          "path": "layers.1.source.params.nestOffset",
+          "range": [
+            0,
+            0.45
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Step",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.nestScale",
+          "range": [
+            0.66,
+            0.86
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Colour steps",
+      "value": 0.833,
+      "targets": [
+        {
+          "path": "layers.1.source.params.colorSpread",
+          "range": [
+            0.4,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Breath",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.1.source.params.pulse",
+          "range": [
+            0,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hue",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.1.params.hue",
+          "range": [
+            -40,
+            40
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Glow Squares": [
+      "#3a2414",
+      "#b4561b",
+      "#e08a2c",
+      "#f2bd4a",
+      "#f6dc8a"
+    ],
+    "Grey Squares": [
+      "#23262b",
+      "#4f5866",
+      "#7f8b99",
+      "#b5bcc4",
+      "#e4e2da"
+    ],
+    "Green Squares": [
+      "#1d2a1a",
+      "#3f6b3a",
+      "#7da35a",
+      "#c4cf7a",
+      "#eee8b5"
+    ]
+  },
+  "description": "Flat squares nested inside each other, each sitting a little lower, the colours shifting slowly with the phrase: the mid-century colour-field series."
+}

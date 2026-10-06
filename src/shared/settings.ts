@@ -19,6 +19,20 @@ export interface OutputSettings {
   openOnLaunch: boolean;
 }
 
+export type LaunchQuantize = 'now' | 'beat' | 'bar' | 'phrase';
+
+export interface LibrarySettings {
+  /** Preset ids starred by the user, in the order they were starred (keys 1–9 launch the first nine). */
+  favorites: string[];
+  /** When a picked preset goes live. */
+  quantize: LaunchQuantize;
+  autoShuffle: boolean;
+  /** Auto-shuffle interval in bars. */
+  shuffleBars: number;
+  /** Shuffle from favorites (falls back to every preset when there are none). */
+  shufflePool: 'favorites' | 'all';
+}
+
 export interface Settings {
   version: 1;
   input: InputSettings;
@@ -26,6 +40,7 @@ export interface Settings {
   output: OutputSettings;
   globals: GlobalControls;
   ui: { showHud: boolean };
+  library: LibrarySettings;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -35,6 +50,7 @@ export const DEFAULT_SETTINGS: Settings = {
   output: { fullscreen: false, renderScale: 1, openOnLaunch: true },
   globals: DEFAULT_GLOBALS,
   ui: { showHud: true },
+  library: { favorites: [], quantize: 'bar', autoShuffle: false, shuffleBars: 16, shufflePool: 'favorites' },
 };
 
 type DeepPartial<T> = T extends readonly unknown[] ? T : T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;

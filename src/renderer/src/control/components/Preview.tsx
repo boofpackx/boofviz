@@ -35,7 +35,9 @@ export function Preview() {
       renderer.setScene(currentScene());
       preview.renderer = renderer;
       unsubscribe = useShow.subscribe((s, prev) => {
-        if (s.doc !== prev.doc) renderer.setScene(sceneOf(s.doc));
+        if (s.doc !== prev.doc || (s.queued !== prev.queued && !s.queued)) renderer.setScene(sceneOf(s.doc));
+        // A queued launch goes live on its beat in the preview exactly as in the output.
+        if (s.queued && (s.queued !== prev.queued || s.doc !== prev.doc)) renderer.setScene(sceneOf(s.queued.entry.preset), s.queued.atBeat);
       });
       const fit = (): void => {
         const r = wrap.getBoundingClientRect();

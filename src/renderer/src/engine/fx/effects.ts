@@ -19,6 +19,8 @@ export interface Effect {
   readonly kind: string;
   render(renderer: THREE.WebGLRenderer, input: THREE.WebGLRenderTarget, out: THREE.WebGLRenderTarget, params: ParamBag, ctx: FxContext): THREE.WebGLRenderTarget;
   resize?(w: number, h: number): void;
+  /** Passes whose shaders can be compiled in the background before first use. */
+  compileTargets?(): FullscreenPass[];
   dispose(): void;
 }
 
@@ -75,6 +77,10 @@ class SimpleEffect implements Effect {
     this.apply(u, params, ctx);
     this.pass.render(renderer, out);
     return out;
+  }
+
+  compileTargets(): FullscreenPass[] {
+    return [this.pass];
   }
 
   dispose(): void {
@@ -178,6 +184,108 @@ void main() {
   fragColor = vec4(max(c.rgb + g * uAmount * (0.35 + w), 0.0), c.a);
 }`;
 
+const HALFTONE = `${HEADER}
+${PALETTE_GLSL}
+uniform float uCell; uniform float uAngle; uniform int uMode; uniform float uMix;
+float screenDot(vec2 frag, float ang, float cell, out vec2 center) {
+  mat2 r = rot2(ang);
+  vec2 q = r * frag / cell;
+  vec2 id = floor(q) + 0.5;
+  center = transpose(r) * (id * cell);
+  return length(q - id);
+}
+void main() {
+  vec4 src = texture(uInput, vUv);
+  vec2 frag = gl_FragCoord.xy;
+  vec3 col;
+  if (uMode == 2) {
+    // CMYK screens at the classic angles, printed on paper.
+    vec3 paper = vec3(0.95, 0.93, 0.88);
+    col = paper;
+    float angs[4] = float[4](0.2618, 1.309, 0.0, 0.7854);
+    vec3 inks[4] = vec3[4](vec3(0.0, 0.6, 0.85), vec3(0.85, 0.1, 0.5), vec3(0.98, 0.85, 0.0), vec3(0.08));
+    for (int i = 0; i < 4; i++) {
+      vec2 c;
+      float d = screenDot(frag, angs[i] + uAngle, uCell, c);
+      vec3 s = clamp(texture(uInput, c / uRes).rgb, 0.0, 1.0);
+      vec3 cmy = 1.0 - s;
+      float k = min(cmy.r, min(cmy.g, cmy.b));
+      float amt = i == 0 ? cmy.r - k : i == 1 ? cmy.g - k : i == 2 ? cmy.b - k : k;
+      float r = sqrt(max(amt, 0.0)) * 0.62;
+      float on = 1.0 - smoothstep(r - 0.06, r + 0.06, d);
+      col = mix(col, col * inks[i] * 1.05, on * 0.92);
+    }
+  } else {
+    vec2 c;
+    float d = screenDot(frag, uAngle, uCell, c);
+    vec3 s = texture(uInput, c / uRes).rgb;
+    float l = clamp(luma(s), 0.0, 1.0);
+    float r = sqrt(l) * 0.62;
+    float on = 1.0 - smoothstep(r - 0.06, r + 0.06, d);
+    // 0: dots in the image's own colours on black; 1: palette ink on paper (comic print).
+    col = uMode == 0 ? s * on * 1.5 : mix(uPal[4], uPal[0], on);
+  }
+  fragColor = vec4(mix(src.rgb, col, uMix), max(src.a, uMix));
+}`;
+
+const LED_SCREEN = `${HEADER}
+uniform float uCell; uniform float uGap; uniform float uGlowAmt;
+void main() {
+  vec2 cell = floor(gl_FragCoord.xy / uCell);
+  vec2 f = fract(gl_FragCoord.xy / uCell) - 0.5;
+  vec4 s = texture(uInput, (cell + 0.5) * uCell / uRes);
+  float d = length(f);
+  float r = 0.5 - uGap;
+  float led = 1.0 - smoothstep(r - 0.08, r + 0.02, d);
+  vec3 c = s.rgb * led * 1.5 + s.rgb * exp(-d * 6.0) * 0.25 * uGlowAmt;
+  // Unlit diodes stay faintly visible, like a real panel.
+  c += vec3(0.02) * led;
+  fragColor = vec4(c, 1.0);
+}`;
+
+const POP_GRID = `${HEADER}
+${PALETTE_GLSL}
+uniform float uTiles; uniform float uHueStep; uniform float uLevels;
+vec3 hueRotate(vec3 c, float a) {
+  const vec3 k = vec3(0.57735);
+  float ca = cos(a);
+  return c * ca + cross(k, c) * sin(a) + k * dot(k, c) * (1.0 - ca);
+}
+void main() {
+  vec2 g = vUv * uTiles;
+  vec2 id = floor(g);
+  vec2 uv = fract(g);
+  vec3 s = texture(uInput, uv).rgb;
+  // Each tile: posterised, then pushed to its own flat colour scheme (screen-print look).
+  float l = clamp(luma(s) / (1.0 + luma(s)) * 1.8, 0.0, 1.0);
+  float q = floor(l * uLevels) / max(uLevels - 1.0, 1.0);
+  float tileIdx = id.x + id.y * uTiles;
+  vec3 c = palette(fract(q * 0.85 + tileIdx * 0.21));
+  c = max(hueRotate(c, tileIdx * uHueStep), 0.0) * (0.6 + 0.8 * q);
+  // Thin white gutters between tiles.
+  vec2 e = min(uv, 1.0 - uv) * uRes / uTiles;
+  c = mix(vec3(0.95), c, smoothstep(1.0, 3.0, min(e.x, e.y)));
+  fragColor = vec4(c, 1.0);
+}`;
+
+const CRT = `${HEADER}
+uniform float uCurve; uniform float uScan; uniform float uMask; uniform float uVig;
+void main() {
+  vec2 p = vUv * 2.0 - 1.0;
+  p *= 1.0 + uCurve * 0.12 * dot(p.yx, p.yx);
+  vec2 uv = p * 0.5 + 0.5;
+  if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) { fragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
+  float off = 1.2 / uRes.x;
+  vec3 c = vec3(texture(uInput, uv + vec2(off, 0.0)).r, texture(uInput, uv).g, texture(uInput, uv - vec2(off, 0.0)).b);
+  float line = 0.5 + 0.5 * sin(uv.y * uRes.y * 3.14159);
+  c *= mix(1.0, 0.55 + 0.6 * line, uScan);
+  int m = int(mod(gl_FragCoord.x, 3.0));
+  vec3 mask = m == 0 ? vec3(1.0, 0.7, 0.7) : m == 1 ? vec3(0.7, 1.0, 0.7) : vec3(0.7, 0.7, 1.0);
+  c *= mix(vec3(1.0), mask * 1.15, uMask);
+  c *= 1.0 - uVig * 0.8 * dot(p * 0.5, p * 0.5) * 1.6;
+  fragColor = vec4(c, 1.0);
+}`;
+
 // ---------------------------------------------------------------------------
 
 const FEEDBACK = `${HEADER}
@@ -248,6 +356,10 @@ class FeedbackEffect implements Effect {
     this.b = this.a;
     this.a = result;
     return result;
+  }
+
+  compileTargets(): FullscreenPass[] {
+    return [this.pass];
   }
 
   dispose(): void {
@@ -365,6 +477,10 @@ class BloomEffect implements Effect {
     return out;
   }
 
+  compileTargets(): FullscreenPass[] {
+    return [this.prefilter, this.down, this.up, this.combine];
+  }
+
   dispose(): void {
     [this.prefilter, this.down, this.up, this.combine].forEach((x) => x.dispose());
     [...this.levels, ...this.ups].forEach((t) => t.dispose());
@@ -431,6 +547,34 @@ export function createEffect(kind: string): Effect | null {
         u.uAmount.value = n(p.amount, 0.05);
         u.uSize.value = n(p.size, 1);
         u.uSeed.value = ctx.frameIndex % 97;
+      });
+    case 'halftone':
+      return new SimpleEffect('halftone', HALFTONE, { uCell: { value: 8 }, uAngle: { value: 0.785 }, uMode: { value: 0 }, uMix: { value: 1 }, uPal: palUniform() }, (u, p, ctx) => {
+        u.uCell.value = n(p.cell, 8) * (u.uRes.value as THREE.Vector2).y / 1080;
+        u.uAngle.value = (n(p.angle, 45) * Math.PI) / 180;
+        u.uMode.value = p.mode === 'ink' ? 1 : p.mode === 'cmyk' ? 2 : 0;
+        u.uMix.value = n(p.mix, 1);
+        setPal(u, ctx.palette);
+      });
+    case 'ledScreen':
+      return new SimpleEffect('ledScreen', LED_SCREEN, { uCell: { value: 10 }, uGap: { value: 0.12 }, uGlowAmt: { value: 1 } }, (u, p) => {
+        u.uCell.value = Math.max(2, n(p.cell, 10) * (u.uRes.value as THREE.Vector2).y / 1080);
+        u.uGap.value = n(p.gap, 0.12);
+        u.uGlowAmt.value = n(p.glow, 1);
+      });
+    case 'popGrid':
+      return new SimpleEffect('popGrid', POP_GRID, { uTiles: { value: 2 }, uHueStep: { value: 1.2 }, uLevels: { value: 4 }, uPal: palUniform() }, (u, p, ctx) => {
+        u.uTiles.value = Math.round(n(p.tiles, 2));
+        u.uHueStep.value = n(p.hueStep, 1.2);
+        u.uLevels.value = Math.round(n(p.levels, 4));
+        setPal(u, ctx.palette);
+      });
+    case 'crt':
+      return new SimpleEffect('crt', CRT, { uCurve: { value: 0.5 }, uScan: { value: 0.6 }, uMask: { value: 0.4 }, uVig: { value: 0.5 } }, (u, p) => {
+        u.uCurve.value = n(p.curvature, 0.5);
+        u.uScan.value = n(p.scanlines, 0.6);
+        u.uMask.value = n(p.mask, 0.4);
+        u.uVig.value = n(p.vignette, 0.5);
       });
     default:
       return null;

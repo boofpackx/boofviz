@@ -24,6 +24,21 @@ export interface OutputStatus {
 export interface OutputCommand {
   globals?: GlobalControls;
   scene?: Scene;
+  /** Apply `scene` when the beat counter reaches this beat (quantized launch). */
+  applyAtBeat?: number;
+}
+
+/** Ableton Link session snapshot (main → control → analysis worker). */
+export interface LinkState {
+  available: boolean;
+  enabled: boolean;
+  peers: number;
+  tempo: number;
+  /** Session beat (quantum 4: beat 0, 4, 8… are bar starts) at `epochMs`. */
+  beat: number;
+  epochMs: number;
+  playing: boolean;
+  error?: string;
 }
 
 export interface StoredPreset {
@@ -60,6 +75,9 @@ export interface BoofvizApi {
   openPresetFolder(): Promise<void>;
   readSession(): Promise<string | null>;
   writeSession(json: string): void;
+  // Ableton Link
+  setLinkEnabled(on: boolean): Promise<LinkState>;
+  onLinkState(cb: (s: LinkState) => void): () => void;
 }
 
 export const IPC = {
@@ -83,6 +101,8 @@ export const IPC = {
   openPresetFolder: 'presets:openFolder',
   readSession: 'session:read',
   writeSession: 'session:write',
+  setLinkEnabled: 'link:setEnabled',
+  linkState: 'link:state',
 } as const;
 
 /** window.postMessage tag the preload uses to hand a MessagePort to the page. */

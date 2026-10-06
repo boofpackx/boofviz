@@ -4,7 +4,7 @@ import { BUILTIN_PRESETS, BUILTIN_TEMPLATES } from '@/engine/library';
 import { ModulationEngine, shapeWave } from '@/engine/modulation';
 import { PaletteRuntime, paletteLinear } from '@/engine/palettes';
 import { normalizePreset, parsePreset, sceneOf, serializePreset, toTemplate } from '@/engine/presetIO';
-import { effectDef, generatorDef, isNumericSpec, specForLayerPath } from '@/engine/registry';
+import { EFFECTS, effectDef, GENERATORS, generatorDef, isNumericSpec, specForLayerPath } from '@/engine/registry';
 import { applyMacros, ScenePlan, splitScenePath } from '@/engine/scenePlan';
 import type { Modulator, Preset } from '@shared/types/engine';
 
@@ -27,7 +27,21 @@ describe('built-in presets', () => {
     const count = (c: string) => BUILTIN_PRESETS.filter((e) => e.preset.category === c).length;
     expect(count('Equalizers')).toBeGreaterThanOrEqual(8);
     expect(count('2D Graphic')).toBeGreaterThanOrEqual(8);
+    expect(count('Icons & Homages')).toBeGreaterThanOrEqual(12);
+    expect(count('Pop Culture')).toBeGreaterThanOrEqual(12);
     expect(BUILTIN_TEMPLATES.every((t) => t.preset.isTemplate)).toBe(true);
+  });
+
+  it('keeps third-party trademarks out of everything a user sees', () => {
+    // Homages are by likeness only: no brand, product, band or film names.
+    const marks = /\b(winamp|pac-?man|tetris|space invaders|the matrix|tron|mystify|dvd|daft punk|pink floyd|joy division|unknown pleasures|kraftwerk|star ?wars|stargate|stranger things|interstellar|nokia|game ?boy|atari|nintendo|sega|out ?run|tame impala|boards of canada|new order|mondrian|warhol|kusama|lichtenstein|kandinsky|albers|vasarely)\b/i;
+    const seen: string[] = [];
+    for (const { preset } of all) {
+      seen.push(preset.name, preset.description ?? '', ...preset.tags, preset.palette, ...Object.keys(preset.customPalettes ?? {}));
+      for (const l of preset.layers) seen.push(l.name, l.source.kind, ...Object.values(l.source.params).filter((v): v is string => typeof v === 'string'));
+    }
+    for (const def of [...GENERATORS, ...EFFECTS]) seen.push(def.kind, def.label, def.description, ...def.params.flatMap((p) => [p.label, p.hint ?? '', ...(p.options ?? [])]));
+    expect(seen.filter((x) => marks.test(x))).toEqual([]);
   });
 
   for (const { id, preset } of all) {

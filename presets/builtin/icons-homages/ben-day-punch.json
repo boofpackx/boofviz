@@ -1,0 +1,202 @@
+{
+  "schema": 1,
+  "name": "Ben-Day Punch",
+  "category": "Icons & Homages",
+  "tags": [
+    "pop art",
+    "comic",
+    "halftone",
+    "type",
+    "homage",
+    "punchy"
+  ],
+  "energy": 4,
+  "palette": "Comic",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Burst",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "radial",
+          "from": 0.7,
+          "to": 0.3,
+          "intensity": 1.1,
+          "motion": 0.3,
+          "pulse": 0.5
+        }
+      },
+      "fx": [
+        {
+          "type": "halftone",
+          "enabled": true,
+          "params": {
+            "mode": "color",
+            "cell": 14,
+            "angle": 45,
+            "mix": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "word",
+      "name": "Word",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "POW / BAM / ZAP / WHAM / BOOM",
+          "mode": "words",
+          "font": "heavy",
+          "rows": 5,
+          "speed": 1,
+          "size": 0.85,
+          "stretch": 0.2,
+          "outline": 1,
+          "wordBeats": 2,
+          "skew": -0.15,
+          "punch": 0.25
+        }
+      },
+      "fx": [
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1.1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Dot size",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.cell",
+          "range": [
+            6,
+            30
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Word size",
+      "value": 0.583,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.5,
+            1.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Beats/word",
+      "value": 0.067,
+      "targets": [
+        {
+          "path": "layers.1.source.params.wordBeats",
+          "range": [
+            1,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Punch",
+      "value": 0.417,
+      "targets": [
+        {
+          "path": "layers.1.source.params.punch",
+          "range": [
+            0,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lean",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.skew",
+          "range": [
+            -0.4,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Burst",
+      "value": 0.545,
+      "targets": [
+        {
+          "path": "layers.0.source.params.intensity",
+          "range": [
+            0.5,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Comic": [
+      "#0a0a0a",
+      "#d7262b",
+      "#2a5db0",
+      "#f6d21f",
+      "#fff8e8"
+    ]
+  },
+  "bpmHint": [
+    120,
+    175
+  ],
+  "description": "Comic-book sound effects slamming in on the beat over Ben-Day dots: the 1960s pop-art comic panels. Edit the words in the Inspector."
+}

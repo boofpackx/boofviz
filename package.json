@@ -17,10 +17,13 @@
     "dist:win": "electron-vite build && electron-builder --win",
     "dist:mac": "electron-vite build && electron-builder --mac",
     "smoke": "node scripts/smoke.mjs",
+    "link:e2e": "node scripts/link-e2e.mjs",
+    "soak": "node scripts/soak.mjs",
     "make-test-track": "node scripts/make-test-track.mjs test-output/test-128bpm.wav",
     "presets:format": "esbuild scripts/format-presets.ts --tsconfig=tsconfig.node.json --bundle --platform=node --format=esm --log-level=warning --outfile=out/tools/format-presets.mjs && node out/tools/format-presets.mjs",
     "presets:check": "esbuild scripts/format-presets.ts --tsconfig=tsconfig.node.json --bundle --platform=node --format=esm --log-level=warning --outfile=out/tools/format-presets.mjs && node out/tools/format-presets.mjs --check",
-    "tour": "node scripts/preset-tour.mjs"
+    "tour": "node scripts/preset-tour.mjs",
+    "link:build": "node scripts/build-link.mjs"
   },
   "dependencies": {
     "three": "^0.186.1"
@@ -36,6 +39,8 @@
     "electron-builder": "^26.17.0",
     "electron-vite": "^5.0.0",
     "esbuild": "^0.25.12",
+    "node-addon-api": "^8.9.2",
+    "node-gyp": "^11.5.0",
     "playwright-core": "^1.63.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -53,7 +58,8 @@
     },
     "files": [
       "out/**/*",
-      "package.json"
+      "package.json",
+      "native/link/build/Release/*.node"
     ],
     "win": {
       "target": [
@@ -70,6 +76,9 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
-    }
+    },
+    "asarUnpack": [
+      "native/link/build/Release/*.node"
+    ]
   }
 }

@@ -1,6 +1,6 @@
 import type * as THREE from 'three';
 import { StrokeBatch } from '../three/StrokeBatch';
-import type { GenContext, Generator } from './Generator';
+import type { CompileTarget, GenContext, Generator } from './Generator';
 import { num } from './ShaderGenerator';
 
 const N = 1024;
@@ -100,6 +100,10 @@ export class Scope implements Generator {
     if (this.glow > 0) b.stroke(this.pts, this.count, this.thick * 5, r, g, bl, 0.35 * this.glow * this.bright, 1, this.closed);
     b.stroke(this.pts, this.count, this.thick, r * 1.8 + 0.25, g * 1.8 + 0.25, bl * 1.8 + 0.25, this.bright, 0, this.closed);
     b.draw(renderer, target, true);
+  }
+
+  compileTargets(): CompileTarget[] {
+    return [this.batch.compileTarget];
   }
 
   dispose(): void {

@@ -84,3 +84,60 @@ export function drumLoop(p: DrumPattern): { samples: Float32Array; kickTimes: nu
   }
   return { samples: out, kickTimes, snareTimes, hatTimes };
 }
+
+/**
+ * A structured dance track: four-on-the-floor kick (equal on every beat), snare
+ * on 2 & 4, 8th hats, a bass note that changes on every downbeat, and every
+ * `phraseBars` bars a new section (crash + a pad chord that toggles), so both
+ * the downbeat and the phrase start are musically marked, as in real tracks.
+ */
+export function structuredTrack(p: { bpm: number; bars: number; phraseBars: number; sr?: number }): { samples: Float32Array; barStarts: number[]; phraseStarts: number[] } {
+  const sr = p.sr ?? SR;
+  const beat = 60 / p.bpm;
+  const total = Math.round(p.bars * 4 * beat * sr);
+  const out = new Float32Array(total);
+  const rand = rng(11);
+  const barStarts: number[] = [];
+  const phraseStarts: number[] = [];
+  const roots = [55, 65.41, 49, 73.42];
+  for (let bar = 0; bar < p.bars; bar++) {
+    const tb = bar * 4 * beat;
+    barStarts.push(tb);
+    const phraseStart = bar % p.phraseBars === 0;
+    if (phraseStart) phraseStarts.push(tb);
+    const section = Math.floor(bar / p.phraseBars) % 2;
+    // Bass note for the whole bar.
+    const f0 = roots[bar % roots.length];
+    const s0 = Math.round(tb * sr);
+    const len = Math.round(4 * beat * sr);
+    for (let i = 0; i < len && s0 + i < total; i++) {
+      const t = i / sr;
+      const env = Math.min(1, t * 200) * (0.6 + 0.4 * Math.exp(-t * 3));
+      out[s0 + i] += 0.18 * env * Math.sin(2 * Math.PI * f0 * t);
+      // Pad chord only in odd sections: a big spectral change at phrase boundaries.
+      if (section === 1) out[s0 + i] += 0.05 * (Math.sin(2 * Math.PI * 440 * t) + Math.sin(2 * Math.PI * 554.4 * t) + Math.sin(2 * Math.PI * 659.3 * t));
+    }
+    if (phraseStart) {
+      for (let i = 0; i < 0.6 * sr && s0 + i < total; i++) out[s0 + i] += 0.25 * (rand() * 2 - 1) * Math.exp((-i / sr) * 5);
+    }
+    for (let b = 0; b < 4; b++) {
+      const t0 = tb + b * beat;
+      const st = Math.round(t0 * sr);
+      let ph = 0;
+      for (let i = 0; i < 0.25 * sr && st + i < total; i++) {
+        const t = i / sr;
+        ph += (2 * Math.PI * (50 + 110 * Math.exp(-t * 30))) / sr;
+        out[st + i] += 0.7 * Math.sin(ph) * Math.exp(-t * 9);
+      }
+      if (b % 2 === 1) for (let i = 0; i < 0.15 * sr && st + i < total; i++) out[st + i] += 0.3 * (rand() * 2 - 1) * Math.exp((-i / sr) * 25);
+      const sh = Math.round((t0 + beat / 2) * sr);
+      let prev = 0;
+      for (let i = 0; i < 0.04 * sr && sh + i < total; i++) {
+        const x = rand() * 2 - 1;
+        out[sh + i] += 0.15 * (x - prev) * Math.exp((-i / sr) * 90);
+        prev = x;
+      }
+    }
+  }
+  return { samples: out, barStarts, phraseStarts };
+}

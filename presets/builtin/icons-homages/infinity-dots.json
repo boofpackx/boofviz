@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "name": "Infinity Dots",
+  "category": "Icons & Homages",
+  "tags": [
+    "dots",
+    "polka",
+    "art",
+    "homage",
+    "infinite",
+    "red"
+  ],
+  "energy": 3,
+  "palette": "Infinity",
+  "paletteCycle": {
+    "mode": "phrase",
+    "every": 2,
+    "fadeBeats": 4,
+    "list": [
+      "Infinity",
+      "Infinity Yellow"
+    ]
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "dots",
+      "name": "Dots",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "dots",
+        "params": {
+          "mode": "polka",
+          "density": 1,
+          "size": 1,
+          "pulse": 0.6,
+          "drift": 1,
+          "zoom": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.03,
+            "size": 1
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.25,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Density",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.density",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dot size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.6,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pulse",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.pulse",
+          "range": [
+            0,
+            1.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drift",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.drift",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Zoom",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.zoom",
+          "range": [
+            0.6,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Infinity": [
+      "#0a0a0a",
+      "#5a0000",
+      "#d0101a",
+      "#f4f4f4",
+      "#ffffff"
+    ],
+    "Infinity Yellow": [
+      "#0a0a0a",
+      "#3d3300",
+      "#f5d300",
+      "#111111",
+      "#0b0b0b"
+    ]
+  },
+  "description": "White polka dots on red, falling forever into themselves and swelling with the bass: the infinity rooms of the dot-obsessed Japanese artist."
+}

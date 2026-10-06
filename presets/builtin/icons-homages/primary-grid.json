@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "name": "Primary Grid",
+  "category": "Icons & Homages",
+  "tags": [
+    "de stijl",
+    "grid",
+    "primary",
+    "art",
+    "homage",
+    "bauhaus"
+  ],
+  "energy": 3,
+  "palette": "De Stijl",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "grid",
+      "name": "Grid",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "deStijl",
+        "params": {
+          "cells": 11,
+          "color": 0.35,
+          "line": 0.012,
+          "reshuffle": "phrase"
+        }
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.05,
+            "size": 1
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.15,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Cells",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cells",
+          "range": [
+            4,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Colour",
+      "value": 0.357,
+      "targets": [
+        {
+          "path": "layers.0.source.params.color",
+          "range": [
+            0.1,
+            0.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lines",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.line",
+          "range": [
+            0.006,
+            0.026
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grain",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "De Stijl": [
+      "#111111",
+      "#d0281e",
+      "#1d3f97",
+      "#f4c40f",
+      "#f2eee3"
+    ]
+  },
+  "description": "Thick black rules, white canvas and red, blue and yellow blocks that flash with the bands, re-drawn every phrase: the 1920s De Stijl painting, moving."
+}

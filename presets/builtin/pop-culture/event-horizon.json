@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "name": "Event Horizon",
+  "category": "Pop Culture",
+  "tags": [
+    "space",
+    "black hole",
+    "film",
+    "sci-fi",
+    "mellow",
+    "cosmic"
+  ],
+  "energy": 2,
+  "palette": "Accretion",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "hole",
+      "name": "Black hole",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "orb",
+        "params": {
+          "mode": "blackhole",
+          "size": 1,
+          "spin": 1,
+          "tilt": 0.25,
+          "beams": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.5,
+            "threshold": 0.8,
+            "radius": 0.8,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.03,
+            "size": 1
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.3,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": -1,
+            "contrast": 1.15,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.6,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.667,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            -3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tilt",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.tilt",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.133,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0.3,
+            1.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Jets",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.beams",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Accretion": [
+      "#000000",
+      "#3a1400",
+      "#d9701e",
+      "#ffc06b",
+      "#fff3dc"
+    ]
+  },
+  "description": "A black hole wrapped in a lensed, glowing accretion disk that brightens with the bass: the 2014 space-travel epic's giant."
+}

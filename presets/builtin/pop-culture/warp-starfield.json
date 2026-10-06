@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "name": "Warp Starfield",
+  "category": "Pop Culture",
+  "tags": [
+    "space",
+    "stars",
+    "screensaver",
+    "mellow",
+    "retro",
+    "sci-fi"
+  ],
+  "energy": 2,
+  "palette": "Mono",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "warp",
+      "name": "Warp",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "warp",
+        "params": {
+          "mode": "starfield",
+          "speed": 0.8,
+          "density": 1.4,
+          "streak": 0.2,
+          "twist": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.5,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.4,
+            "zoom": 0.01,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stars",
+      "value": 0.429,
+      "targets": [
+        {
+          "path": "layers.0.source.params.density",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Streak",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.streak",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trails",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.amount",
+          "range": [
+            0,
+            0.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Twist",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.twist",
+          "range": [
+            -0.5,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "description": "Flying through an endless field of white stars, faster when the music swells: the 90s desktop screensaver and every starship bridge."
+}

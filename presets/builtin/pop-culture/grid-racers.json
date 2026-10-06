@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "name": "Grid Racers",
+  "category": "Pop Culture",
+  "tags": [
+    "light cycles",
+    "neon",
+    "grid",
+    "sci-fi",
+    "game",
+    "retro"
+  ],
+  "energy": 4,
+  "palette": "Grid",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "game",
+      "name": "Game",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "pixelArcade",
+        "params": {
+          "mode": "racers",
+          "speed": 1.5,
+          "cycleBars": 8,
+          "glow": 1,
+          "paletteMix": 0,
+          "scanlines": 0.15
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.6,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.35,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.455,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Restart",
+      "value": 0.097,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycleBars",
+          "range": [
+            2,
+            64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.375,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tint",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.paletteMix",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scanlines",
+      "value": 0.15,
+      "targets": [
+        {
+          "path": "layers.0.source.params.scanlines",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Grid": [
+      "#000308",
+      "#00303f",
+      "#00e5ff",
+      "#ff8c00",
+      "#e8fbff"
+    ]
+  },
+  "bpmHint": [
+    110,
+    150
+  ],
+  "description": "Light-cycles carving glowing walls across a dark grid, turning on the beat until someone crashes: the 1982 sci-fi movie's arena game."
+}

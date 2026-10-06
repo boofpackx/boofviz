@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "name": "Block Drop",
+  "category": "Pop Culture",
+  "tags": [
+    "arcade",
+    "puzzle",
+    "blocks",
+    "retro",
+    "8-bit",
+    "game"
+  ],
+  "energy": 3,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "game",
+      "name": "Game",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "pixelArcade",
+        "params": {
+          "mode": "blocks",
+          "speed": 1,
+          "cycleBars": 16,
+          "glow": 1,
+          "paletteMix": 0,
+          "scanlines": 0.3
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.4,
+            "threshold": 0.7,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.25,
+            "scanlines": 0.3,
+            "mask": 0.2,
+            "vignette": 0.4
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Restart",
+      "value": 0.226,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycleBars",
+          "range": [
+            2,
+            64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tint",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.paletteMix",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scanlines",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.scanlines",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    100,
+    140
+  ],
+  "description": "Falling bevelled blocks dropping one row per beat, lines clearing on the bar: the 1984 Soviet puzzle game played by the music."
+}

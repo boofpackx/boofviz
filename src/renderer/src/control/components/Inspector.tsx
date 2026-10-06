@@ -419,6 +419,7 @@ function MaskSection({ layer, index, doc }: { layer: Layer; index: number; doc: 
               { value: 'rect', label: 'Rect' },
               { value: 'ring', label: 'Ring' },
               { value: 'linear', label: 'Linear' },
+              { value: 'triangle', label: 'Tri' },
             ]}
           />
           <Slider label="Size" value={mask.size} min={0} max={2} onChange={(v) => edit((d) => void (d.layers[index].mask!.size = v), `mask:size:${layer.id}`)} />

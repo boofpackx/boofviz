@@ -54,6 +54,11 @@ export class StrokeBatch {
   private v = 0;
   private i = 0;
 
+  /** For background shader compilation. */
+  get compileTarget(): { scene: THREE.Object3D; camera: THREE.Camera } {
+    return { scene: this.scene, camera: this.camera };
+  }
+
   constructor(maxVerts: number) {
     this.maxVerts = maxVerts;
     this.pos = new Float32Array(maxVerts * 2);

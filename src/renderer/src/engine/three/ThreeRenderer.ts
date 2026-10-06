@@ -4,6 +4,7 @@ import type { Renderer, RendererOptions, RenderContext, RenderStats, Scene } fro
 import { OUTPUT_FRAG, OUTPUT_VERT } from '../shaders/output';
 import { Compositor } from './Compositor';
 import { FullscreenPass } from './fullscreen';
+import { ShaderWarmup } from './warmup';
 
 const MAX_DIM = 8192;
 
@@ -21,6 +22,13 @@ export class ThreeRenderer implements Renderer {
   private frameIndex = 0;
   private blackout = 0;
   private css = { w: 1, h: 1, dpr: 1 };
+  /** A scene waiting for its launch beat (quantized preset change). */
+  private pending: { scene: Scene; atBeat: number } | null = null;
+  private readonly warmup = new ShaderWarmup();
+  /** When the last queued scene went live: that frame's beat and the frame before's (sync checks). */
+  lastSwitch: { beat: number; prevBeat: number } | null = null;
+  private lastBeat = Number.NaN;
+  private warmupTimer = 0;
   readonly stats: RenderStats = { fps: 0, frameMs: 0, width: 0, height: 0 };
 
   async init(canvas: HTMLCanvasElement, options: RendererOptions): Promise<void> {
@@ -59,8 +67,31 @@ export class ThreeRenderer implements Renderer {
     canvas.addEventListener('webglcontextlost', (e) => e.preventDefault());
   }
 
-  setScene(scene: Scene): void {
-    this.compositor.setScene(scene);
+  /**
+   * Show `scene`. With `applyAtBeat`, it goes live on the first frame whose
+   * beat counter reaches that beat, so every window switches on the same beat.
+   */
+  setScene(scene: Scene, applyAtBeat?: number): void {
+    if (!this.warmupTimer) {
+      // Once the first look is up, compile every other shader in the background.
+      const kinds = scene.layers.map((l) => l.source.kind);
+      this.warmupTimer = window.setTimeout(() => void this.warmup.run(this.renderer, kinds), 1500);
+    }
+    if (applyAtBeat === undefined) {
+      this.pending = null;
+      this.compositor.setScene(scene);
+    } else this.pending = { scene, atBeat: applyAtBeat };
+  }
+
+  /** Beat a queued scene is waiting for, if any. */
+  get pendingBeat(): number | null {
+    return this.pending?.atBeat ?? null;
+  }
+
+  /** GPU resource counts (soak tests watch these for leaks). */
+  get gpuInfo(): { geometries: number; textures: number; programs: number } {
+    const i = this.renderer.info;
+    return { geometries: i.memory.geometries, textures: i.memory.textures, programs: i.programs?.length ?? 0 };
   }
 
   /** Live modulated parameter values for UI meters. */
@@ -89,6 +120,12 @@ export class ThreeRenderer implements Renderer {
     const g = ctx.globals;
     // Blackout eases over ~80 ms: instant to the eye, but never a hard flash.
     this.blackout += ((g.blackout ? 1 : 0) - this.blackout) * (1 - Math.exp(-ctx.dt / 0.03));
+    if (this.pending && frame.beat >= this.pending.atBeat - 0.002) {
+      this.compositor.setScene(this.pending.scene);
+      this.pending = null;
+      this.lastSwitch = { beat: frame.beat, prevBeat: this.lastBeat };
+    }
+    this.lastBeat = frame.beat;
     const scene = this.compositor.render(frame, ctx.dt, g);
     const u = this.output.material.uniforms;
     u.uScene.value = scene.texture;
@@ -101,6 +138,8 @@ export class ThreeRenderer implements Renderer {
   }
 
   dispose(): void {
+    window.clearTimeout(this.warmupTimer);
+    this.warmup.dispose();
     this.compositor.dispose();
     this.output.dispose();
     this.renderer.dispose();

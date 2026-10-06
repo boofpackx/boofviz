@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import type { PresetEntry } from '@/engine/library';
 import { libraryEntries, useShow } from '../show';
+import { useControl } from '../store';
+import { launchQuantized, toggleFavorite } from '../launcher';
 import { contextMenu } from './ContextMenu';
 import { Swatch } from './Inspector';
 import { Button, Segmented } from './ui';
@@ -11,9 +13,11 @@ type Tab = 'presets' | 'templates';
 export function filteredEntries(tab: Tab, query: string, category: string, tag: string | null): PresetEntry[] {
   const { presets, templates } = libraryEntries();
   const q = query.trim().toLowerCase();
+  const favs = useControl.getState().settings.library.favorites;
   return (tab === 'presets' ? presets : templates).filter((e) => {
     const p = e.preset;
-    if (category !== 'All' && p.category !== category) return false;
+    if (category === '★ Favorites' && !favs.includes(e.id)) return false;
+    if (category !== 'All' && category !== '★ Favorites' && p.category !== category) return false;
     if (tag && !p.tags.includes(tag)) return false;
     if (!q) return true;
     return p.name.toLowerCase().includes(q) || p.tags.some((t) => t.includes(q)) || p.category.toLowerCase().includes(q);
@@ -30,13 +34,16 @@ export function Library() {
   const [confirm, setConfirm] = useState<string | null>(null);
   const userPresets = useShow((s) => s.userPresets);
   const sourceId = useShow((s) => s.sourceId);
+  const queuedId = useShow((s) => s.queued?.entry.id);
   const dirty = useShow((s) => s.dirty);
-  const { load, deleteUser, importFiles } = useShow.getState();
+  const favorites = useControl((s) => s.settings.library.favorites);
+  const { deleteUser, importFiles } = useShow.getState();
+  const load = (e: PresetEntry): void => launchQuantized(e);
   Object.assign(libraryView, { tab, query, category, tag });
 
-  const entries = useMemo(() => filteredEntries(tab, query, category, tag), [tab, query, category, tag, userPresets]); // eslint-disable-line react-hooks/exhaustive-deps
+  const entries = useMemo(() => filteredEntries(tab, query, category, tag), [tab, query, category, tag, userPresets, favorites]); // eslint-disable-line react-hooks/exhaustive-deps
   const all = tab === 'presets' ? libraryEntries().presets : libraryEntries().templates;
-  const categories = ['All', ...Array.from(new Set(all.map((e) => e.preset.category)))];
+  const categories = ['All', ...(tab === 'presets' ? ['★ Favorites'] : []), ...Array.from(new Set(all.map((e) => e.preset.category)))];
   const tags = useMemo(() => {
     const counts = new Map<string, number>();
     for (const e of all) for (const t of e.preset.tags) if (t !== 'template' && t !== 'structure') counts.set(t, (counts.get(t) ?? 0) + 1);
@@ -92,6 +99,9 @@ export function Library() {
             <div className="space-y-1">
               {list.map((e) => {
                 const active = e.id === sourceId;
+                const queued = e.id === queuedId;
+                const fav = favorites.includes(e.id);
+                const favSlot = favorites.indexOf(e.id) + 1;
                 const p = e.preset;
                 return (
                   <div
@@ -102,17 +112,34 @@ export function Library() {
                     onKeyDown={(ev) => ev.key === 'Enter' && load(e)}
                     onContextMenu={contextMenu(() => [
                       { label: 'Load', onSelect: () => load(e) },
+                      { label: 'Load now (skip quantize)', onSelect: () => launchQuantized(e, 'now') },
+                      { label: favorites.includes(e.id) ? 'Remove from favorites' : 'Add to favorites', onSelect: () => toggleFavorite(e.id) },
                       { label: 'Delete', disabled: e.source !== 'user', hint: e.source !== 'user' ? 'built-in' : '', onSelect: () => setConfirm(e.id) },
                     ])}
                     title={p.description}
-                    className={`group cursor-pointer rounded border px-2 py-1.5 transition-colors ${active ? 'border-accent/70 bg-accent/10' : 'border-ink-700 bg-ink-850 hover:border-ink-500'}`}
+                    className={`group cursor-pointer rounded border px-2 py-1.5 transition-colors ${active ? 'border-accent/70 bg-accent/10' : queued ? 'animate-pulse border-accent-2/70 bg-accent-2/10' : 'border-ink-700 bg-ink-850 hover:border-ink-500'}`}
                   >
                     <div className="flex items-center gap-2">
+                      {tab === 'presets' && (
+                        <button
+                          type="button"
+                          title={fav ? `Favorite${favSlot <= 9 ? ` (key ${favSlot})` : ''}: click to remove` : 'Add to favorites'}
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            toggleFavorite(e.id);
+                          }}
+                          className={`-ml-0.5 w-3 text-[12px] leading-none ${fav ? 'text-warn' : 'text-ink-600 opacity-0 group-hover:opacity-100 hover:text-ink-300'}`}
+                        >
+                          {fav ? '★' : '☆'}
+                        </button>
+                      )}
                       <Swatch name={p.palette} custom={p.customPalettes} />
                       <span className="min-w-0 flex-1 truncate text-ink-100">
                         {p.name}
                         {active && dirty && <span className="text-warn"> •</span>}
                       </span>
+                      {fav && favSlot <= 9 && <span className="font-mono text-[9px] text-warn">{favSlot}</span>}
+                      {queued && <span className="rounded bg-accent-2/20 px-1 text-[9px] font-semibold text-accent-2">NEXT</span>}
                       {e.source === 'user' && <span className="rounded bg-accent-2/20 px-1 text-[9px] font-semibold text-accent-2">USER</span>}
                       <span className="flex gap-0.5" title={`Energy ${p.energy}/5`}>
                         {[1, 2, 3, 4, 5].map((n) => (
@@ -120,7 +147,7 @@ export function Library() {
                         ))}
                       </span>
                     </div>
-                    <div className="mt-0.5 truncate pl-[42px] text-[10px] text-ink-400">
+                    <div className={`mt-0.5 truncate text-[10px] text-ink-400 ${tab === 'presets' ? 'pl-[54px]' : 'pl-[42px]'}`}>
                       {p.layers.length} layer{p.layers.length > 1 ? 's' : ''}
                       {p.bpmHint && ` · ${p.bpmHint[0]}–${p.bpmHint[1]} bpm`}
                       {p.tags.length > 0 && ` · ${p.tags.slice(0, 3).join(', ')}`}

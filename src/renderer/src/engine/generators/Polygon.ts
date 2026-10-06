@@ -4,9 +4,9 @@ import { num, ShaderGenerator } from './ShaderGenerator';
 
 const FRAG = /* glsl */ `${GEN_HEADER}
 uniform float uSides, uRound, uSize, uCopies, uSpread, uNested, uNestScale, uTwist, uRot;
-uniform float uStroke, uFill, uGlow, uColorSpread, uBackground;
+uniform float uStroke, uFill, uGlow, uColorSpread, uBackground, uNestOffset, uOffsetY;
 void main() {
-  vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
+  vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y - vec2(0.0, uOffsetY);
   float px = 1.25 / uRes.y;
   vec3 bg = mix(uPal[1] * 0.18, uPal[0] * 0.5, smoothstep(0.0, 0.9, length(p))) * uBackground;
   vec3 col = vec3(0.0);
@@ -23,7 +23,8 @@ void main() {
       float fl = float(l);
       if (fl >= uNested) break;
       float s = uSize * pow(uNestScale, fl);
-      vec2 qq = rot2(uRot + uTwist * fl * 6.28318531) * q;
+      // Nest offset slides each inner shape down (Albers' squares sit low in the frame).
+      vec2 qq = rot2(uRot + uTwist * fl * 6.28318531) * (q + vec2(0.0, uNestOffset * fl * s));
       float d = mix(sdPolygon(qq, s, n0), sdPolygon(qq, s, n0 + 1.0), fr);
       d = mix(d, length(qq) - s * 0.9, uRound);
       vec3 base = paletteWrap(0.1 + uColorSpread * fl / max(uNested, 1.0) + fc * 0.17);
@@ -69,6 +70,8 @@ export class Polygon extends ShaderGenerator {
       uGlow: { value: 0.6 },
       uColorSpread: { value: 0.6 },
       uBackground: { value: 0.3 },
+      uNestOffset: { value: 0 },
+      uOffsetY: { value: 0 },
     });
   }
 
@@ -99,11 +102,13 @@ export class Polygon extends ShaderGenerator {
     u.uNested.value = Math.round(num(p.nested, 1));
     u.uNestScale.value = num(p.nestScale, 0.78);
     u.uTwist.value = num(p.twist, 0.1);
-    u.uRot.value = (2 * Math.PI * num(p.spin, 0.25) * ctx.beat) / Math.max(1, ctx.frame.beatsPerBar);
+    u.uRot.value = (num(p.angle, 0) * Math.PI) / 180 + (2 * Math.PI * num(p.spin, 0.25) * ctx.beat) / Math.max(1, ctx.frame.beatsPerBar);
     u.uStroke.value = num(p.stroke, 0.012);
     u.uFill.value = num(p.fill, 0);
     u.uGlow.value = num(p.glow, 0.6);
     u.uColorSpread.value = num(p.colorSpread, 0.6);
     u.uBackground.value = num(p.background, 0.3);
+    u.uNestOffset.value = num(p.nestOffset, 0);
+    u.uOffsetY.value = num(p.offsetY, 0);
   }
 }

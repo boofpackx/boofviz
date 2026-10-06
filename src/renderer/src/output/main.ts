@@ -11,6 +11,7 @@ const api = window.boofviz;
 const builder = new AudioFrameBuilder();
 let globals: GlobalControls = { ...DEFAULT_GLOBALS };
 let scene: Scene | null = null;
+let applyAtBeat: number | undefined;
 let renderer: ThreeRenderer | null = null;
 
 // Read-only snapshot hook for automated smoke tests.
@@ -18,6 +19,9 @@ let renderer: ThreeRenderer | null = null;
   frame: () => ({ ...builder.frame, fft: undefined, waveform: undefined, bands32: undefined, stereo: undefined }),
   packets: () => builder.packetCount,
   scene: () => scene,
+  pendingBeat: () => renderer?.pendingBeat ?? null,
+  lastSwitch: () => renderer?.lastSwitch ?? null,
+  gpu: () => renderer?.gpuInfo ?? null,
   beatAtEpoch: (ms: number) => builder.beatAtEpoch(ms),
 };
 
@@ -29,7 +33,8 @@ api.onOutputCommand((cmd) => {
   if (cmd.globals) globals = cmd.globals;
   if (cmd.scene) {
     scene = cmd.scene;
-    renderer?.setScene(scene);
+    applyAtBeat = cmd.applyAtBeat;
+    renderer?.setScene(scene, applyAtBeat);
   }
 });
 
@@ -47,7 +52,7 @@ async function start(): Promise<void> {
   }
   renderer = r;
   // Black until the control window sends the scene (main replays it on load).
-  if (scene) r.setScene(scene);
+  if (scene) r.setScene(scene, applyAtBeat);
 
   const fit = (): void => r.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio || 1);
   fit();

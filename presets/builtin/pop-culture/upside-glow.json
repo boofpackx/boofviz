@@ -1,0 +1,183 @@
+{
+  "schema": 1,
+  "name": "Upside Glow",
+  "category": "Pop Culture",
+  "tags": [
+    "title",
+    "neon",
+    "red",
+    "80s",
+    "tv",
+    "type",
+    "horror"
+  ],
+  "energy": 2,
+  "palette": "Upside",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "title",
+      "name": "Title",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "THE / UPSIDE / DROP",
+          "mode": "words",
+          "font": "serif",
+          "rows": 5,
+          "speed": 1,
+          "size": 0.75,
+          "stretch": 0,
+          "outline": 1,
+          "wordBeats": 4,
+          "skew": 0,
+          "punch": 0.04
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 1.4,
+            "threshold": 0.25,
+            "radius": 0.85,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.1,
+            "size": 1.6
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.6,
+            "size": 0.7,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": [
+        {
+          "target": "opacity",
+          "source": "random",
+          "amount": -0.25,
+          "hz": 6,
+          "randomMode": "smooth"
+        }
+      ]
+    }
+  ],
+  "macros": [
+    {
+      "name": "Glow",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0.4,
+            2.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Flicker",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.modulators.0.amount",
+          "range": [
+            0,
+            -0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.5,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Beats/word",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.wordBeats",
+          "range": [
+            1,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grain",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.amount",
+          "range": [
+            0,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Upside": [
+      "#000000",
+      "#0a0000",
+      "#120000",
+      "#1a0202",
+      "#ff2a12"
+    ]
+  },
+  "description": "Glowing red outlined serif letters flickering out of the dark, 80s-horror TV title style. Edit the words in the Inspector."
+}

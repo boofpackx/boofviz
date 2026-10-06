@@ -18,7 +18,7 @@ uniform sampler2D uMaskTex;
 uniform int uMode;        // 0 normal 1 add 2 screen 3 multiply 4 overlay 5 difference 6 lighten
 uniform float uOpacity;
 uniform int uMask;        // 0 none, 1 luma, 2 shape
-uniform int uShape;       // 0 circle 1 rect 2 ring 3 linear
+uniform int uShape;       // 0 circle 1 rect 2 ring 3 linear 4 triangle
 uniform float uSize, uFeather;
 uniform bool uInvert;
 uniform vec2 uRes;
@@ -49,6 +49,17 @@ float maskValue() {
     if (uShape == 1) { vec2 q = abs(p) - vec2(uSize * 0.5 * uRes.x / uRes.y, uSize * 0.5); d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0); }
     else if (uShape == 2) d = abs(length(p) - uSize * 0.5) - uSize * 0.12;
     else if (uShape == 3) d = (vUv.y - uSize) * 0.5;
+    else if (uShape == 4) {
+      // Equilateral triangle, apex up, sized by height.
+      vec2 q = p + vec2(0.0, uSize * 0.2);
+      const float k = 1.7320508;
+      float r = uSize * 0.5;
+      q.x = abs(q.x) - r;
+      q.y = q.y + r / k;
+      if (q.x + k * q.y > 0.0) q = vec2(q.x - k * q.y, -k * q.x - q.y) / 2.0;
+      q.x -= clamp(q.x, -2.0 * r, 0.0);
+      d = -length(q) * sign(q.y);
+    }
     else d = length(p) - uSize * 0.5;
     m = 1.0 - smoothstep(-f, f, d);
   }
@@ -75,7 +86,7 @@ void main() { fragColor = texture(uInput, vUv); }
 `;
 
 const BLEND_INDEX: Record<string, number> = { normal: 0, add: 1, screen: 2, multiply: 3, overlay: 4, difference: 5, lighten: 6 };
-const SHAPE_INDEX: Record<string, number> = { circle: 0, rect: 1, ring: 2, linear: 3 };
+const SHAPE_INDEX: Record<string, number> = { circle: 0, rect: 1, ring: 2, linear: 3, triangle: 4 };
 
 interface LayerRuntime {
   id: string;

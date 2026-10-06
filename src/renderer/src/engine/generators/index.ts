@@ -1,16 +1,26 @@
 import { Background } from './Background';
 import { BarCity } from './BarCity';
+import { CodeRain } from './CodeRain';
+import { DeStijl } from './DeStijl';
+import { Dots } from './Dots';
 import type { Generator } from './Generator';
 import { KineticType } from './KineticType';
 import { Lines } from './Lines';
 import { Memphis } from './Memphis';
+import { OpArt } from './OpArt';
+import { Orb } from './Orb';
+import { PixelArcade } from './PixelArcade';
 import { Polygon } from './Polygon';
+import { Prism } from './Prism';
 import { RadialSpectrum } from './RadialSpectrum';
+import { Ricochet } from './Ricochet';
 import { Scope } from './Scope';
-import { SpectrumBars } from './SpectrumBars';
 import { Spectrogram } from './Spectrogram';
+import { SpectrumBars } from './SpectrumBars';
 import { SwissGrid } from './SwissGrid';
+import { SynthSunset } from './SynthSunset';
 import { Tiles } from './Tiles';
+import { Warp } from './Warp';
 
 const FACTORIES: Record<string, () => Generator> = {
   spectrumBars: () => new SpectrumBars(),
@@ -24,6 +34,16 @@ const FACTORIES: Record<string, () => Generator> = {
   tiles: () => new Tiles(),
   memphis: () => new Memphis(),
   kineticType: () => new KineticType(),
+  prism: () => new Prism(),
+  synthSunset: () => new SynthSunset(),
+  opArt: () => new OpArt(),
+  dots: () => new Dots(),
+  deStijl: () => new DeStijl(),
+  pixelArcade: () => new PixelArcade(),
+  codeRain: () => new CodeRain(),
+  warp: () => new Warp(),
+  orb: () => new Orb(),
+  ricochet: () => new Ricochet(),
   background: () => new Background(),
 };
 

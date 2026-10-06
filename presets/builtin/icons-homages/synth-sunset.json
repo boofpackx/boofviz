@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "name": "Synth Sunset",
+  "category": "Icons & Homages",
+  "tags": [
+    "synthwave",
+    "retro",
+    "80s",
+    "sunset",
+    "grid",
+    "neon"
+  ],
+  "energy": 3,
+  "palette": "Synthwave",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "sunset",
+      "name": "Sunset",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "synthSunset",
+        "params": {
+          "sun": 0.22,
+          "stripes": 9,
+          "horizon": 0.42,
+          "mountains": 1,
+          "glow": 1,
+          "stars": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.8,
+            "threshold": 0.6,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "rgbSplit",
+          "enabled": true,
+          "params": {
+            "amount": 0.0015,
+            "angle": 0,
+            "radial": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.04,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Sun",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.sun",
+          "range": [
+            0.12,
+            0.32
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stripes",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stripes",
+          "range": [
+            0,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mountains",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.mountains",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.429,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0.2,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Horizon",
+      "value": 0.48,
+      "targets": [
+        {
+          "path": "layers.0.source.params.horizon",
+          "range": [
+            0.3,
+            0.55
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stars",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stars",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Synthwave": [
+      "#0b0122",
+      "#2a0a5e",
+      "#ff1f8e",
+      "#ff7b3a",
+      "#ffe14d"
+    ]
+  },
+  "bpmHint": [
+    95,
+    125
+  ],
+  "description": "A striped sun sinking behind spectrum mountains while a neon grid races toward you on the beat: the 80s synthwave night drive."
+}

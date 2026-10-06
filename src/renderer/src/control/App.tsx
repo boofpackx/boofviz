@@ -3,6 +3,8 @@ import { sceneOf } from '@/engine/presetIO';
 import { engine, initEngine } from './runtime';
 import { useControl } from './store';
 import { useShow } from './show';
+import { applyTempoSource, initExternalTempo } from './externalTempo';
+import { favoriteEntries, launchQuantized, shuffleNow, startLauncher } from './launcher';
 import { TopBar } from './components/TopBar';
 import { SourcePanel, useFileDrop } from './components/SourcePanel';
 import { Preview } from './components/Preview';
@@ -22,22 +24,40 @@ function useBootstrap(): void {
     engine.onStatus = (engineStatus) => set({ engineStatus });
     const offSettings = api.onSettings((s) => useControl.setState({ settings: s }));
     const offOutput = api.onOutputStatus((output) => set({ output }));
+    const offLink = initExternalTempo();
 
     // The look follows the working preset: output gets it (throttled while dragging), session autosaves.
     let pending = false;
     let timer = 0;
+    const pushQueued = (): void => {
+      const q = useShow.getState().queued;
+      if (q) api.sendOutputCommand({ scene: sceneOf(q.entry.preset), applyAtBeat: q.atBeat });
+    };
     const pushScene = (): void => {
       pending = false;
       const { doc, sourceId, dirty } = useShow.getState();
       api.sendOutputCommand({ scene: sceneOf(doc) });
+      pushQueued();
       api.writeSession(JSON.stringify({ doc, sourceId, dirty }));
     };
     const unsubscribe = useShow.subscribe((s, prev) => {
+      if (s.queued !== prev.queued) {
+        // Newly queued launch: hand it to the output now so it switches on the same beat.
+        if (s.queued) pushQueued();
+        else if (s.doc === prev.doc) api.sendOutputCommand({ scene: sceneOf(s.doc) });
+      }
       if (s.doc === prev.doc && s.sourceId === prev.sourceId && s.dirty === prev.dirty) return;
+      if (s.sourceId !== prev.sourceId) {
+        // A new look goes out at once, before this window spends a frame building its preview.
+        window.clearTimeout(timer);
+        pushScene();
+        return;
+      }
       if (pending) return;
       pending = true;
       timer = window.setTimeout(pushScene, 33);
     });
+    const stopLauncher = startLauncher();
 
     void (async () => {
       const settings = await api.getSettings();
@@ -61,7 +81,9 @@ function useBootstrap(): void {
     return () => {
       offSettings();
       offOutput();
+      offLink();
       unsubscribe();
+      stopLauncher();
       window.clearTimeout(timer);
     };
   }, [hydrate, set]);
@@ -72,14 +94,19 @@ function useBootstrap(): void {
   useEffect(() => {
     if (loaded) engine.setAnalysisSettings(analysis);
   }, [analysis, loaded]);
+
+  // Link networking / MIDI listening follow the chosen tempo source.
+  useEffect(() => {
+    if (loaded) void applyTempoSource(analysis.tempoSource, analysis.midiInputId);
+  }, [analysis.tempoSource, analysis.midiInputId, loaded]);
 }
 
 function stepPreset(dir: 1 | -1): void {
   const list = filteredEntries(libraryView.tab, libraryView.query, libraryView.category, libraryView.tag);
   if (!list.length) return;
-  const { sourceId, load } = useShow.getState();
-  const i = list.findIndex((e) => e.id === sourceId);
-  load(list[(i + dir + list.length) % list.length]);
+  const { sourceId, queued } = useShow.getState();
+  const i = list.findIndex((e) => e.id === (queued?.entry.id ?? sourceId));
+  launchQuantized(list[(i + dir + list.length) % list.length]);
 }
 
 function useShortcuts(): void {
@@ -106,6 +133,27 @@ function useShortcuts(): void {
         case 'tab':
           stepPreset(e.shiftKey ? -1 : 1);
           break;
+        case 's':
+          shuffleNow();
+          break;
+        case 'escape':
+          if (!show.queued) return;
+          show.cancelQueued();
+          break;
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9': {
+          const fav = favoriteEntries()[Number(e.key) - 1];
+          if (!fav) return;
+          launchQuantized(fav);
+          break;
+        }
         case 't':
           engine.tempo({ cmd: 'tap' });
           if (s.settings.analysis.tempoSource !== 'tap') s.update({ analysis: { tempoSource: 'tap' } });
@@ -207,6 +255,12 @@ export function App() {
             <Kbd>Tab</Kbd> next preset
           </span>
           <span>
+            <Kbd>S</Kbd> shuffle
+          </span>
+          <span>
+            <Kbd>1–9</Kbd> favorites
+          </span>
+          <span>
             <Kbd>Ctrl Z</Kbd> undo
           </span>
           <span>
@@ -231,7 +285,7 @@ export function App() {
           <span>
             <Kbd>H</Kbd> hide UI
           </span>
-          <span className="ml-auto">Phase 2 · Engine core</span>
+          <span className="ml-auto">Phase 3 · Beat engine</span>
         </footer>
       )}
       <ContextMenuHost />

@@ -29,6 +29,8 @@ export class BpmEstimator {
   constructor(
     private readonly hopRate: number,
     windowSec = 8,
+    /** Per-beat weight decay when folding phase: lower = follows jumps faster. */
+    private readonly phaseDecay = 0.75,
   ) {
     const n = Math.round(windowSec * hopRate);
     this.env = new Float32Array(n);
@@ -161,7 +163,7 @@ export class BpmEstimator {
         const f = pos - k;
         const v = x[k] * (1 - f) + x[k + 1 < n ? k + 1 : k] * f;
         fold += v * w;
-        w *= 0.93;
+        w *= this.phaseDecay;
       }
       if (fold > bestFold) {
         bestFold = fold;

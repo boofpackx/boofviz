@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "name": "Several Circles",
+  "category": "Icons & Homages",
+  "tags": [
+    "circles",
+    "abstract",
+    "art",
+    "homage",
+    "mellow",
+    "cosmic"
+  ],
+  "energy": 2,
+  "palette": "Circle Study",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "circles",
+      "name": "Circles",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "dots",
+        "params": {
+          "mode": "circles",
+          "density": 1,
+          "size": 1.1,
+          "pulse": 0.7,
+          "drift": 0.6,
+          "zoom": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.5,
+            "threshold": 0.6,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.06,
+            "size": 1.4
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.4,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.6,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pulse",
+      "value": 0.467,
+      "targets": [
+        {
+          "path": "layers.0.source.params.pulse",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drift",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.drift",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.357,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grain",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.amount",
+          "range": [
+            0,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Circle Study": [
+      "#0a0c18",
+      "#2f5aa8",
+      "#d23c2f",
+      "#e9b824",
+      "#efe4cf"
+    ]
+  },
+  "description": "Translucent coloured discs floating in a dark cosmos, each one sized by its frequency band: the 1926 abstract painting of overlapping circles."
+}

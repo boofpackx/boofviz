@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "name": "Winamp Tribute",
+  "name": "Classic Player",
   "category": "Equalizers",
   "tags": [
     "retro",
-    "winamp",
+    "media player",
     "bars",
     "scope",
     "2000s"
   ],
   "energy": 3,
-  "palette": "Winamp",
+  "palette": "Classic Skin",
   "paletteCycle": {
     "mode": "off",
     "every": 1,
@@ -206,7 +206,7 @@
     }
   ],
   "customPalettes": {
-    "Winamp": [
+    "Classic Skin": [
       "#000000",
       "#08260f",
       "#22c55e",
@@ -214,5 +214,5 @@
       "#ef4444"
     ]
   },
-  "description": "It really whips the llama: segmented bars with falling peaks and a green scope on top."
+  "description": "Segmented bars with falling peak caps and a green scope on top: the late-90s desktop MP3 player skin."
 }

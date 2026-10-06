@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "name": "Snake Beat",
+  "category": "Pop Culture",
+  "tags": [
+    "handheld",
+    "snake",
+    "lcd",
+    "retro",
+    "phone",
+    "game"
+  ],
+  "energy": 2,
+  "palette": "Handheld LCD",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "game",
+      "name": "Game",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "pixelArcade",
+        "params": {
+          "mode": "snake",
+          "speed": 1,
+          "cycleBars": 16,
+          "glow": 0.3,
+          "paletteMix": 0,
+          "scanlines": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.2,
+            "threshold": 0.8,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.04,
+            "size": 1
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.3,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Restart",
+      "value": 0.226,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycleBars",
+          "range": [
+            2,
+            64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.125,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tint",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.paletteMix",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scanlines",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.scanlines",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Handheld LCD": [
+      "#0f380f",
+      "#306230",
+      "#8bac0f",
+      "#9bbc0f",
+      "#c7d4a2"
+    ]
+  },
+  "bpmHint": [
+    90,
+    140
+  ],
+  "description": "A snake slithering across a green LCD a cell per beat, growing every time it eats: the late-90s phone game and green-screen handhelds."
+}

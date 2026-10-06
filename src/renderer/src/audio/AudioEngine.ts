@@ -114,6 +114,11 @@ export class AudioEngine {
     this.post({ type: 'settings', analysis: this.analysis, extraLatencyMs: extra });
   }
 
+  /** Feed an external clock reading (Link snapshot / MIDI Clock fit) to the beat clock. */
+  external(source: 'link' | 'midiClock', bpm: number, beat: number, epochMs: number): void {
+    this.post({ type: 'external', source, bpm, beat, epochMs });
+  }
+
   tempo(cmd: TempoCommandInput): void {
     if (!this.ctx) return;
     this.post({ type: 'tempo', command: { ...cmd, t: this.ctx.currentTime } as TempoCommand });

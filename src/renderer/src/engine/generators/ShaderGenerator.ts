@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { FULLSCREEN_VERT } from '../shaders/common';
 import { FullscreenPass } from '../three/fullscreen';
-import type { GenContext, Generator } from './Generator';
+import type { CompileTarget, GenContext, Generator } from './Generator';
 
 export type Uniforms = Record<string, THREE.IUniform>;
 
@@ -57,6 +57,10 @@ export abstract class ShaderGenerator implements Generator {
   render(renderer: THREE.WebGLRenderer, target: THREE.WebGLRenderTarget): void {
     (this.u.uRes.value as THREE.Vector2).set(target.width, target.height);
     this.pass.render(renderer, target);
+  }
+
+  compileTargets(): CompileTarget[] {
+    return [this.pass];
   }
 
   dispose(): void {

@@ -2,6 +2,7 @@ import { app, ipcMain, BrowserWindow } from 'electron';
 import { IPC, type OutputCommand } from '@shared/ipc';
 import type { SettingsPatch } from '@shared/settings';
 import { installCaptureHandlers } from './audioCapture';
+import { LinkService } from './link';
 import { deleteUserPreset, exportPresetFile, flushSession, importPresetFiles, listUserPresets, openPresetFolder, readSession, saveUserPreset, writeSession } from './presetStore';
 import { dataDir, SettingsStore } from './settingsStore';
 import { listDisplays, WindowManager } from './windows';
@@ -20,6 +21,7 @@ if (!app.requestSingleInstanceLock()) app.quit();
 
 let store: SettingsStore;
 let windows: WindowManager;
+let link: LinkService;
 
 function registerIpc(): void {
   ipcMain.handle(IPC.getSettings, () => store.get());
@@ -39,6 +41,10 @@ function registerIpc(): void {
   ipcMain.handle(IPC.readSession, () => readSession());
   ipcMain.on(IPC.writeSession, (_e, json: string) => writeSession(json));
   ipcMain.on(IPC.requestAnalysisPort, () => windows.connectAnalysis());
+  ipcMain.handle(IPC.setLinkEnabled, (_e, on: boolean) => {
+    link.setEnabled(on);
+    return link.state();
+  });
 
   store.onChange((s) => {
     for (const w of BrowserWindow.getAllWindows()) w.webContents.send(IPC.settingsChanged, s);
@@ -49,6 +55,7 @@ app.whenReady().then(() => {
   store = new SettingsStore();
   windows = new WindowManager(store);
   installCaptureHandlers();
+  link = new LinkService((s) => windows.control?.webContents.send(IPC.linkState, s));
   registerIpc();
   windows.createControl();
   if (store.get().output.openOnLaunch) windows.openOutput();
@@ -61,6 +68,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', () => {
+  link?.dispose();
   void store?.flush();
   void flushSession();
 });

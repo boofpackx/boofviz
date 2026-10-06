@@ -2,6 +2,7 @@ import { PORT_MESSAGE_TAG } from '@shared/ipc';
 import { AudioEngine } from '@/audio/AudioEngine';
 import type { ThreeRenderer } from '@/engine/three/ThreeRenderer';
 import { libraryEntries, useShow } from './show';
+import { useControl } from './store';
 
 /** Process-wide singletons for the control window (outside React's lifecycle). */
 export const engine = new AudioEngine();
@@ -29,6 +30,10 @@ export function liveValue(layerId: string, path: string): number | undefined {
     return !!e;
   },
   show: () => useShow.getState(),
+  settings: () => useControl.getState().settings,
+  updateSettings: (patch: Parameters<ReturnType<typeof useControl.getState>['update']>[0]) => useControl.getState().update(patch),
+  gpu: () => preview.renderer?.gpuInfo ?? null,
+  previewLastSwitch: () => preview.renderer?.lastSwitch ?? null,
 };
 
 let ready = false;

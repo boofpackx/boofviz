@@ -55,6 +55,8 @@ export function AnalysisPanel() {
         <p className="text-[11px] leading-snug text-ink-400">Detected tempos outside the range are folded by half/double time (e.g. 87 → 174 for DnB with 120–190).</p>
       </Section>
 
+      <ExternalTempoSection />
+
       <Section
         title="Smoothing"
         right={
@@ -76,6 +78,66 @@ export function AnalysisPanel() {
       </Section>
 
     </div>
+  );
+}
+
+function ExternalTempoSection() {
+  const a = useControl((s) => s.settings.analysis);
+  const update = useControl((s) => s.update);
+  const link = useControl((s) => s.link);
+  const midi = useControl((s) => s.midi);
+  const patch = (p: Partial<typeof a>): void => update({ analysis: p });
+  return (
+    <Section title="Sync (Link / MIDI Clock)">
+      <Segmented
+        value={a.tempoSource}
+        onChange={(v) => patch({ tempoSource: v })}
+        options={[
+          { value: 'auto', label: 'Auto' },
+          { value: 'tap', label: 'Tap' },
+          { value: 'link', label: 'Link', disabled: !link.available },
+          { value: 'midiClock', label: 'MIDI Clock', disabled: !midi.supported },
+        ]}
+      />
+      {!link.available && (
+        <p className="text-[11px] leading-snug text-ink-400">
+          Ableton Link needs a one-time build: run <span className="font-mono text-ink-200">npm run link:build</span> (needs Visual Studio Build Tools on Windows), then restart BOOFVIZ.
+        </p>
+      )}
+      {a.tempoSource === 'link' && (
+        <p className="text-[11px] leading-snug text-ink-400">
+          Turn on <b className="text-ink-200">Link</b> in Rekordbox (Performance mode, LINK button) or Serato (Setup → Ableton Link). {link.peers > 0 ? `Connected to ${link.peers} peer${link.peers > 1 ? 's' : ''} at ${link.tempo.toFixed(2)} BPM.` : 'Waiting for peers…'}
+        </p>
+      )}
+      {a.tempoSource === 'midiClock' && (
+        <div className="grid grid-cols-[84px_1fr] items-center gap-2">
+          <span className="text-ink-300">MIDI input</span>
+          <select value={a.midiInputId ?? ''} onChange={(e) => patch({ midiInputId: e.target.value || undefined })}>
+            <option value="">First available</option>
+            {midi.inputs.map((i) => (
+              <option key={i.id} value={i.id}>
+                {i.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      {(a.tempoSource === 'link' || a.tempoSource === 'midiClock') && (
+        <>
+          <Slider
+            label="Sync offset"
+            value={a.externalOffsetMs}
+            min={-100}
+            max={100}
+            step={1}
+            defaultValue={0}
+            format={(v) => `${v > 0 ? '+' : ''}${v.toFixed(0)} ms`}
+            onChange={(v) => patch({ externalOffsetMs: v })}
+          />
+          <p className="text-[11px] leading-snug text-ink-400">Positive moves beat-locked motion earlier to cover projector / LED processor delay. The audio latency offset doesn&apos;t apply to Link or clock timing.</p>
+        </>
+      )}
+    </Section>
   );
 }
 

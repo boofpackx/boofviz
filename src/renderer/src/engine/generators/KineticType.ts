@@ -23,6 +23,8 @@ uniform float uCapFrac;       // cap height / row height
 uniform int uMode;
 uniform float uRowsN, uScroll, uSize, uStretch, uOutline, uSkew, uPunch;
 uniform float uWord, uWordT;
+uniform vec2 uBounce;          // badge position 0..1 within the free area
+uniform float uBounceHue, uFlash, uLines, uCrawl;
 
 // Sample row r at text-space coords: x in em (row heights), y 0..1 across the cap height.
 vec2 glyph(int r, float x, float y) {
@@ -65,6 +67,44 @@ void main() {
     float cov = outline && !hot ? gl.g : gl.r;
     col = (hot ? palette(0.45) * 1.6 : outline ? lineCol : fillCol) * cov;
     a = cov;
+  } else if (uMode == 4) {
+    // Bouncing logo: changes colour on every wall hit, flashes on a corner hit.
+    float w = uWidths[0] * ${ATLAS_W}.0 / ${ROW_H}.0;
+    float emPx = uRes.y * 0.16 * uSize;
+    vec2 box = vec2(w * emPx, emPx * uCapFrac * 1.4);
+    vec2 pos = uBounce * (uRes - box);
+    vec2 q = p - pos;
+    float gy = q.y / (emPx * uCapFrac) - 0.2;
+    float gx = q.x / emPx;
+    vec2 gl = glyph(0, gx, gy);
+    vec3 c = palette(0.3 + 0.7 * fract(uBounceHue * 0.618)) * (1.4 + 2.0 * uFlash);
+    col = c * max(gl.r, gl.g * 0.5);
+    a = max(gl.r, gl.g * 0.5);
+    col += vec3(1.0) * uFlash * 0.25;
+    a = max(a, uFlash * 0.25);
+  } else if (uMode == 5) {
+    // Opening crawl: lines receding up a tilted plane toward the horizon.
+    float s = p.y / uRes.y;
+    float horizon = 0.92;
+    if (s < horizon) {
+      float d = 1.0 / (1.0 - s / horizon * 0.94);          // depth: 1 at the bottom, large near the horizon
+      float x = (p.x - 0.5 * uRes.x) / uRes.y * d;
+      // Text coordinate: line 0 leads, furthest away; the block recedes as uCrawl grows.
+      float v = uCrawl - (d - 1.0) * 0.55;
+      float lineH = 0.32 * uSize;
+      float li = floor(v / lineH);
+      if (li >= 0.0 && li < uLines) {
+        int r = 1 + int(li);
+        float w = uWidths[r] * ${ATLAS_W}.0 / ${ROW_H}.0;
+        float em = 0.36 * uSize;
+        float gx = x / em + w * 0.5;
+        float gy = 1.0 - fract(v / lineH) * 1.6 + 0.3;
+        vec2 gl = glyph(r, gx, gy);
+        float fade = 1.0 - smoothstep(horizon * 0.55, horizon, s);
+        col = fillCol * gl.r * fade;
+        a = gl.r * fade;
+      }
+    }
   } else {
     // Punch (whole text) or one word per beat, centred and fitted.
     int r = uMode == 2 ? 1 + int(uWord) : 0;
@@ -122,6 +162,11 @@ export class KineticType extends ShaderGenerator {
       uPunch: { value: 0.2 },
       uWord: { value: 0 },
       uWordT: { value: 1 },
+      uBounce: { value: new THREE.Vector2() },
+      uBounceHue: { value: 0 },
+      uFlash: { value: 0 },
+      uLines: { value: 1 },
+      uCrawl: { value: 0 },
     });
     this.canvas = canvas;
     this.tex = tex;
@@ -129,8 +174,10 @@ export class KineticType extends ShaderGenerator {
 
   private draw(text: string, font: string): void {
     const ctx = this.canvas.getContext('2d')!;
-    const full = text.toUpperCase().replace(/\s*\/\s*/g, ' ').trim() || ' ';
-    this.words = full.split(/\s+/).filter(Boolean).slice(0, MAX_WORDS);
+    const upper = text.toUpperCase();
+    const full = upper.replace(/\s*\/\s*/g, ' ').trim() || ' ';
+    // "/" separates words or lines (crawl); otherwise split on spaces.
+    this.words = (upper.includes('/') ? upper.split('/') : upper.split(/\s+/)).map((w) => w.trim()).filter(Boolean).slice(0, MAX_WORDS);
     if (!this.words.length) this.words = [' '];
     const rows = [full, ...this.words];
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -176,7 +223,24 @@ export class KineticType extends ShaderGenerator {
     }
     const u = this.u;
     const mode = String(p.mode ?? 'stack');
-    u.uMode.value = mode === 'punch' ? 1 : mode === 'words' ? 2 : mode === 'marquee' ? 3 : 0;
+    u.uMode.value = mode === 'punch' ? 1 : mode === 'words' ? 2 : mode === 'marquee' ? 3 : mode === 'bounce' ? 4 : mode === 'crawl' ? 5 : 0;
+    if (mode === 'bounce') {
+      // Pure function of time: x and y are triangle waves, each wall hit bumps the colour.
+      const t = ctx.time * num(p.speed, 1) * 0.11;
+      const vx = 1;
+      const vy = 1.37;
+      const tri = (x: number): number => {
+        const f = ((x % 2) + 2) % 2;
+        return f < 1 ? f : 2 - f;
+      };
+      (u.uBounce.value as THREE.Vector2).set(tri(t * vx), tri(t * vy));
+      u.uBounceHue.value = Math.floor(t * vx) + Math.floor(t * vy);
+      const near = (x: number): number => Math.min(x - Math.floor(x), Math.ceil(x) - x);
+      const corner = Math.max(near(t * vx), near(t * vy)) < 0.012;
+      u.uFlash.value = corner ? 1 : Math.max(0, (u.uFlash.value as number) - ctx.dt * 1.5);
+    }
+    u.uLines.value = this.words.length;
+    u.uCrawl.value = (ctx.time * num(p.speed, 1) * 0.08) % (this.words.length * 0.32 * num(p.size, 0.8) + 3);
     u.uRowsN.value = Math.round(num(p.rows, 5));
     u.uScroll.value = (num(p.speed, 1) * ctx.beat) / 4;
     u.uSize.value = num(p.size, 0.8);

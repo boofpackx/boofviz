@@ -1,0 +1,203 @@
+{
+  "schema": 1,
+  "name": "Human Machine",
+  "category": "Icons & Homages",
+  "tags": [
+    "swiss",
+    "constructivist",
+    "electro",
+    "album art",
+    "homage",
+    "red",
+    "type"
+  ],
+  "energy": 3,
+  "palette": "Constructivist",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "grid",
+      "name": "Grid",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "swissGrid",
+        "params": {
+          "mode": "bars",
+          "cols": 12,
+          "rows": 6,
+          "margin": 0.05,
+          "gutter": 0.008,
+          "accent": 0.8,
+          "lines": 0.4,
+          "shift": 0.6,
+          "paper": false
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "HUMAN / MACHINE",
+          "mode": "words",
+          "font": "condensed",
+          "rows": 5,
+          "speed": 1,
+          "size": 0.75,
+          "stretch": 0.2,
+          "outline": 0,
+          "wordBeats": 4,
+          "skew": -0.12,
+          "punch": 0.12
+        }
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.06,
+            "size": 1
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1.15,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Accent",
+      "value": 0.75,
+      "targets": [
+        {
+          "path": "layers.0.source.params.accent",
+          "range": [
+            0.2,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Columns",
+      "value": 0.429,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cols",
+          "range": [
+            6,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Type size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.5,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Type",
+      "value": 1,
+      "targets": [
+        {
+          "path": "layers.1.opacity",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Beats/word",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.1.source.params.wordBeats",
+          "range": [
+            1,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lean",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.1.source.params.skew",
+          "range": [
+            -0.3,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Constructivist": [
+      "#0d0d0d",
+      "#3a0b0b",
+      "#d01c1f",
+      "#e8e0cc",
+      "#f4ecd8"
+    ]
+  },
+  "bpmHint": [
+    110,
+    130
+  ],
+  "description": "Red, black and cream constructivist blocks pumping with the EQ under slanted condensed type: a nod to late-70s robot electro sleeves."
+}

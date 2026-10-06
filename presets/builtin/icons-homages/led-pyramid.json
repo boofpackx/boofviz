@@ -1,0 +1,230 @@
+{
+  "schema": 1,
+  "name": "LED Pyramid",
+  "category": "Icons & Homages",
+  "tags": [
+    "led",
+    "pyramid",
+    "french house",
+    "stage",
+    "homage",
+    "club"
+  ],
+  "energy": 4,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "phrase",
+    "every": 1,
+    "fadeBeats": 2,
+    "list": [
+      "Neon",
+      "Infrared",
+      "Ocean",
+      "Acid"
+    ]
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bars",
+      "name": "LED bars",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "spectrumBars",
+        "params": {
+          "bars": 32,
+          "gap": 0.16,
+          "height": 0.9,
+          "horizon": 0.33,
+          "mirror": "center",
+          "segments": 16,
+          "roundness": 0,
+          "colorMode": "frequency",
+          "caps": true,
+          "glow": 1,
+          "reflection": 0,
+          "floor": 0,
+          "background": 1,
+          "release": 0.14,
+          "punch": 0.06
+        }
+      },
+      "fx": [
+        {
+          "type": "ledScreen",
+          "enabled": true,
+          "params": {
+            "cell": 11,
+            "gap": 0.22,
+            "glow": 1.2
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.9,
+            "threshold": 0.5,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": [],
+      "mask": {
+        "type": "shape",
+        "size": 0.86,
+        "feather": 0.005,
+        "invert": false,
+        "shape": "triangle"
+      }
+    },
+    {
+      "id": "edge",
+      "name": "Pyramid edge",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "polygon",
+        "params": {
+          "sides": 3,
+          "roundness": 0,
+          "beatMorph": 0,
+          "size": 0.497,
+          "copies": 1,
+          "spread": 0.25,
+          "nested": 1,
+          "nestScale": 0.78,
+          "nestOffset": 0,
+          "twist": 0.1,
+          "spin": 0,
+          "angle": 0,
+          "offsetY": -0.172,
+          "stroke": 0.004,
+          "fill": 0,
+          "glow": 1.4,
+          "pulse": 0.04,
+          "colorSpread": 0,
+          "background": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 1,
+            "threshold": 0.3,
+            "radius": 0.8,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "LED size",
+      "value": 0.357,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.cell",
+          "range": [
+            6,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.437,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.strength",
+          "range": [
+            0.2,
+            1.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Height",
+      "value": 0.857,
+      "targets": [
+        {
+          "path": "layers.0.source.params.height",
+          "range": [
+            0.6,
+            0.95
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Edge",
+      "value": 1,
+      "targets": [
+        {
+          "path": "layers.1.opacity",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bars",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bars",
+          "range": [
+            24,
+            64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick punch",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.punch",
+          "range": [
+            0,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    115,
+    130
+  ],
+  "description": "A giant stepped pyramid built from LED panels, bars climbing its face to the music, colours changing every phrase: the 2007 French-house live show."
+}

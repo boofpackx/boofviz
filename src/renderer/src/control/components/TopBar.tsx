@@ -108,6 +108,8 @@ function TempoDisplay() {
   const source = useControl((s) => s.settings.analysis.tempoSource);
   const update = useControl((s) => s.update);
   const conf = f.bpmConfidence;
+  const link = useControl((s) => s.link);
+  const midi = useControl((s) => s.midi);
   const beatInBar = Math.floor(f.barPhase * f.beatsPerBar);
   const setSource = (v: TempoSourceKind): void => update({ analysis: { tempoSource: v } });
   return (
@@ -142,10 +144,11 @@ function TempoDisplay() {
         options={[
           { value: 'auto', label: 'Auto' },
           { value: 'tap', label: 'Tap' },
-          { value: 'link', label: 'Link', disabled: true, title: 'Ableton Link — arrives with the beat engine (Phase 3)' },
-          { value: 'midiClock', label: 'MIDI', disabled: true, title: 'MIDI Clock in — arrives with the beat engine (Phase 3)' },
+          { value: 'link', label: 'Link', disabled: !link.available, title: link.available ? 'Ableton Link: tempo and beat from Rekordbox, Serato, Traktor, Ableton…' : (link.error ?? 'Link add-on not built') },
+          { value: 'midiClock', label: 'MIDI', disabled: !midi.supported, title: 'MIDI Clock in from DJ software, a mixer or a DAW' },
         ]}
       />
+      <SyncChip />
       <div className="flex gap-0.5">
         <Button title="Half time" onClick={() => engine.tempo({ cmd: 'half' })}>
           ½
@@ -165,6 +168,29 @@ function TempoDisplay() {
       </div>
     </div>
   );
+}
+
+/** Sync status for the external tempo sources. */
+function SyncChip() {
+  const source = useControl((s) => s.settings.analysis.tempoSource);
+  const link = useControl((s) => s.link);
+  const midi = useControl((s) => s.midi);
+  if (source === 'link') {
+    const ok = link.enabled && link.peers > 0;
+    return (
+      <span className={`rounded px-1.5 py-0.5 font-mono text-[10px] ${ok ? 'bg-ok/15 text-ok' : 'bg-warn/15 text-warn'}`} title={ok ? `Following the Link session at ${link.tempo.toFixed(2)} BPM` : 'Enable Link in your DJ software (same computer or network)'}>
+        LINK · {link.peers} peer{link.peers === 1 ? '' : 's'}
+      </span>
+    );
+  }
+  if (source === 'midiClock') {
+    return (
+      <span className={`rounded px-1.5 py-0.5 font-mono text-[10px] ${midi.receiving ? 'bg-ok/15 text-ok' : 'bg-warn/15 text-warn'}`} title={midi.receiving ? 'Receiving MIDI Clock' : 'No MIDI Clock pulses: check the input in Audio → Tempo'}>
+        {midi.receiving ? `CLOCK · ${midi.bpm.toFixed(1)}` : 'NO CLOCK'}
+      </span>
+    );
+  }
+  return null;
 }
 
 function Stats() {

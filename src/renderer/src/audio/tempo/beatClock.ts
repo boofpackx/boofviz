@@ -36,12 +36,74 @@ export class TempoTracker {
   private lastJumpTime = -Infinity;
   private pendingBpm = 0;
   private pendingCount = 0;
-  private readonly downbeatScore = new Float64Array(4);
-  private lastDownbeatBeat = -1;
+  private lastErr = 0;
   private manualDownbeat = false;
+  private externalAt = -Infinity;
+
+  /** True when the user pinned the downbeat, or an external clock defines the bar. */
+  get downbeatLocked(): boolean {
+    return this.manualDownbeat || this.state.source === 'link' || this.state.source === 'midiClock';
+  }
+
+  /** Seconds since the last external (Link / MIDI) update, at audio time t. */
+  externalAge(t: number): number {
+    return t - this.externalAt;
+  }
 
   setSource(source: TempoSourceKind): void {
-    this.state = { ...this.state, source };
+    if (source === this.state.source) return;
+    const external = source === 'link' || source === 'midiClock';
+    // Leaving or joining an external clock: its bar grid replaces ours (and vice versa).
+    this.state = { ...this.state, source, confidence: external ? 0 : this.state.confidence };
+    this.manualDownbeat = false;
+    this.externalAt = -Infinity;
+  }
+
+  /**
+   * Follow an external clock (Ableton Link or MIDI Clock): `beat` is the
+   * session beat at audio time `t`, already shifted by any offset. Beat 0 is a
+   * bar start. Snaps when far off, otherwise re-anchors in tiny steps so the
+   * beat counter stays smooth.
+   */
+  applyExternal(source: 'link' | 'midiClock', bpm: number, beat: number, t: number): boolean {
+    if (this.state.source !== source || !(bpm > 0)) return false;
+    this.externalAt = t;
+    const predicted = beatAt(this.state, t);
+    const err = predicted - beat;
+    const tempoChanged = Math.abs(bpm / this.state.bpm - 1) > 1e-4;
+    if (this.state.confidence < 0.5 || Math.abs(err) > 0.25 || tempoChanged || Math.abs(err) > 0.002) {
+      const bar = this.state.beatsPerBar;
+      this.state = {
+        ...this.state,
+        bpm,
+        anchorTime: t,
+        anchorBeat: beat,
+        confidence: 1,
+        downbeatOffset: this.manualDownbeat ? this.state.downbeatOffset : 0,
+        phraseOffset: this.manualDownbeat ? this.state.phraseOffset : ((this.state.phraseOffset % bar) + bar) % bar === 0 ? this.state.phraseOffset : 0,
+      };
+      this.locked = true;
+    }
+    return true;
+  }
+
+  /** An external clock went quiet: keep the tempo running, but say we're unsure. */
+  markStale(): void {
+    if (this.state.confidence > 0.25) this.state = { ...this.state, confidence: 0.25 };
+  }
+
+  /** Apply downbeat / phrase offsets found by the meter tracker. */
+  setMeter(downbeatOffset: number, phraseOffset: number): void {
+    if (this.manualDownbeat) return;
+    const down = this.downbeatLocked ? this.state.downbeatOffset : downbeatOffset;
+    if (down !== this.state.downbeatOffset || phraseOffset !== this.state.phraseOffset) {
+      this.state = { ...this.state, downbeatOffset: down, phraseOffset };
+    }
+  }
+
+  /** The tracker has a beat grid worth measuring meter against. */
+  get isLocked(): boolean {
+    return this.locked;
   }
 
   setBeatsPerPhrase(n: number): void {
@@ -97,8 +159,12 @@ export class TempoTracker {
     // the residual phase error into tempo so a small BPM bias can't drift.
     const predicted = beatAt(this.state, est.beatTime);
     const err = predicted - Math.round(predicted); // -0.5..0.5 beats
-    const gain = Math.abs(err) > 0.1 ? 0.6 : 0.35;
-    const correction = -err * gain * Math.min(1, est.confidence * 2);
+    // The same large error twice in a row is a jump (cue, loop, new track): snap to it.
+    const jump = Math.abs(err) > 0.12 && Math.abs(err - this.lastErr) < 0.06;
+    this.lastErr = err;
+    // Big, confident errors are corrected almost fully; small ones gently (jitter).
+    const gain = jump ? 1 : Math.abs(err) > 0.15 ? 0.85 : Math.abs(err) > 0.06 ? 0.6 : 0.35;
+    const correction = -err * gain * (jump ? 1 : Math.min(1, est.confidence * 2));
     const dtEst = this.lastEstimateTime ? now - this.lastEstimateTime : 0;
     // A large error is a phase jump (cue, loop, new track), not a tempo error:
     // hold the integrator off until the loop has settled to avoid overshoot.
@@ -110,29 +176,6 @@ export class TempoTracker {
     this.reanchor(now, newBpm, correction);
     this.state = { ...this.state, confidence: this.state.confidence + (est.confidence - this.state.confidence) * 0.3 };
     return true;
-  }
-
-  /** Feed kick onsets (with strength) to estimate which beat of the bar is the downbeat. */
-  observeKick(t: number, strength: number, bassLevel: number): void {
-    if (this.manualDownbeat || !this.locked) return;
-    const b = beatAt(this.state, t);
-    const nearest = Math.round(b);
-    const dist = Math.abs(b - nearest);
-    if (dist > 0.2) return;
-    const pos = ((nearest % 4) + 4) % 4;
-    for (let i = 0; i < 4; i++) this.downbeatScore[i] *= 0.995;
-    this.downbeatScore[pos] += strength * (0.5 + bassLevel) * (1 - dist * 4);
-    if (nearest - this.lastDownbeatBeat < 16) return;
-    let best = 0;
-    let sum = 0;
-    for (let i = 0; i < 4; i++) {
-      sum += this.downbeatScore[i];
-      if (this.downbeatScore[i] > this.downbeatScore[best]) best = i;
-    }
-    if (this.downbeatScore[best] > (sum / 4) * 1.2 && best !== this.state.downbeatOffset) {
-      this.state = { ...this.state, downbeatOffset: best, phraseOffset: best };
-      this.lastDownbeatBeat = nearest;
-    }
   }
 
   command(c: TempoCommand, tap: (t: number) => { bpm: number; lastTap: number } | null): void {

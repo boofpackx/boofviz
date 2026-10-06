@@ -17,8 +17,13 @@ interface ShowState {
   selectedLayer: number;
   userPresets: PresetEntry[];
   toast: string | null;
+  /** A preset waiting to go live on a beat / bar / phrase boundary. */
+  queued: { entry: PresetEntry; atBeat: number } | null;
 
   load(entry: PresetEntry): void;
+  /** Go live now, or queue for `atBeat` (both windows switch on that beat). */
+  launch(entry: PresetEntry, atBeat?: number): void;
+  cancelQueued(): void;
   /** Undoable edit. Consecutive edits sharing a `coalesce` key within one gesture (one drag) merge into one undo step. */
   edit(fn: (draft: Preset) => void, coalesce?: string): void;
   undo(): void;
@@ -62,6 +67,7 @@ export const useShow = create<ShowState>((set, get) => ({
   selectedLayer: 0,
   userPresets: [],
   toast: null,
+  queued: null,
 
   load: (entry) => {
     const { doc, past } = get();
@@ -76,6 +82,15 @@ export const useShow = create<ShowState>((set, get) => ({
       selectedLayer: Math.max(0, entry.preset.layers.length - 1),
     });
   },
+
+  launch: (entry, atBeat) => {
+    if (atBeat === undefined) {
+      set({ queued: null });
+      get().load(entry);
+    } else set({ queued: { entry, atBeat } });
+  },
+
+  cancelQueued: () => set({ queued: null }),
 
   edit: (fn, coalesce) => {
     const { doc, past } = get();

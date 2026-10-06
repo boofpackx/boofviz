@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "name": "Vapor Mall",
+  "category": "Icons & Homages",
+  "tags": [
+    "vaporwave",
+    "aesthetic",
+    "retro",
+    "90s",
+    "pastel",
+    "sunset"
+  ],
+  "energy": 2,
+  "palette": "Vaporwave",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "sunset",
+      "name": "Sunset",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "synthSunset",
+        "params": {
+          "sun": 0.2,
+          "stripes": 6,
+          "horizon": 0.4,
+          "mountains": 0.6,
+          "glow": 0.8,
+          "stars": 0.4
+        }
+      },
+      "fx": [
+        {
+          "type": "rgbSplit",
+          "enabled": true,
+          "params": {
+            "amount": 0.004,
+            "angle": 0,
+            "radial": 0.3
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.3,
+            "scanlines": 0.45,
+            "mask": 0.25,
+            "vignette": 0.4
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.05,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "A E S T H E T I C / P L A Z A / 1 9 9 5",
+          "mode": "words",
+          "font": "serif",
+          "rows": 5,
+          "speed": 1,
+          "size": 0.5,
+          "stretch": 0,
+          "outline": 0.6,
+          "wordBeats": 8,
+          "skew": 0,
+          "punch": 0.05
+        }
+      },
+      "fx": [],
+      "blend": "difference",
+      "opacity": 0.85,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Sun",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.sun",
+          "range": [
+            0.12,
+            0.32
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chroma",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            0.01
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tube",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.curvature",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Type",
+      "value": 0.85,
+      "targets": [
+        {
+          "path": "layers.1.opacity",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Beats/word",
+      "value": 0.467,
+      "targets": [
+        {
+          "path": "layers.1.source.params.wordBeats",
+          "range": [
+            1,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scanlines",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.scanlines",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    60,
+    100
+  ],
+  "description": "Pastel sunset, wobbling chroma and a fuzzy CRT, with wide-spaced type drifting by: late-night 90s mall-music nostalgia."
+}

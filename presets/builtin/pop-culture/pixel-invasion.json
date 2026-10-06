@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "name": "Pixel Invasion",
+  "category": "Pop Culture",
+  "tags": [
+    "arcade",
+    "aliens",
+    "shooter",
+    "retro",
+    "8-bit",
+    "game"
+  ],
+  "energy": 3,
+  "palette": "Mono",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "game",
+      "name": "Game",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "pixelArcade",
+        "params": {
+          "mode": "aliens",
+          "speed": 1,
+          "cycleBars": 16,
+          "glow": 1,
+          "paletteMix": 0,
+          "scanlines": 0.35
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.35,
+            "threshold": 0.8,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.3,
+            "scanlines": 0.35,
+            "mask": 0.25,
+            "vignette": 0.45
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Restart",
+      "value": 0.226,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycleBars",
+          "range": [
+            2,
+            64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.219,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tint",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.paletteMix",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scanlines",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.0.source.params.scanlines",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    100,
+    140
+  ],
+  "description": "Rows of pixel aliens marching down a step per beat while a cannon fires back from behind crumbling shields: the 1978 alien-shooter cabinet."
+}

@@ -66,12 +66,49 @@ try {
   }
   check(worst < 2, `control and output beat clocks agree (worst ${worst.toFixed(2)} ms)`);
 
-  // ---- Phase 2: library, modulation, macros, undo, save ------------------
+  // ---- Phase 3: quantized launch, favorites, shuffle ----------------------
   const dbg = (fn) => control.evaluate(fn);
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const waitFor = async (fn, ms = 6000) => {
+    for (const end = Date.now() + ms; Date.now() < end; await sleep(50)) if (await dbg(fn)) return true;
+    return false;
+  };
   await control.getByRole('button', { name: 'Library', exact: true }).click();
   await control.getByText('Shape Morph', { exact: true }).first().click();
-  await new Promise((r) => setTimeout(r, 800));
-  check((await dbg(() => window.__BOOFVIZ_DEBUG__.show().doc.name)) === 'Shape Morph', 'library click loads a preset');
+  const q = await dbg(() => {
+    const s = window.__BOOFVIZ_DEBUG__.show();
+    return s.queued && { name: s.queued.entry.preset.name, atBeat: s.queued.atBeat, beat: window.__BOOFVIZ_DEBUG__.frame().beat };
+  });
+  check(!!q && q.name === 'Shape Morph' && Number.isInteger(q.atBeat) && q.atBeat > q.beat && q.atBeat - q.beat <= 4.1, `library click queues the preset for the next bar (${q ? `beat ${q.beat.toFixed(2)} → ${q.atBeat}` : 'not queued'})`);
+  await sleep(150);
+  check((await output.evaluate(() => window.__BOOFVIZ_DEBUG__.pendingBeat())) === q?.atBeat, 'output holds the queued scene for the same beat');
+  await waitFor(() => window.__BOOFVIZ_DEBUG__.show().doc.name === 'Shape Morph');
+  await sleep(300);
+  check((await dbg(() => window.__BOOFVIZ_DEBUG__.show().doc.name)) === 'Shape Morph', 'the queued preset goes live');
+  // Each window must switch on its first frame that reaches the bar (never early, never a frame late).
+  const pSw = await dbg(() => window.__BOOFVIZ_DEBUG__.previewLastSwitch());
+  const oSw = await output.evaluate(() => window.__BOOFVIZ_DEBUG__.lastSwitch());
+  const onTime = (s) => !!s && !!q && s.prevBeat < q.atBeat - 0.002 && s.beat >= q.atBeat - 0.002;
+  const late = (s) => (s && q ? (((s.beat - q.atBeat) * 60000) / f.bpm).toFixed(1) : '?');
+  check(onTime(pSw) && onTime(oSw), `preview and output both switch on the first frame of the bar (preview +${late(pSw)} ms, output +${late(oSw)} ms after the downbeat)`);
+
+  for (const name of ['Prism Spectrum', 'Arcade Maze']) {
+    await control.locator('div[role=button]', { hasText: name }).first().getByTitle('Add to favorites').click();
+  }
+  await sleep(300);
+  const favs = await dbg(() => window.__BOOFVIZ_DEBUG__.settings().library.favorites);
+  check(favs.length === 2 && favs[0] === 'builtin:prism-spectrum' && favs[1] === 'builtin:arcade-maze', `star adds favorites (${favs.join(', ')})`);
+  await control.locator('body').click({ position: { x: 5, y: 5 } });
+  await control.keyboard.press('2');
+  check((await dbg(() => window.__BOOFVIZ_DEBUG__.show().queued?.entry.id)) === 'builtin:arcade-maze', 'key 2 queues favorite #2');
+  await control.keyboard.press('Escape');
+  check((await dbg(() => window.__BOOFVIZ_DEBUG__.show().queued)) === null, 'Esc cancels the queued launch');
+  await control.keyboard.press('s');
+  const shuffled = await dbg(() => window.__BOOFVIZ_DEBUG__.show().queued?.entry.id);
+  check(favs.includes(shuffled), `S shuffles from the favorites (${shuffled})`);
+  await control.keyboard.press('Escape');
+
+  // ---- Phase 2: modulation, macros, undo, save ---------------------------
 
   await control.getByRole('button', { name: 'Layers', exact: true }).click();
   const sizeRow = control.locator('label', { hasText: /^Size$/ }).first();

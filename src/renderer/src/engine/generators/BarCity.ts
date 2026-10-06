@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { PALETTE_GLSL, UTIL_GLSL } from '../shaders/common';
 import { BarAnalyzer } from './barAnalyzer';
-import type { GenContext, Generator } from './Generator';
+import type { CompileTarget, GenContext, Generator } from './Generator';
 import { num } from './ShaderGenerator';
 
 const MAX = 64;
@@ -249,6 +249,10 @@ export class BarCity implements Generator {
     renderer.setClearColor(0x000000, 1);
     renderer.clear(true, true, false);
     renderer.render(this.scene, this.camera);
+  }
+
+  compileTargets(): CompileTarget[] {
+    return [{ scene: this.scene, camera: this.camera }];
   }
 
   dispose(): void {

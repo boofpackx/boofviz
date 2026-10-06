@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "name": "Lightspeed",
+  "category": "Pop Culture",
+  "tags": [
+    "space",
+    "hyperspace",
+    "sci-fi",
+    "film",
+    "drop",
+    "stars"
+  ],
+  "energy": 4,
+  "palette": "Hyperspace",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "warp",
+      "name": "Warp",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "warp",
+        "params": {
+          "mode": "hyperspace",
+          "speed": 1.2,
+          "density": 1.2,
+          "streak": 0.6,
+          "twist": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 1.1,
+            "threshold": 0.4,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "rgbSplit",
+          "enabled": true,
+          "params": {
+            "amount": 0.002,
+            "angle": 0,
+            "radial": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Streak",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.streak",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stars",
+      "value": 0.357,
+      "targets": [
+        {
+          "path": "layers.0.source.params.density",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0.2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Twist",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.twist",
+          "range": [
+            -0.5,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Hyperspace": [
+      "#000000",
+      "#0a1030",
+      "#5a7dff",
+      "#bcd2ff",
+      "#ffffff"
+    ]
+  },
+  "bpmHint": [
+    120,
+    175
+  ],
+  "description": "Stars stretching into blue-white streaks as you jump to lightspeed, the jump hitting on every drop: the 1977 space-opera hyperdrive."
+}

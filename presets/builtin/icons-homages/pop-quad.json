@@ -1,0 +1,175 @@
+{
+  "schema": 1,
+  "name": "Pop Quad",
+  "category": "Icons & Homages",
+  "tags": [
+    "pop art",
+    "flowers",
+    "screen print",
+    "grid",
+    "homage",
+    "60s"
+  ],
+  "energy": 3,
+  "palette": "Pop",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "flower",
+      "name": "Flower",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "radialSpectrum",
+        "params": {
+          "style": "bloom",
+          "bars": 96,
+          "radius": 0.16,
+          "length": 0.3,
+          "thickness": 0.8,
+          "symmetry": 4,
+          "spin": 0.05,
+          "core": 0.8,
+          "glow": 0.4,
+          "release": 0.15,
+          "punch": 0.15
+        }
+      },
+      "fx": [
+        {
+          "type": "popGrid",
+          "enabled": true,
+          "params": {
+            "tiles": 2,
+            "hueStep": 1.6,
+            "levels": 4
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1.1,
+            "saturation": 1.35,
+            "hue": 0,
+            "temperature": 0
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.05,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Tiles",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.tiles",
+          "range": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Colour step",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.hueStep",
+          "range": [
+            0.4,
+            2.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Posterise",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.levels",
+          "range": [
+            2,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Petals",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.length",
+          "range": [
+            0.15,
+            0.45
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Symmetry",
+      "value": 0.429,
+      "targets": [
+        {
+          "path": "layers.0.source.params.symmetry",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Pop": [
+      "#101010",
+      "#ff3ea5",
+      "#00b7eb",
+      "#ffe600",
+      "#ff7a00"
+    ]
+  },
+  "description": "One flower, screen-printed four times in clashing flat colours: the 1960s New York pop-art silkscreens."
+}

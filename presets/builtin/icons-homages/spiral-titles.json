@@ -1,0 +1,193 @@
+{
+  "schema": 1,
+  "name": "Spiral Titles",
+  "category": "Icons & Homages",
+  "tags": [
+    "spiral",
+    "title sequence",
+    "film",
+    "homage",
+    "hypnotic",
+    "retro"
+  ],
+  "energy": 2,
+  "palette": "Title Card",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "spiral",
+      "name": "Spiral",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "polygon",
+        "params": {
+          "sides": 4,
+          "roundness": 0,
+          "beatMorph": 0,
+          "size": 0.6,
+          "copies": 1,
+          "spread": 0.25,
+          "nested": 12,
+          "nestScale": 0.82,
+          "nestOffset": 0,
+          "twist": 0.035,
+          "spin": -0.12,
+          "angle": 0,
+          "offsetY": 0,
+          "stroke": 0.006,
+          "fill": 0,
+          "glow": 0.5,
+          "pulse": 0.06,
+          "colorSpread": 0.25,
+          "background": 0.4
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.6,
+            "zoom": 0.006,
+            "rotate": 0.002,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.06,
+            "size": 1
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.45,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Twist",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.twist",
+          "range": [
+            0,
+            0.07
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            -0.3,
+            0.06
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Depth",
+      "value": 1,
+      "targets": [
+        {
+          "path": "layers.0.source.params.nested",
+          "range": [
+            6,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trails",
+      "value": 0.571,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0.2,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Round",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.roundness",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Line",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stroke",
+          "range": [
+            0.003,
+            0.012
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Title Card": [
+      "#0b0b0b",
+      "#3a0d05",
+      "#e8461e",
+      "#f29a2e",
+      "#f6efe2"
+    ]
+  },
+  "description": "A vortex of twisting squares in orange and black, dizzy and hypnotic: the 1950s thriller title sequences."
+}

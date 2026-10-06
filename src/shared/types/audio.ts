@@ -112,6 +112,10 @@ export interface AnalysisSettings {
   spectrumSmoothing: BandSmoothing;
   bpmRange: [number, number];
   tempoSource: TempoSourceKind;
+  /** Link / MIDI Clock only: shift the beat earlier (+) to cover projector / display delay. */
+  externalOffsetMs: number;
+  /** Web MIDI input id used for MIDI Clock. */
+  midiInputId?: string;
 }
 
 export const DEFAULT_ANALYSIS_SETTINGS: AnalysisSettings = {
@@ -133,6 +137,7 @@ export const DEFAULT_ANALYSIS_SETTINGS: AnalysisSettings = {
   spectrumSmoothing: { attackMs: 10, releaseMs: 140 },
   bpmRange: [70, 180],
   tempoSource: 'auto',
+  externalOffsetMs: 0,
 };
 
 // ---------------------------------------------------------------------------

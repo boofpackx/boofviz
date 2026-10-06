@@ -43,12 +43,17 @@ try {
   await control.getByRole('button', { name: 'Input', exact: true }).click();
   await control.setInputFiles('input[type=file]', wav);
   await new Promise((r) => setTimeout(r, 4000));
-  const ids = (await control.evaluate(() => window.__BOOFVIZ_DEBUG__.presets())).filter((id) => !only || id.includes(only));
+  const filters = only ? only.split(",") : [];
+  const ids = (await control.evaluate(() => window.__BOOFVIZ_DEBUG__.presets())).filter((id) => !filters.length || filters.some((f) => id.includes(f)));
   for (const id of ids) {
     current = id;
     const ok = await control.evaluate((x) => window.__BOOFVIZ_DEBUG__.load(x), id);
     if (!ok) errors.push(`could not load ${id}`);
     await new Promise((r) => setTimeout(r, dwell));
+    // The output window must be showing the look that was just loaded.
+    const want = await control.evaluate(() => window.__BOOFVIZ_DEBUG__.show().doc.layers.map((l) => l.id).join(','));
+    const got = await output.evaluate(() => window.__BOOFVIZ_DEBUG__.scene()?.layers.map((l) => l.id).join(','));
+    if (want !== got) errors.push(`${id}: output shows [${got}], expected [${want}]`);
     const file = join(outDir, `${id.replace(/[:/]/g, '_')}.png`);
     await output.screenshot({ path: file });
     console.log(`shot ${id}`);
