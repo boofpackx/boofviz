@@ -20,6 +20,7 @@ import { SpectrumBars } from './SpectrumBars';
 import { SwissGrid } from './SwissGrid';
 import { SynthSunset } from './SynthSunset';
 import { Tiles } from './Tiles';
+import { TwistCube } from './TwistCube';
 import { Warp } from './Warp';
 
 const FACTORIES: Record<string, () => Generator> = {
@@ -44,6 +45,7 @@ const FACTORIES: Record<string, () => Generator> = {
   warp: () => new Warp(),
   orb: () => new Orb(),
   ricochet: () => new Ricochet(),
+  twistCube: () => new TwistCube(),
   background: () => new Background(),
 };
 

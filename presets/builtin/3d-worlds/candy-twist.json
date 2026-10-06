@@ -1,0 +1,215 @@
+{
+  "schema": 1,
+  "name": "Candy Twist",
+  "category": "3D Worlds",
+  "tags": [
+    "3d",
+    "cube",
+    "y2k",
+    "candy",
+    "glossy",
+    "bouncy"
+  ],
+  "energy": 3,
+  "palette": "Candy Y2K",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Studio",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "diagonal",
+          "from": 0.75,
+          "to": 0.95,
+          "intensity": 0.55,
+          "motion": 0.25,
+          "pulse": 0.1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "cube",
+      "name": "Twist cube",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "twistCube",
+        "params": {
+          "style": "candy",
+          "colors": "classic",
+          "turnsPerBar": 4,
+          "cyclePhrases": 1,
+          "snap": 0.3,
+          "slices": true,
+          "tumble": true,
+          "spin": 0.2,
+          "size": 1,
+          "punch": 0.08,
+          "explode": 1.4,
+          "round": 0.18,
+          "glow": 0.9,
+          "shadow": 0.45,
+          "tilt": 0.5
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.35,
+            "threshold": 1,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.2,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Turns/bar",
+      "value": 0.429,
+      "targets": [
+        {
+          "path": "layers.1.source.params.turnsPerBar",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.667,
+      "targets": [
+        {
+          "path": "layers.1.source.params.spin",
+          "range": [
+            -0.6,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.6,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drop burst",
+      "value": 0.467,
+      "targets": [
+        {
+          "path": "layers.1.source.params.explode",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rim light",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.1.source.params.glow",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tilt",
+      "value": 0.444,
+      "targets": [
+        {
+          "path": "layers.1.source.params.tilt",
+          "range": [
+            0.1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Snap",
+      "value": 0.231,
+      "targets": [
+        {
+          "path": "layers.1.source.params.snap",
+          "range": [
+            0.15,
+            0.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.233,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.strength",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Candy Y2K": [
+      "#2a2440",
+      "#7b3fe4",
+      "#ff8fd0",
+      "#8ff3ff",
+      "#fff9fe"
+    ]
+  },
+  "description": "A stickerless candy-gloss cube on a pastel Y2K sweep: snappy face turns on the beat, a solve on every phrase, and a bouncy burst on the drop."
+}

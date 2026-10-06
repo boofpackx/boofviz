@@ -1,0 +1,222 @@
+{
+  "schema": 1,
+  "name": "Twist Cube",
+  "category": "3D Worlds",
+  "tags": [
+    "3d",
+    "cube",
+    "puzzle",
+    "studio",
+    "beat"
+  ],
+  "energy": 3,
+  "palette": "Studio Night",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Studio",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "radial",
+          "from": 0.35,
+          "to": 0,
+          "intensity": 0.6,
+          "motion": 0.1,
+          "pulse": 0.15
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "cube",
+      "name": "Twist cube",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "twistCube",
+        "params": {
+          "style": "stickers",
+          "colors": "classic",
+          "turnsPerBar": 4,
+          "cyclePhrases": 1,
+          "snap": 0.35,
+          "slices": true,
+          "tumble": true,
+          "spin": 0.15,
+          "size": 1,
+          "punch": 0.06,
+          "explode": 1.2,
+          "round": 0.12,
+          "glow": 0.35,
+          "shadow": 0.6,
+          "tilt": 0.45
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.45,
+            "threshold": 0.9,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.35,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.02,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Turns/bar",
+      "value": 0.429,
+      "targets": [
+        {
+          "path": "layers.1.source.params.turnsPerBar",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.625,
+      "targets": [
+        {
+          "path": "layers.1.source.params.spin",
+          "range": [
+            -0.6,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.6,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drop burst",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.1.source.params.explode",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rim light",
+      "value": 0.175,
+      "targets": [
+        {
+          "path": "layers.1.source.params.glow",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tilt",
+      "value": 0.389,
+      "targets": [
+        {
+          "path": "layers.1.source.params.tilt",
+          "range": [
+            0.1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Snap",
+      "value": 0.308,
+      "targets": [
+        {
+          "path": "layers.1.source.params.snap",
+          "range": [
+            0.15,
+            0.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.strength",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Studio Night": [
+      "#050608",
+      "#14161c",
+      "#2a6cff",
+      "#9fb8ff",
+      "#e9eef7"
+    ]
+  },
+  "description": "A classic stickered twisting puzzle cube in a dark studio: one slice turn per beat, scrambled through the phrase and solved again exactly on the next one; it tumbles on the bar and bursts apart on the drop."
+}

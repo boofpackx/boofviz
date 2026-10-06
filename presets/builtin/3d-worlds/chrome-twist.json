@@ -1,0 +1,224 @@
+{
+  "schema": 1,
+  "name": "Chrome Twist",
+  "category": "3D Worlds",
+  "tags": [
+    "3d",
+    "cube",
+    "chrome",
+    "garage",
+    "glints",
+    "club"
+  ],
+  "energy": 4,
+  "palette": "Velvet Chrome",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Studio",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "radial",
+          "from": 0.3,
+          "to": 0,
+          "intensity": 0.7,
+          "motion": 0.15,
+          "pulse": 0.25
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "cube",
+      "name": "Twist cube",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "twistCube",
+        "params": {
+          "style": "chrome",
+          "colors": "palette",
+          "turnsPerBar": 8,
+          "cyclePhrases": 2,
+          "snap": 0.4,
+          "slices": false,
+          "tumble": true,
+          "spin": -0.25,
+          "size": 0.95,
+          "punch": 0.08,
+          "explode": 1.2,
+          "round": 0.1,
+          "glow": 1.2,
+          "shadow": 0.5,
+          "tilt": 0.35
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.8,
+            "threshold": 0.7,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "rgbSplit",
+          "enabled": true,
+          "params": {
+            "amount": 0.0015,
+            "angle": 0,
+            "radial": 1
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.4,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Turns/bar",
+      "value": 1,
+      "targets": [
+        {
+          "path": "layers.1.source.params.turnsPerBar",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.292,
+      "targets": [
+        {
+          "path": "layers.1.source.params.spin",
+          "range": [
+            -0.6,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.438,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.6,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drop burst",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.1.source.params.explode",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rim light",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.1.source.params.glow",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tilt",
+      "value": 0.278,
+      "targets": [
+        {
+          "path": "layers.1.source.params.tilt",
+          "range": [
+            0.1,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Snap",
+      "value": 0.385,
+      "targets": [
+        {
+          "path": "layers.1.source.params.snap",
+          "range": [
+            0.15,
+            0.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.533,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.strength",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Velvet Chrome": [
+      "#07020d",
+      "#2a0a3d",
+      "#b44cff",
+      "#ffd36b",
+      "#fff4e0"
+    ]
+  },
+  "description": "A mirror-chrome cube with jewel-coloured tiles on velvet purple: eighth-note turns, a two-phrase scramble and solve, glints on the snare and a big burst on the drop."
+}
