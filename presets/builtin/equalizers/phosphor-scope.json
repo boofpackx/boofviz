@@ -1,0 +1,229 @@
+{
+  "schema": 1,
+  "name": "Phosphor Scope",
+  "category": "Equalizers",
+  "tags": [
+    "oscilloscope",
+    "waveform",
+    "retro",
+    "lab"
+  ],
+  "energy": 2,
+  "palette": "Phosphor",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "glass",
+      "name": "CRT glass",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "radial",
+          "from": 0.18,
+          "to": 0,
+          "intensity": 0.35,
+          "motion": 0,
+          "pulse": 0.15
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "trace",
+      "name": "Trace",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "scope",
+        "params": {
+          "mode": "wave",
+          "thickness": 2.6,
+          "gain": 1.4,
+          "glow": 1.2,
+          "smoothing": 0.25,
+          "color": 0.55,
+          "radius": 0.28,
+          "length": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.8,
+            "zoom": 0,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.9,
+            "threshold": 0.5,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.035,
+            "size": 1
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.gain",
+          "range": [
+            0.8,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.length",
+          "range": [
+            1,
+            0.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.3.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Smooth",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.smoothing",
+          "range": [
+            0,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Thickness",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.thickness",
+          "range": [
+            1.2,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Persistence",
+      "value": 0.88,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.amount",
+          "range": [
+            0,
+            0.92
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.1.fx.1.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grain",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.1.fx.2.params.amount",
+          "range": [
+            0,
+            0.1
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Phosphor": [
+      "#000a04",
+      "#003b16",
+      "#14ff6a",
+      "#9dffc2",
+      "#eafff2"
+    ]
+  },
+  "description": "A green-phosphor oscilloscope with afterglow, locked to rising zero crossings for a steady trace."
+}

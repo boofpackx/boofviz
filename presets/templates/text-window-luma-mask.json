@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "name": "Text Window (luma mask)",
+  "category": "2D Graphic",
+  "tags": [
+    "template",
+    "structure",
+    "mask",
+    "typography"
+  ],
+  "energy": 3,
+  "palette": "Mono",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "matte",
+      "name": "Text matte (hidden)",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "BOOFVIZ",
+          "mode": "punch",
+          "font": "heavy",
+          "rows": 5,
+          "speed": 1,
+          "size": 1.15,
+          "stretch": 0.3,
+          "outline": 0.5,
+          "wordBeats": 1,
+          "skew": 0,
+          "punch": 0.15
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 0,
+      "modulators": []
+    },
+    {
+      "id": "fill",
+      "name": "Fill (masked by text)",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "spectrumBars",
+        "params": {
+          "bars": 48,
+          "gap": 0.28,
+          "height": 0.8,
+          "horizon": 0.12,
+          "mirror": "none",
+          "segments": 0,
+          "roundness": 1,
+          "colorMode": "frequency",
+          "caps": true,
+          "glow": 0.9,
+          "reflection": 0.3,
+          "floor": 0,
+          "background": 1,
+          "release": 0.14,
+          "punch": 0.1
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.5,
+            "zoom": 0.01,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.8,
+            "threshold": 0.6,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": [],
+      "mask": {
+        "type": "luma",
+        "size": 0.5,
+        "feather": 0.05,
+        "invert": false,
+        "layer": 0
+      }
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.2.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0,
+      "targets": []
+    },
+    {
+      "name": "Zoom",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "Trails",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.amount",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.1.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Punch",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "description": "Layer 1 is a hidden text matte and layer 2 only shows through the letters (luma mask). Put any generator in layer 2.",
+  "isTemplate": true
+}

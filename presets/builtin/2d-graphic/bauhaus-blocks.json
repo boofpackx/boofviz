@@ -1,0 +1,194 @@
+{
+  "schema": 1,
+  "name": "Bauhaus Blocks",
+  "category": "2D Graphic",
+  "tags": [
+    "bauhaus",
+    "tiles",
+    "geometric",
+    "flat"
+  ],
+  "energy": 2,
+  "palette": "Bauhaus",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "tiles",
+      "name": "Bauhaus tiles",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "tiles",
+        "params": {
+          "style": "bauhaus",
+          "cells": 5,
+          "flipOn": "beat",
+          "flipAmount": 0.2,
+          "ease": 0.6,
+          "stroke": 0.12,
+          "colors": 4,
+          "pulse": 0.03
+        }
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.045,
+            "size": 1.5
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.25,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.flipAmount",
+          "range": [
+            0.05,
+            0.35
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.ease",
+          "range": [
+            1,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.pulse",
+          "range": [
+            0,
+            0.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cells",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cells",
+          "range": [
+            3,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grain",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Vignette",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.amount",
+          "range": [
+            0,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Colours",
+      "value": 0.66,
+      "targets": [
+        {
+          "path": "layers.0.source.params.colors",
+          "range": [
+            2,
+            5
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Bauhaus": [
+      "#111111",
+      "#d62828",
+      "#f6bd00",
+      "#1d4e89",
+      "#efe6d5"
+    ]
+  },
+  "description": "Primary-colour quarter circles, half discs and squares that turn on the beat. A poster that dances."
+}

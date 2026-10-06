@@ -1,0 +1,219 @@
+{
+  "schema": 1,
+  "name": "Spectrum Bloom",
+  "category": "Equalizers",
+  "tags": [
+    "radial",
+    "flower",
+    "organic",
+    "melodic"
+  ],
+  "energy": 2,
+  "palette": "Sunset",
+  "paletteCycle": {
+    "mode": "energy",
+    "every": 1,
+    "fadeBeats": 0,
+    "list": [
+      "Ocean",
+      "Sunset",
+      "Infrared"
+    ]
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "flower",
+      "name": "Bloom",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "radialSpectrum",
+        "params": {
+          "style": "bloom",
+          "bars": 96,
+          "radius": 0.14,
+          "length": 0.3,
+          "thickness": 0.55,
+          "symmetry": 3,
+          "spin": 0.06,
+          "core": 0.8,
+          "glow": 0.7,
+          "release": 0.25,
+          "punch": 0.15
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.8,
+            "zoom": -0.006,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 1.1,
+            "threshold": 0.6,
+            "radius": 0.8,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.45,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": [
+        {
+          "target": "source.params.symmetry",
+          "source": "random",
+          "amount": 0.25,
+          "rate": 16,
+          "randomMode": "hold"
+        }
+      ]
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.length",
+          "range": [
+            0.16,
+            0.44
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            0,
+            0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.3.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.modulators.0.amount",
+          "range": [
+            0,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.radius",
+          "range": [
+            0.06,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trails",
+      "value": 0.86,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            0.93
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.strength",
+          "range": [
+            0,
+            2.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Punch",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.punch",
+          "range": [
+            0,
+            0.3
+          ]
+        }
+      ]
+    }
+  ],
+  "bpmHint": [
+    90,
+    128
+  ],
+  "description": "Layered spectrum petals that open with the music. Colours follow the track energy."
+}

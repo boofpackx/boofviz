@@ -1,0 +1,234 @@
+{
+  "schema": 1,
+  "name": "Mirror Pulse",
+  "category": "Equalizers",
+  "tags": [
+    "bars",
+    "mirrored",
+    "symmetry",
+    "peak"
+  ],
+  "energy": 4,
+  "palette": "Vaporwave",
+  "paletteCycle": {
+    "mode": "phrase",
+    "every": 1,
+    "fadeBeats": 4,
+    "list": [
+      "Vaporwave",
+      "Neon",
+      "Sunset"
+    ]
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "eq",
+      "name": "Mirrored EQ",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "spectrumBars",
+        "params": {
+          "bars": 96,
+          "gap": 0.35,
+          "height": 0.42,
+          "horizon": 0.3,
+          "mirror": "center",
+          "segments": 0,
+          "roundness": 1,
+          "colorMode": "frequency",
+          "caps": false,
+          "glow": 0.9,
+          "reflection": 1,
+          "floor": 1,
+          "background": 0.6,
+          "release": 0.1,
+          "punch": 0.18
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.72,
+            "zoom": 0.012,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 1,
+            "threshold": 0.7,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "rgbSplit",
+          "enabled": true,
+          "params": {
+            "amount": 0.002,
+            "angle": 0,
+            "radial": 1
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": [
+        {
+          "target": "fx.0.params.zoom",
+          "source": "tempo.bar",
+          "amount": 0.12,
+          "shape": "ramp"
+        },
+        {
+          "target": "fx.2.params.amount",
+          "source": "audio.onset.snare",
+          "amount": 0.12
+        }
+      ]
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.height",
+          "range": [
+            0.25,
+            0.48
+          ]
+        },
+        {
+          "path": "layers.0.source.params.glow",
+          "range": [
+            0.4,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.release",
+          "range": [
+            0.2,
+            0.03
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.3.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.15,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.amount",
+          "range": [
+            0,
+            0.012
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bars",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bars",
+          "range": [
+            48,
+            144
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trails",
+      "value": 0.8,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Punch",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.punch",
+          "range": [
+            0,
+            0.3
+          ]
+        }
+      ]
+    }
+  ],
+  "bpmHint": [
+    120,
+    135
+  ],
+  "description": "Bars grow up and down from the centre line and smear outward in zoom trails. Colours turn over every phrase."
+}

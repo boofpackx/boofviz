@@ -32,6 +32,14 @@ const api: BoofvizApi = {
   onOutputCommand: (cb) => subscribe<OutputCommand>(IPC.outputCommand, cb),
   requestAnalysisPort: () => ipcRenderer.send(IPC.requestAnalysisPort),
   pathForFile: (file) => webUtils.getPathForFile(file),
+  listUserPresets: () => ipcRenderer.invoke(IPC.listUserPresets),
+  saveUserPreset: (slug, json, template) => ipcRenderer.invoke(IPC.saveUserPreset, slug, json, template),
+  deleteUserPreset: (slug, template) => ipcRenderer.invoke(IPC.deleteUserPreset, slug, template),
+  importPresets: () => ipcRenderer.invoke(IPC.importPresets),
+  exportPreset: (slug, json) => ipcRenderer.invoke(IPC.exportPreset, slug, json),
+  openPresetFolder: () => ipcRenderer.invoke(IPC.openPresetFolder),
+  readSession: () => ipcRenderer.invoke(IPC.readSession),
+  writeSession: (json) => ipcRenderer.send(IPC.writeSession, json),
 };
 
 contextBridge.exposeInMainWorld('boofviz', api);

@@ -19,6 +19,10 @@ vec3 palette(float t) {
   f = f * f * (3.0 - 2.0 * f);
   return mix(uPal[i], uPal[i + 1], f);
 }
+// Wrapping lookup that skips the darkest (background) stop.
+vec3 paletteWrap(float t) {
+  return palette(0.25 + 0.75 * fract(t));
+}
 `;
 
 export const SDF_GLSL = /* glsl */ `
@@ -26,4 +30,76 @@ float sdRoundBox(vec2 p, vec2 b, float r) {
   vec2 q = abs(p) - b + r;
   return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
 }
+float sdBox(vec2 p, vec2 b) {
+  vec2 d = abs(p) - b;
+  return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+// Regular n-gon (iq), circumradius r; n may be fractional.
+float sdPolygon(vec2 p, float r, float n) {
+  float an = 3.14159265 / n;
+  vec2 acs = vec2(cos(an), sin(an));
+  float bn = mod(atan(p.x, p.y), 2.0 * an) - an;
+  p = length(p) * vec2(cos(bn), abs(sin(bn)));
+  p -= r * acs;
+  p.y += clamp(-p.y, 0.0, r * acs.y);
+  return length(p) * sign(p.x);
+}
+float sdSegment(vec2 p, vec2 a, vec2 b) {
+  vec2 pa = p - a, ba = b - a;
+  float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+  return length(pa - ba * h);
+}
+float sdTriangleEq(vec2 p, float r) {
+  const float k = 1.7320508;
+  p.x = abs(p.x) - r;
+  p.y = p.y + r / k;
+  if (p.x + k * p.y > 0.0) p = vec2(p.x - k * p.y, -k * p.x - p.y) / 2.0;
+  p.x -= clamp(p.x, -2.0 * r, 0.0);
+  return -length(p) * sign(p.y);
+}
+`;
+
+export const UTIL_GLSL = /* glsl */ `
+float hash11(float p) { p = fract(p * 0.1031); p *= p + 33.33; p *= p + p; return fract(p); }
+float hash21(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+vec2 hash22(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973)); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.xx + p3.yz) * p3.zy); }
+mat2 rot2(float a) { float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
+float vnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash21(i), hash21(i + vec2(1, 0)), u.x), mix(hash21(i + vec2(0, 1)), hash21(i + vec2(1, 1)), u.x), u.y);
+}
+float fbm(vec2 p) {
+  float v = 0.0, a = 0.5;
+  for (int i = 0; i < 5; i++) { v += a * vnoise(p); p = p * 2.03 + 17.1; a *= 0.5; }
+  return v;
+}
+float easeOutBack(float x) { const float c1 = 1.70158; const float c3 = c1 + 1.0; x = clamp(x, 0.0, 1.0); return 1.0 + c3 * pow(x - 1.0, 3.0) + c1 * pow(x - 1.0, 2.0); }
+float easeInOut(float x) { x = clamp(x, 0.0, 1.0); return x < 0.5 ? 4.0 * x * x * x : 1.0 - pow(-2.0 * x + 2.0, 3.0) / 2.0; }
+float luma(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
+// Coverage alpha for generators drawn without a background (so 'normal' blend overlays).
+float coverAlpha(vec3 c, float bg) { return mix(clamp(max(c.r, max(c.g, c.b)) * 2.0, 0.0, 1.0), 1.0, clamp(bg, 0.0, 1.0)); }
+`;
+
+/** Standard uniforms every shader generator receives. */
+export const GEN_HEADER = /* glsl */ `
+precision highp float;
+uniform vec2 uRes;
+uniform float uTime;
+uniform float uBeat;
+uniform float uBeatPhase;
+uniform float uBarPhase;
+uniform float uKick;
+uniform float uSnare;
+uniform float uHat;
+uniform float uBass;
+uniform float uMids;
+uniform float uHighs;
+uniform float uEnergy;
+uniform float uBeatsPerBar;
+in vec2 vUv;
+out vec4 fragColor;
+${PALETTE_GLSL}
+${SDF_GLSL}
+${UTIL_GLSL}
 `;

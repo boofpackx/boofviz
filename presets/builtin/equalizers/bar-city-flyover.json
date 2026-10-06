@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "name": "Bar City Flyover",
+  "category": "Equalizers",
+  "tags": [
+    "3d",
+    "city",
+    "bars",
+    "flyover",
+    "peak"
+  ],
+  "energy": 4,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "city",
+      "name": "City",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "barCity",
+        "params": {
+          "columns": 32,
+          "rows": 40,
+          "height": 1.4,
+          "speed": 1,
+          "camHeight": 1,
+          "swing": 0.35,
+          "gap": 0.25,
+          "fog": 0.5,
+          "windows": 0.6,
+          "glow": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 1,
+            "threshold": 0.9,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.4,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": [
+        {
+          "target": "source.params.height",
+          "source": "envelope",
+          "amount": 0.12,
+          "curve": "smooth",
+          "trigger": "drop",
+          "attackMs": 40,
+          "holdMs": 600,
+          "decayMs": 4000
+        }
+      ]
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.height",
+          "range": [
+            0.8,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.5,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.0.source.params.swing",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Camera",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.camHeight",
+          "range": [
+            0.4,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fog",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.fog",
+          "range": [
+            0.1,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Windows",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.windows",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    }
+  ],
+  "bpmHint": [
+    120,
+    140
+  ],
+  "description": "The spectrum as a skyline: each row is a moment of the track, rolling away from a camera that swings over each phrase."
+}

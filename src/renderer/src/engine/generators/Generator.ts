@@ -1,14 +1,40 @@
 import type * as THREE from 'three';
 import type { AudioFrame } from '@shared/types/audio';
-import type { ParamBag, ParamSpec, RenderContext } from '@shared/types/engine';
+import type { GlobalControls, ParamBag } from '@shared/types/engine';
 
-/** A layer source that draws into the linear-HDR scene target. */
+/** Eased audio envelopes shared by every generator in a frame. */
+export interface AudioEnv {
+  kick: number;
+  snare: number;
+  hat: number;
+  any: number;
+  bass: number;
+  mids: number;
+  highs: number;
+  energy: number;
+  /** Long, slow envelope after a detected drop. */
+  drop: number;
+}
+
+export interface GenContext {
+  frame: AudioFrame;
+  env: AudioEnv;
+  dt: number;
+  /** Animation time in seconds (shared audio clock × speed). */
+  time: number;
+  /** Beat counter × speed, phrase-aligned (see modulation.alignedBeat). */
+  beat: number;
+  palette: Float32Array;
+  params: ParamBag;
+  globals: GlobalControls;
+  width: number;
+  height: number;
+}
+
+/** A layer source that draws into a linear-HDR target (alpha = coverage). */
 export interface Generator {
   readonly kind: string;
-  readonly params: readonly ParamSpec[];
-  setParams(params: ParamBag): void;
-  setPalette(linear: Float32Array): void;
-  update(frame: AudioFrame, ctx: RenderContext): void;
+  update(ctx: GenContext): void;
   render(renderer: THREE.WebGLRenderer, target: THREE.WebGLRenderTarget): void;
   dispose(): void;
 }

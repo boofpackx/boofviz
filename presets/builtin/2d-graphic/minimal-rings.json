@@ -1,0 +1,200 @@
+{
+  "schema": 1,
+  "name": "Minimal Rings",
+  "category": "2D Graphic",
+  "tags": [
+    "lines",
+    "rings",
+    "minimal",
+    "radial",
+    "ambient"
+  ],
+  "energy": 1,
+  "palette": "Ocean",
+  "paletteCycle": {
+    "mode": "phrase",
+    "every": 2,
+    "fadeBeats": 8,
+    "list": [
+      "Ocean",
+      "Pastel"
+    ]
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "rings",
+      "name": "Rings",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lines",
+        "params": {
+          "mode": "radial",
+          "count": 22,
+          "amplitude": 0.5,
+          "thickness": 2.2,
+          "speed": 0.8,
+          "spread": 0.92,
+          "perspective": 0.3,
+          "color": 0.8,
+          "glow": 0.6
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.5,
+            "zoom": 0.004,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.7,
+            "threshold": 0.6,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.amplitude",
+          "range": [
+            0.2,
+            0.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.3,
+            1.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.zoom",
+          "range": [
+            0,
+            0.01
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rings",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.count",
+          "range": [
+            10,
+            40
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trails",
+      "value": 0.55,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Thickness",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.thickness",
+          "range": [
+            1.2,
+            3.2
+          ]
+        }
+      ]
+    }
+  ],
+  "bpmHint": [
+    70,
+    125
+  ],
+  "description": "Concentric rings ripple outward with spectrum history. Calm enough for an opener."
+}

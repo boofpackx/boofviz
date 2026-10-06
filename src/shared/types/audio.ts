@@ -31,7 +31,10 @@ export type TempoSourceKind = 'auto' | 'tap' | 'link' | 'midiClock';
  * consumer and mutated in place each render frame (no per-frame allocation).
  */
 export interface AudioFrame {
-  /** Audio-clock time in seconds this frame represents (latency offset applied). */
+  /**
+   * Continuous audio-clock time in seconds for this frame (latency offset
+   * applied). Identical across windows, so time-based animation stays in sync.
+   */
   time: number;
 
   // Spectrum

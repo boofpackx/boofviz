@@ -1,11 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { sceneOf } from '@/engine/presetIO';
 import { engine, initEngine } from './runtime';
 import { useControl } from './store';
+import { useShow } from './show';
 import { TopBar } from './components/TopBar';
 import { SourcePanel, useFileDrop } from './components/SourcePanel';
 import { Preview } from './components/Preview';
-import { AnalysisPanel } from './components/AnalysisPanel';
-import { Kbd } from './components/ui';
+import { AnalysisPanel, MasterPanel } from './components/AnalysisPanel';
+import { Inspector } from './components/Inspector';
+import { filteredEntries, Library, libraryView } from './components/Library';
+import { MacroStrip } from './components/MacroStrip';
+import { ContextMenuHost } from './components/ContextMenu';
+import { Kbd, Segmented } from './components/ui';
 
 function useBootstrap(): void {
   const hydrate = useControl((s) => s.hydrate);
@@ -17,9 +23,27 @@ function useBootstrap(): void {
     const offSettings = api.onSettings((s) => useControl.setState({ settings: s }));
     const offOutput = api.onOutputStatus((output) => set({ output }));
 
+    // The look follows the working preset: output gets it (throttled while dragging), session autosaves.
+    let pending = false;
+    let timer = 0;
+    const pushScene = (): void => {
+      pending = false;
+      const { doc, sourceId, dirty } = useShow.getState();
+      api.sendOutputCommand({ scene: sceneOf(doc) });
+      api.writeSession(JSON.stringify({ doc, sourceId, dirty }));
+    };
+    const unsubscribe = useShow.subscribe((s, prev) => {
+      if (s.doc === prev.doc && s.sourceId === prev.sourceId && s.dirty === prev.dirty) return;
+      if (pending) return;
+      pending = true;
+      timer = window.setTimeout(pushScene, 33);
+    });
+
     void (async () => {
       const settings = await api.getSettings();
       hydrate(settings);
+      await useShow.getState().restoreSession();
+      pushScene();
       await initEngine();
       engine.setAnalysisSettings(settings.analysis);
       api.sendOutputCommand({ globals: useControl.getState().globals });
@@ -37,6 +61,8 @@ function useBootstrap(): void {
     return () => {
       offSettings();
       offOutput();
+      unsubscribe();
+      window.clearTimeout(timer);
     };
   }, [hydrate, set]);
 
@@ -48,14 +74,38 @@ function useBootstrap(): void {
   }, [analysis, loaded]);
 }
 
+function stepPreset(dir: 1 | -1): void {
+  const list = filteredEntries(libraryView.tab, libraryView.query, libraryView.category, libraryView.tag);
+  if (!list.length) return;
+  const { sourceId, load } = useShow.getState();
+  const i = list.findIndex((e) => e.id === sourceId);
+  load(list[(i + dir + list.length) % list.length]);
+}
+
 function useShortcuts(): void {
   useEffect(() => {
     const onKey = (e: KeyboardEvent): void => {
       const t = e.target as HTMLElement;
-      if (t.tagName === 'INPUT' && (t as HTMLInputElement).type !== 'range') return;
-      if (t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+      const typing = (t.tagName === 'INPUT' && (t as HTMLInputElement).type !== 'range') || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT';
+      const mod = e.ctrlKey || e.metaKey;
+      const show = useShow.getState();
+      if (mod && !e.altKey) {
+        const k = e.key.toLowerCase();
+        if (k === 'z' && !typing) {
+          if (e.shiftKey) show.redo();
+          else show.undo();
+        } else if (k === 'y' && !typing) show.redo();
+        else if (k === 's') void show.save();
+        else return;
+        e.preventDefault();
+        return;
+      }
+      if (typing || e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
       const s = useControl.getState();
       switch (e.key.toLowerCase()) {
+        case 'tab':
+          stepPreset(e.shiftKey ? -1 : 1);
+          break;
         case 't':
           engine.tempo({ cmd: 'tap' });
           if (s.settings.analysis.tempoSource !== 'tap') s.update({ analysis: { tempoSource: 'tap' } });
@@ -85,6 +135,7 @@ function useShortcuts(): void {
           engine.tempo({ cmd: 'nudge', beats: 1 / 16 });
           break;
         case 'enter':
+          if (t.tagName === 'BUTTON' || t.getAttribute('role') === 'button') return;
           engine.tempo({ cmd: 'resyncDownbeat' });
           break;
         default:
@@ -97,32 +148,70 @@ function useShortcuts(): void {
   }, []);
 }
 
+type LeftTab = 'library' | 'input';
+type RightTab = 'layers' | 'audio' | 'master';
+
 export function App() {
   useBootstrap();
   useShortcuts();
   const hideUi = useControl((s) => s.hideUi);
   const drop = useFileDrop();
+  const [left, setLeft] = useState<LeftTab>('library');
+  const [right, setRight] = useState<RightTab>('layers');
 
   return (
     <div className="flex h-full flex-col" {...drop}>
       {!hideUi && <TopBar />}
       <div className="flex min-h-0 flex-1">
         {!hideUi && (
-          <aside className="w-72 shrink-0 border-r border-ink-700 bg-ink-900">
-            <SourcePanel />
+          <aside className="flex w-72 shrink-0 flex-col border-r border-ink-700 bg-ink-900">
+            <div className="border-b border-ink-700/70 p-2">
+              <Segmented
+                value={left}
+                onChange={setLeft}
+                options={[
+                  { value: 'library', label: 'Library' },
+                  { value: 'input', label: 'Input' },
+                ]}
+              />
+            </div>
+            <div className="min-h-0 flex-1">{left === 'library' ? <Library /> : <SourcePanel />}</div>
           </aside>
         )}
-        <main className="min-w-0 flex-1">
-          <Preview />
+        <main className="flex min-w-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1">
+            <Preview />
+          </div>
+          {!hideUi && <MacroStrip />}
         </main>
         {!hideUi && (
-          <aside className="w-80 shrink-0 border-l border-ink-700 bg-ink-900">
-            <AnalysisPanel />
+          <aside className="flex w-[340px] shrink-0 flex-col border-l border-ink-700 bg-ink-900">
+            <div className="border-b border-ink-700/70 p-2">
+              <Segmented
+                value={right}
+                onChange={setRight}
+                options={[
+                  { value: 'layers', label: 'Layers' },
+                  { value: 'audio', label: 'Audio' },
+                  { value: 'master', label: 'Master' },
+                ]}
+              />
+            </div>
+            <div className="min-h-0 flex-1">{right === 'layers' ? <Inspector /> : right === 'audio' ? <AnalysisPanel /> : <MasterPanel />}</div>
           </aside>
         )}
       </div>
       {!hideUi && (
         <footer className="flex h-7 shrink-0 items-center gap-4 border-t border-ink-700 bg-ink-900 px-3 text-[10px] text-ink-400">
+          <span>
+            <Kbd>Tab</Kbd> next preset
+          </span>
+          <span>
+            <Kbd>Ctrl Z</Kbd> undo
+          </span>
+          <span>
+            <Kbd>Ctrl S</Kbd> save
+          </span>
           <span>
             <Kbd>T</Kbd> tap
           </span>
@@ -131,10 +220,7 @@ export function App() {
             <Kbd>]</Kbd> nudge
           </span>
           <span>
-            <Kbd>Enter</Kbd> resync downbeat
-          </span>
-          <span>
-            <Kbd>F</Kbd> fullscreen output
+            <Kbd>F</Kbd> fullscreen out
           </span>
           <span>
             <Kbd>B</Kbd> blackout
@@ -145,9 +231,10 @@ export function App() {
           <span>
             <Kbd>H</Kbd> hide UI
           </span>
-          <span className="ml-auto">Phase 1 · Foundation</span>
+          <span className="ml-auto">Phase 2 · Engine core</span>
         </footer>
       )}
+      <ContextMenuHost />
     </div>
   );
 }

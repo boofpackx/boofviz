@@ -1,34 +1,22 @@
 import * as THREE from 'three';
 import type { AudioFrame } from '@shared/types/audio';
 import type { Renderer, RendererOptions, RenderContext, RenderStats, Scene } from '@shared/types/engine';
-import type { Generator } from '../generators/Generator';
-import { SpectrumBars } from '../generators/SpectrumBars';
-import { paletteLinear } from '../palettes';
 import { OUTPUT_FRAG, OUTPUT_VERT } from '../shaders/output';
+import { Compositor } from './Compositor';
 import { FullscreenPass } from './fullscreen';
 
 const MAX_DIM = 8192;
 
-function createGenerator(kind: string): Generator {
-  switch (kind) {
-    case 'spectrumBars':
-      return new SpectrumBars();
-    default:
-      throw new Error(`Unknown generator "${kind}"`);
-  }
-}
-
 /**
- * WebGL2 backend. Phase 1 draws the first generator layer into a half-float
- * linear target, then tonemaps + dithers to the canvas. The Phase 2 compositor
- * slots in between (layers, blend modes, FX chain) without changing callers.
+ * WebGL2 backend: the compositor renders the scene in linear HDR, then the
+ * output pass applies master brightness/saturation/hue, ACES tonemapping,
+ * sRGB encoding, dithering and blackout.
  */
 export class ThreeRenderer implements Renderer {
   readonly backend = 'webgl2' as const;
   private renderer!: THREE.WebGLRenderer;
-  private target!: THREE.WebGLRenderTarget;
+  private compositor!: Compositor;
   private output!: FullscreenPass;
-  private generator: Generator | null = null;
   private options: RendererOptions = { renderScale: 1, isOutput: false };
   private frameIndex = 0;
   private blackout = 0;
@@ -50,13 +38,7 @@ export class ThreeRenderer implements Renderer {
     this.renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
     this.renderer.autoClear = false;
     this.renderer.setPixelRatio(1);
-    this.target = new THREE.WebGLRenderTarget(1, 1, {
-      type: THREE.HalfFloatType,
-      format: THREE.RGBAFormat,
-      depthBuffer: false,
-      minFilter: THREE.LinearFilter,
-      magFilter: THREE.LinearFilter,
-    });
+    this.compositor = new Compositor(this.renderer);
     this.output = new FullscreenPass(
       new THREE.RawShaderMaterial({
         glslVersion: THREE.GLSL3,
@@ -65,7 +47,7 @@ export class ThreeRenderer implements Renderer {
         depthTest: false,
         depthWrite: false,
         uniforms: {
-          uScene: { value: this.target.texture },
+          uScene: { value: null },
           uExposure: { value: 1 },
           uSaturation: { value: 1 },
           uHueShift: { value: 0 },
@@ -78,14 +60,12 @@ export class ThreeRenderer implements Renderer {
   }
 
   setScene(scene: Scene): void {
-    const layer = scene.layers.find((l) => l.enabled && l.source.type === 'generator');
-    if (!layer) return;
-    if (!this.generator || this.generator.kind !== layer.source.kind) {
-      this.generator?.dispose();
-      this.generator = createGenerator(layer.source.kind);
-    }
-    this.generator.setParams(layer.source.params);
-    this.generator.setPalette(paletteLinear(scene.palette));
+    this.compositor.setScene(scene);
+  }
+
+  /** Live modulated parameter values for UI meters. */
+  get live(): Map<string, number> | null {
+    return this.compositor?.live ?? null;
   }
 
   setRenderScale(scale: number): void {
@@ -100,7 +80,7 @@ export class ThreeRenderer implements Renderer {
     const h = Math.max(1, Math.min(MAX_DIM, Math.round(cssHeight * s)));
     if (w === this.stats.width && h === this.stats.height) return;
     this.renderer.setSize(w, h, false);
-    this.target.setSize(w, h);
+    this.compositor.resize(w, h);
     this.stats.width = w;
     this.stats.height = h;
   }
@@ -109,15 +89,9 @@ export class ThreeRenderer implements Renderer {
     const g = ctx.globals;
     // Blackout eases over ~80 ms: instant to the eye, but never a hard flash.
     this.blackout += ((g.blackout ? 1 : 0) - this.blackout) * (1 - Math.exp(-ctx.dt / 0.03));
-
-    if (this.generator) {
-      this.generator.update(frame, ctx);
-      this.generator.render(this.renderer, this.target);
-    } else {
-      this.renderer.setRenderTarget(this.target);
-      this.renderer.clear();
-    }
+    const scene = this.compositor.render(frame, ctx.dt, g);
     const u = this.output.material.uniforms;
+    u.uScene.value = scene.texture;
     u.uExposure.value = g.brightness;
     u.uSaturation.value = g.saturation;
     u.uHueShift.value = (g.hueShift * Math.PI) / 180;
@@ -127,9 +101,8 @@ export class ThreeRenderer implements Renderer {
   }
 
   dispose(): void {
-    this.generator?.dispose();
+    this.compositor.dispose();
     this.output.dispose();
-    this.target.dispose();
     this.renderer.dispose();
   }
 }

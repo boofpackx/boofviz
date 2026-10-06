@@ -83,7 +83,7 @@ export function Button({ children, onClick, active, title, tone = 'default', cla
     danger: active ? 'border-bad bg-bad/80 text-white' : 'border-ink-600 bg-ink-800 text-ink-200 hover:border-bad/70',
   };
   return (
-    <button type="button" title={title} onClick={onClick} className={`rounded border px-2 py-1 text-[11px] font-medium transition-colors ${tones[tone]} ${className}`}>
+    <button type="button" title={title} onClick={onClick} className={`rounded border px-2 py-1 text-[11px] font-medium whitespace-nowrap transition-colors ${tones[tone]} ${className}`}>
       {children}
     </button>
   );

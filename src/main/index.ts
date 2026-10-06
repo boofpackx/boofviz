@@ -2,6 +2,7 @@ import { app, ipcMain, BrowserWindow } from 'electron';
 import { IPC, type OutputCommand } from '@shared/ipc';
 import type { SettingsPatch } from '@shared/settings';
 import { installCaptureHandlers } from './audioCapture';
+import { deleteUserPreset, exportPresetFile, flushSession, importPresetFiles, listUserPresets, openPresetFolder, readSession, saveUserPreset, writeSession } from './presetStore';
 import { dataDir, SettingsStore } from './settingsStore';
 import { listDisplays, WindowManager } from './windows';
 
@@ -28,7 +29,15 @@ function registerIpc(): void {
   ipcMain.handle(IPC.closeOutput, () => windows.closeOutput());
   ipcMain.handle(IPC.toggleOutputFullscreen, () => windows.toggleOutputFullscreen());
   ipcMain.on(IPC.outputStats, (_e, stats: { fps: number; width: number; height: number }) => windows.setOutputStats(stats));
-  ipcMain.on(IPC.outputCommand, (_e, cmd: OutputCommand) => windows.output?.webContents.send(IPC.outputCommand, cmd));
+  ipcMain.on(IPC.outputCommand, (_e, cmd: OutputCommand) => windows.sendOutputCommand(cmd));
+  ipcMain.handle(IPC.listUserPresets, () => listUserPresets());
+  ipcMain.handle(IPC.saveUserPreset, (_e, slug: string, json: string, template: boolean) => saveUserPreset(slug, json, template));
+  ipcMain.handle(IPC.deleteUserPreset, (_e, slug: string, template: boolean) => deleteUserPreset(slug, template));
+  ipcMain.handle(IPC.importPresets, () => importPresetFiles(windows.control));
+  ipcMain.handle(IPC.exportPreset, (_e, slug: string, json: string) => exportPresetFile(windows.control, slug, json));
+  ipcMain.handle(IPC.openPresetFolder, () => openPresetFolder());
+  ipcMain.handle(IPC.readSession, () => readSession());
+  ipcMain.on(IPC.writeSession, (_e, json: string) => writeSession(json));
   ipcMain.on(IPC.requestAnalysisPort, () => windows.connectAnalysis());
 
   store.onChange((s) => {
@@ -48,9 +57,10 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  void store?.flush().finally(() => app.quit());
+  void Promise.allSettled([store?.flush(), flushSession()]).finally(() => app.quit());
 });
 
 app.on('before-quit', () => {
   void store?.flush();
+  void flushSession();
 });

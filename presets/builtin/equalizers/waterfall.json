@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "name": "Waterfall",
+  "category": "Equalizers",
+  "tags": [
+    "spectrogram",
+    "waterfall",
+    "data",
+    "minimal"
+  ],
+  "energy": 2,
+  "palette": "Infrared",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "fall",
+      "name": "Spectrogram",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "spectrogram",
+        "params": {
+          "direction": "down",
+          "speed": 1,
+          "contrast": 1.2,
+          "floor": 0.18,
+          "glow": 0.5,
+          "perspective": 0.6
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.7,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.5,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.contrast",
+          "range": [
+            1.8,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.5,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Floor",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.floor",
+          "range": [
+            0.05,
+            0.31
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Depth",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.perspective",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fade",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.amount",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Highlights",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.glow",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    }
+  ],
+  "bpmHint": [
+    70,
+    180
+  ],
+  "description": "A heat-map waterfall of the spectrum receding to the horizon."
+}

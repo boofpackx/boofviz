@@ -1,0 +1,220 @@
+{
+  "schema": 1,
+  "name": "Word Punch",
+  "category": "2D Graphic",
+  "tags": [
+    "typography",
+    "text",
+    "words",
+    "kinetic",
+    "peak"
+  ],
+  "energy": 4,
+  "palette": "Infrared",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Backdrop",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "radial",
+          "from": 0.3,
+          "to": 0,
+          "intensity": 0.5,
+          "motion": 0.2,
+          "pulse": 0.4
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Words",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "FEEL / THE / BASS / DROP",
+          "mode": "words",
+          "font": "condensed",
+          "rows": 5,
+          "speed": 1,
+          "size": 0.9,
+          "stretch": 0.4,
+          "outline": 0,
+          "wordBeats": 1,
+          "skew": 0,
+          "punch": 0.22
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.6,
+            "zoom": 0.02,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.7,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.punch",
+          "range": [
+            0.05,
+            0.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.1.source.params.wordBeats",
+          "range": [
+            1,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.2.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.stretch",
+          "range": [
+            0,
+            0.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.6,
+            1.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trails",
+      "value": 0.67,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.amount",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.1.fx.1.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Zoom",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.zoom",
+          "range": [
+            0,
+            0.04
+          ]
+        }
+      ]
+    }
+  ],
+  "bpmHint": [
+    120,
+    150
+  ],
+  "description": "One word per beat, punched in with a kick and smeared into zoom trails. Separate words with \"/\"."
+}

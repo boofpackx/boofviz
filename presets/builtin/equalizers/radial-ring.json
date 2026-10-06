@@ -1,0 +1,239 @@
+{
+  "schema": 1,
+  "name": "Radial Ring",
+  "category": "Equalizers",
+  "tags": [
+    "radial",
+    "circle",
+    "ring"
+  ],
+  "energy": 3,
+  "palette": "Ocean",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Backdrop",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "radial",
+          "from": 0.35,
+          "to": 0,
+          "intensity": 0.45,
+          "motion": 0.2,
+          "pulse": 0.3
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "ring",
+      "name": "Ring",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "radialSpectrum",
+        "params": {
+          "style": "bars",
+          "bars": 120,
+          "radius": 0.2,
+          "length": 0.24,
+          "thickness": 0.5,
+          "symmetry": 2,
+          "spin": 0.12,
+          "core": 0.6,
+          "glow": 0.9,
+          "release": 0.15,
+          "punch": 0.15
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.55,
+            "zoom": 0.01,
+            "rotate": 0.004,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.9,
+            "threshold": 0.7,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 1,
+      "modulators": [
+        {
+          "target": "source.params.length",
+          "source": "audio.energy",
+          "amount": 0.12
+        },
+        {
+          "target": "fx.0.params.rotate",
+          "source": "random",
+          "amount": 0.2,
+          "offset": -0.1,
+          "rate": 8,
+          "randomMode": "hold"
+        }
+      ]
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.length",
+          "range": [
+            0.12,
+            0.36
+          ]
+        },
+        {
+          "path": "layers.1.source.params.glow",
+          "range": [
+            0.4,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.spin",
+          "range": [
+            0,
+            0.24
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.2.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.1.modulators.1.amount",
+          "range": [
+            0,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.radius",
+          "range": [
+            0.12,
+            0.28
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trails",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.amount",
+          "range": [
+            0,
+            0.92
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.1.fx.1.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Punch",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.punch",
+          "range": [
+            0,
+            0.3
+          ]
+        }
+      ]
+    }
+  ],
+  "bpmHint": [
+    100,
+    130
+  ],
+  "description": "A ring of spectrum bars around a breathing core, slowly orbiting with rotating trails."
+}

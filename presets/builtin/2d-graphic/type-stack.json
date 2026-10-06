@@ -1,0 +1,194 @@
+{
+  "schema": 1,
+  "name": "Type Stack",
+  "category": "2D Graphic",
+  "tags": [
+    "typography",
+    "text",
+    "kinetic",
+    "brutalist"
+  ],
+  "energy": 4,
+  "palette": "Brutalist B&W",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "BOOFVIZ",
+          "mode": "stack",
+          "font": "heavy",
+          "rows": 6,
+          "speed": 1,
+          "size": 0.8,
+          "stretch": 0.3,
+          "outline": 0.5,
+          "wordBeats": 1,
+          "skew": 0,
+          "punch": 0.2
+        }
+      },
+      "fx": [
+        {
+          "type": "rgbSplit",
+          "enabled": true,
+          "params": {
+            "amount": 0,
+            "angle": 0,
+            "radial": 0
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.04,
+            "size": 1
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": [
+        {
+          "target": "fx.0.params.amount",
+          "source": "audio.onset.kick",
+          "amount": 0.12
+        }
+      ]
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stretch",
+          "range": [
+            0,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.modulators.0.amount",
+          "range": [
+            0,
+            0.24
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rows",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.0.source.params.rows",
+          "range": [
+            2,
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Outline",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.outline",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Skew",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.skew",
+          "range": [
+            -0.3,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grain",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.amount",
+          "range": [
+            0,
+            0.1
+          ]
+        }
+      ]
+    }
+  ],
+  "description": "Your name, stacked and scrolling in alternating directions. One row lights up on every beat. Set the text in the inspector."
+}

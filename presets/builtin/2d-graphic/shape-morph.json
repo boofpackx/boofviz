@@ -1,0 +1,225 @@
+{
+  "schema": 1,
+  "name": "Shape Morph",
+  "category": "2D Graphic",
+  "tags": [
+    "shapes",
+    "polygon",
+    "morph",
+    "flat",
+    "vector"
+  ],
+  "energy": 3,
+  "palette": "Pastel",
+  "paletteCycle": {
+    "mode": "bar",
+    "every": 4,
+    "fadeBeats": 2,
+    "list": [
+      "Pastel",
+      "Vaporwave",
+      "Sunset"
+    ]
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Backdrop",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "radial",
+          "from": 0.15,
+          "to": 0,
+          "intensity": 0.35,
+          "motion": 0.2,
+          "pulse": 0.2
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "shape",
+      "name": "Morphing polygon",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "polygon",
+        "params": {
+          "sides": 3,
+          "roundness": 0,
+          "beatMorph": 1,
+          "size": 0.32,
+          "copies": 1,
+          "spread": 0.25,
+          "nested": 7,
+          "nestScale": 0.8,
+          "twist": 0.04,
+          "spin": 0.125,
+          "stroke": 0.006,
+          "fill": 0,
+          "glow": 0.8,
+          "pulse": 0.12,
+          "colorSpread": 0.8,
+          "background": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.7,
+            "zoom": 0.006,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.7,
+            "threshold": 0.6,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.glow",
+          "range": [
+            0.3,
+            1.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.spin",
+          "range": [
+            0,
+            0.25
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.2.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.1.source.params.twist",
+          "range": [
+            0,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.2,
+            0.44
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trails",
+      "value": 0.77,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.amount",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Nesting",
+      "value": 0.55,
+      "targets": [
+        {
+          "path": "layers.1.source.params.nested",
+          "range": [
+            1,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Morph",
+      "value": 1,
+      "targets": [
+        {
+          "path": "layers.1.source.params.beatMorph",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    }
+  ],
+  "description": "Triangle, square, hexagon, circle: nested outlines snap to the next shape on every beat, with a little overshoot."
+}

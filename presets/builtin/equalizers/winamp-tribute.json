@@ -1,0 +1,218 @@
+{
+  "schema": 1,
+  "name": "Winamp Tribute",
+  "category": "Equalizers",
+  "tags": [
+    "retro",
+    "winamp",
+    "bars",
+    "scope",
+    "2000s"
+  ],
+  "energy": 3,
+  "palette": "Winamp",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bars",
+      "name": "Analyzer",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "spectrumBars",
+        "params": {
+          "bars": 40,
+          "gap": 0.22,
+          "height": 0.62,
+          "horizon": 0.1,
+          "mirror": "none",
+          "segments": 24,
+          "roundness": 0,
+          "colorMode": "level",
+          "caps": true,
+          "glow": 0.25,
+          "reflection": 0,
+          "floor": 0,
+          "background": 0,
+          "release": 0.1,
+          "punch": 0.1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.35,
+            "threshold": 0.9,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "scope",
+      "name": "Oscilloscope",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "scope",
+        "params": {
+          "mode": "wave",
+          "thickness": 1.4,
+          "gain": 0.9,
+          "glow": 0.4,
+          "smoothing": 0,
+          "color": 0.62,
+          "radius": 0.28,
+          "length": 1
+        }
+      },
+      "fx": [],
+      "blend": "add",
+      "opacity": 0.8,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.height",
+          "range": [
+            0.45,
+            0.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.release",
+          "range": [
+            0.2,
+            0.02
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scope",
+      "value": 0.8,
+      "targets": [
+        {
+          "path": "layers.1.opacity",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bars",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bars",
+          "range": [
+            20,
+            60
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Segments",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.segments",
+          "range": [
+            12,
+            36
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Punch",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.punch",
+          "range": [
+            0,
+            0.3
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Winamp": [
+      "#000000",
+      "#08260f",
+      "#22c55e",
+      "#eab308",
+      "#ef4444"
+    ]
+  },
+  "description": "It really whips the llama: segmented bars with falling peaks and a green scope on top."
+}

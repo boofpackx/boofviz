@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { ThreeRenderer } from '@/engine/three/ThreeRenderer';
 import { RenderLoop } from '@/engine/RenderLoop';
-import { DEFAULT_SCENE } from '@/engine/defaultScene';
-import { engine } from '../runtime';
+import { sceneOf } from '@/engine/presetIO';
+import { engine, preview } from '../runtime';
+import { currentScene, useShow } from '../show';
 import { useControl } from '../store';
 import { DebugHud } from '../hud/DebugHud';
 import { previewStats } from '../hooks';
@@ -27,10 +28,15 @@ export function Preview() {
     let ro: ResizeObserver | null = null;
     let disposed = false;
     let hudWasOn = false;
+    let unsubscribe: (() => void) | null = null;
 
     void renderer.init(canvas, { renderScale: 1, isOutput: false }).then(() => {
       if (disposed) return;
-      renderer.setScene(DEFAULT_SCENE);
+      renderer.setScene(currentScene());
+      preview.renderer = renderer;
+      unsubscribe = useShow.subscribe((s, prev) => {
+        if (s.doc !== prev.doc) renderer.setScene(sceneOf(s.doc));
+      });
       const fit = (): void => {
         const r = wrap.getBoundingClientRect();
         const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -63,6 +69,8 @@ export function Preview() {
 
     return () => {
       disposed = true;
+      unsubscribe?.();
+      if (preview.renderer === renderer) preview.renderer = null;
       loop?.stop();
       ro?.disconnect();
       renderer.dispose();

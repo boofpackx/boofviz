@@ -75,23 +75,29 @@ export function AnalysisPanel() {
           ))}
       </Section>
 
-      <GlobalsSection />
     </div>
   );
 }
 
-function GlobalsSection() {
+export function MasterPanel() {
   const g = useControl((s) => s.globals);
   const setGlobals = useControl((s) => s.setGlobals);
   const scale = useControl((s) => s.settings.output.renderScale);
   const update = useControl((s) => s.update);
   return (
-    <Section title="Master">
-      <Slider label="Brightness" value={g.brightness} min={0} max={2} defaultValue={1} onChange={(v) => setGlobals({ brightness: v })} />
-      <Slider label="Reactivity" value={g.reactivity} min={0.25} max={2} defaultValue={1} onChange={(v) => setGlobals({ reactivity: v })} />
-      <Slider label="Saturation" value={g.saturation} min={0} max={2} defaultValue={1} onChange={(v) => setGlobals({ saturation: v })} />
-      <Slider label="Hue shift" value={g.hueShift} min={-180} max={180} step={1} unit="°" defaultValue={0} onChange={(v) => setGlobals({ hueShift: v })} />
-      <Slider label="Output scale" value={scale} min={0.5} max={2} step={0.05} defaultValue={1} format={(v) => `${Math.round(v * 100)}%`} onChange={(v) => update({ output: { renderScale: v } })} />
-    </Section>
+    <div className="h-full overflow-y-auto">
+      <Section title="Master (over any preset)">
+        <Slider label="Brightness" value={g.brightness} min={0} max={2} defaultValue={1} onChange={(v) => setGlobals({ brightness: v })} />
+        <Slider label="Reactivity" value={g.reactivity} min={0.25} max={2} defaultValue={1} onChange={(v) => setGlobals({ reactivity: v })} />
+        <Slider label="Speed" value={g.speed} min={0.25} max={4} step={0.25} defaultValue={1} format={(v) => `×${v}`} onChange={(v) => setGlobals({ speed: v })} />
+        <Slider label="Trails" value={g.trails} min={0} max={0.95} defaultValue={0} onChange={(v) => setGlobals({ trails: v })} />
+        <Slider label="Saturation" value={g.saturation} min={0} max={2} defaultValue={1} onChange={(v) => setGlobals({ saturation: v })} />
+        <Slider label="Hue shift" value={g.hueShift} min={-180} max={180} step={1} unit="°" defaultValue={0} onChange={(v) => setGlobals({ hueShift: v })} />
+        <p className="text-[11px] leading-snug text-ink-400">Double-click a slider to reset it. Speed scales every beat-synced motion (×0.25 to ×4 of the BPM).</p>
+      </Section>
+      <Section title="Output">
+        <Slider label="Render scale" value={scale} min={0.5} max={2} step={0.05} defaultValue={1} format={(v) => `${Math.round(v * 100)}%`} onChange={(v) => update({ output: { renderScale: v } })} />
+      </Section>
+    </div>
   );
 }

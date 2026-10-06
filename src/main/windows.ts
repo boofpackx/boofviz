@@ -1,6 +1,6 @@
 import { BrowserWindow, MessageChannelMain, screen, type Rectangle } from 'electron';
 import { join } from 'node:path';
-import { IPC, type DisplayInfo, type OutputStatus } from '@shared/ipc';
+import { IPC, type DisplayInfo, type OutputCommand, type OutputStatus } from '@shared/ipc';
 import type { SettingsStore } from './settingsStore';
 
 const preloadPath = join(__dirname, '../preload/index.cjs');
@@ -30,6 +30,8 @@ export class WindowManager {
   private outputStats = { fps: 0, width: 0, height: 0 };
   private boundsTimer: NodeJS.Timeout | null = null;
   private readonly ready = { control: false, output: false };
+  /** Latest scene/globals for the output, replayed whenever the output (re)loads. */
+  private outputState: OutputCommand = {};
 
   constructor(private readonly store: SettingsStore) {}
 
@@ -146,8 +148,14 @@ export class WindowManager {
     win.webContents.on('did-start-loading', () => (this.ready[role] = false));
     win.webContents.on('did-finish-load', () => {
       this.ready[role] = true;
+      if (role === 'output' && (this.outputState.scene || this.outputState.globals)) win.webContents.send(IPC.outputCommand, this.outputState);
       this.connectAnalysis();
     });
+  }
+
+  sendOutputCommand(cmd: OutputCommand): void {
+    this.outputState = { ...this.outputState, ...cmd };
+    if (this.output && this.ready.output) this.output.webContents.send(IPC.outputCommand, cmd);
   }
 
   /** Create a direct renderer↔renderer channel for analysis packets (control → output). */

@@ -1,0 +1,197 @@
+{
+  "schema": 1,
+  "name": "Swiss Blocks Night",
+  "category": "2D Graphic",
+  "tags": [
+    "swiss",
+    "grid",
+    "blocks",
+    "dark",
+    "techno"
+  ],
+  "energy": 3,
+  "palette": "Swiss",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "grid",
+      "name": "Grid",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "swissGrid",
+        "params": {
+          "mode": "blocks",
+          "cols": 10,
+          "rows": 6,
+          "margin": 0.05,
+          "gutter": 0.008,
+          "accent": 0.8,
+          "lines": 0.35,
+          "shift": 0.6,
+          "paper": false
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.5,
+            "threshold": 0.7,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.03,
+            "size": 1
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.accent",
+          "range": [
+            0.4,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.shift",
+          "range": [
+            0.2,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.gutter",
+          "range": [
+            0.003,
+            0.02
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Columns",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cols",
+          "range": [
+            6,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rows",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.rows",
+          "range": [
+            4,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dots",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lines",
+          "range": [
+            0.35,
+            0.9
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Swiss": [
+      "#141414",
+      "#3a3a3a",
+      "#e4002b",
+      "#cfc8b8",
+      "#f3efe6"
+    ]
+  },
+  "description": "The Swiss grid after dark: blocks flicker in rhythm, a signal-red accent jumps with the kicks."
+}

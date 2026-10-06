@@ -12,7 +12,8 @@
     ],
     "jsx": "react-jsx",
     "types": [
-      "vite/client"
+      "vite/client",
+      "node"
     ],
     "strict": true,
     "noUnusedLocals": true,
@@ -34,6 +35,7 @@
   "include": [
     "src/renderer/**/*",
     "src/shared/**/*",
-    "src/preload/api.d.ts"
+    "src/preload/api.d.ts",
+    "tests/**/*"
   ]
 }

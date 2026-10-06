@@ -1,5 +1,5 @@
 import type { Settings, SettingsPatch } from './settings';
-import type { GlobalControls } from './types/engine';
+import type { GlobalControls, Scene } from './types/engine';
 
 export interface DisplayInfo {
   id: number;
@@ -23,6 +23,13 @@ export interface OutputStatus {
 /** Runtime state the control window pushes to the output window. */
 export interface OutputCommand {
   globals?: GlobalControls;
+  scene?: Scene;
+}
+
+export interface StoredPreset {
+  file: string;
+  template: boolean;
+  json: string;
 }
 
 /** API exposed on `window.boofviz` by the preload script. */
@@ -44,6 +51,15 @@ export interface BoofvizApi {
   requestAnalysisPort(): void;
   /** Path of a dropped File (Electron webUtils). */
   pathForFile(file: File): string;
+  // Presets
+  listUserPresets(): Promise<StoredPreset[]>;
+  saveUserPreset(slug: string, json: string, template: boolean): Promise<void>;
+  deleteUserPreset(slug: string, template: boolean): Promise<void>;
+  importPresets(): Promise<string[]>;
+  exportPreset(slug: string, json: string): Promise<boolean>;
+  openPresetFolder(): Promise<void>;
+  readSession(): Promise<string | null>;
+  writeSession(json: string): void;
 }
 
 export const IPC = {
@@ -59,7 +75,14 @@ export const IPC = {
   outputCommand: 'output:command',
   analysisPort: 'analysis:port',
   requestAnalysisPort: 'analysis:requestPort',
-  toggleFullscreenShortcut: 'output:fullscreenShortcut',
+  listUserPresets: 'presets:list',
+  saveUserPreset: 'presets:save',
+  deleteUserPreset: 'presets:delete',
+  importPresets: 'presets:import',
+  exportPreset: 'presets:export',
+  openPresetFolder: 'presets:openFolder',
+  readSession: 'session:read',
+  writeSession: 'session:write',
 } as const;
 
 /** window.postMessage tag the preload uses to hand a MessagePort to the page. */

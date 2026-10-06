@@ -17,7 +17,10 @@
     "dist:win": "electron-vite build && electron-builder --win",
     "dist:mac": "electron-vite build && electron-builder --mac",
     "smoke": "node scripts/smoke.mjs",
-    "make-test-track": "node scripts/make-test-track.mjs test-output/test-128bpm.wav"
+    "make-test-track": "node scripts/make-test-track.mjs test-output/test-128bpm.wav",
+    "presets:format": "esbuild scripts/format-presets.ts --tsconfig=tsconfig.node.json --bundle --platform=node --format=esm --log-level=warning --outfile=out/tools/format-presets.mjs && node out/tools/format-presets.mjs",
+    "presets:check": "esbuild scripts/format-presets.ts --tsconfig=tsconfig.node.json --bundle --platform=node --format=esm --log-level=warning --outfile=out/tools/format-presets.mjs && node out/tools/format-presets.mjs --check",
+    "tour": "node scripts/preset-tour.mjs"
   },
   "dependencies": {
     "three": "^0.186.1"
@@ -32,6 +35,7 @@
     "electron": "^44.5.1",
     "electron-builder": "^26.17.0",
     "electron-vite": "^5.0.0",
+    "esbuild": "^0.25.12",
     "playwright-core": "^1.63.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

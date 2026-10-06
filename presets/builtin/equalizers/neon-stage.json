@@ -1,0 +1,224 @@
+{
+  "schema": 1,
+  "name": "Neon Stage",
+  "category": "Equalizers",
+  "tags": [
+    "bars",
+    "classic",
+    "stage",
+    "synthwave"
+  ],
+  "energy": 3,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "eq",
+      "name": "Spectrum EQ",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "spectrumBars",
+        "params": {
+          "bars": 64,
+          "gap": 0.28,
+          "height": 0.58,
+          "horizon": 0.3,
+          "mirror": "none",
+          "segments": 0,
+          "roundness": 1,
+          "colorMode": "frequency",
+          "caps": true,
+          "glow": 0.6,
+          "reflection": 1,
+          "floor": 1,
+          "background": 1,
+          "release": 0.14,
+          "punch": 0.1
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0,
+            "zoom": 0.004,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.7,
+            "threshold": 0.8,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "rgbSplit",
+          "enabled": true,
+          "params": {
+            "amount": 0,
+            "angle": 0,
+            "radial": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": [
+        {
+          "target": "fx.1.params.strength",
+          "source": "audio.bass",
+          "amount": 0.08
+        }
+      ]
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.height",
+          "range": [
+            0.3,
+            0.86
+          ]
+        },
+        {
+          "path": "layers.0.source.params.glow",
+          "range": [
+            0.2,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.release",
+          "range": [
+            0.26,
+            0.02
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.3.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.amount",
+          "range": [
+            0,
+            0.014
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bars",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bars",
+          "range": [
+            24,
+            104
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trails",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Punch",
+      "value": 0.33,
+      "targets": [
+        {
+          "path": "layers.0.source.params.punch",
+          "range": [
+            0,
+            0.3
+          ]
+        }
+      ]
+    }
+  ],
+  "bpmHint": [
+    110,
+    140
+  ],
+  "description": "The classic: neon bars on a reflective stage with a beat-locked floor."
+}

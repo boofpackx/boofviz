@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "name": "Memphis Party",
+  "category": "2D Graphic",
+  "tags": [
+    "memphis",
+    "80s",
+    "confetti",
+    "pattern",
+    "fun"
+  ],
+  "energy": 3,
+  "palette": "Memphis",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "confetti",
+      "name": "Confetti",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "memphis",
+        "params": {
+          "density": 1,
+          "scale": 1,
+          "drift": 0.4,
+          "jitter": 0.5,
+          "squiggle": 0.5,
+          "outline": 0.6,
+          "background": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.035,
+            "size": 1.3
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.jitter",
+          "range": [
+            0.1,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.drift",
+          "range": [
+            0,
+            0.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.squiggle",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scale",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.scale",
+          "range": [
+            0.6,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Density",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.density",
+          "range": [
+            0.5,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Outline",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.outline",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grain",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            0.1
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Memphis": [
+      "#1b1b1b",
+      "#ff5fa2",
+      "#2ec4f1",
+      "#ffd23f",
+      "#f7f1e3"
+    ]
+  },
+  "description": "Squiggles, zigzags, dots and triangles in 80s Memphis colours, hopping to new spots on every beat."
+}

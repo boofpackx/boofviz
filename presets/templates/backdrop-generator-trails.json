@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "name": "Backdrop + Generator + Trails",
+  "category": "Equalizers",
+  "tags": [
+    "template",
+    "structure"
+  ],
+  "energy": 3,
+  "palette": "Mono",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Backdrop",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "vertical",
+          "from": 0,
+          "to": 0.4,
+          "intensity": 0.6,
+          "motion": 0.2,
+          "pulse": 0.2
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "main",
+      "name": "Main generator",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "spectrumBars",
+        "params": {
+          "bars": 64,
+          "gap": 0.28,
+          "height": 0.58,
+          "horizon": 0.3,
+          "mirror": "none",
+          "segments": 0,
+          "roundness": 1,
+          "colorMode": "frequency",
+          "caps": true,
+          "glow": 0.6,
+          "reflection": 0.6,
+          "floor": 0,
+          "background": 0,
+          "release": 0.14,
+          "punch": 0.1
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.45,
+            "zoom": 0.006,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 1,
+            "threshold": 0.6,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.2.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0,
+      "targets": []
+    },
+    {
+      "name": "Zoom",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "Trails",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.amount",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.1.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Punch",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "description": "A backdrop, one generator on top in screen mode, and a trails / bloom / grade chain wired to the macros. Swap the generator in the inspector.",
+  "isTemplate": true
+}

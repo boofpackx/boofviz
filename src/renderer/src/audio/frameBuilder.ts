@@ -8,7 +8,7 @@ import {
   type TempoState,
 } from '@shared/types/audio';
 
-function emptyFrame(): AudioFrame {
+export function emptyFrame(): AudioFrame {
   return {
     time: 0,
     fft: new Float32Array(SPECTRUM_BINS),
@@ -140,6 +140,8 @@ export class AudioFrameBuilder {
     f.drop = this.pendingDrop;
     this.pendingKick = this.pendingSnare = this.pendingHat = this.pendingAny = this.pendingDrop = false;
 
+    // Continuous audio-clock time shared by every window (wall clock until audio starts).
+    f.time = this.clockEpoch ? now - this.latencySec : performance.now() / 1000;
     this.updateClock(now - this.latencySec);
     return f;
   }
@@ -147,7 +149,6 @@ export class AudioFrameBuilder {
   private apply(p: AnalysisPacket): void {
     const f = this.frame;
     this.latest = p;
-    f.time = p.t;
     f.fft.set(p.fft);
     for (let i = 0; i < BAND_NAMES.length; i++) f.bands[BAND_NAMES[i]] = p.bands[i];
     f.bands32.set(p.bands32);

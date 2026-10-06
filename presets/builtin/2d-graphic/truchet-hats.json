@@ -1,0 +1,183 @@
+{
+  "schema": 1,
+  "name": "Truchet Hats",
+  "category": "2D Graphic",
+  "tags": [
+    "truchet",
+    "tiles",
+    "maze",
+    "hats",
+    "techno"
+  ],
+  "energy": 3,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "maze",
+      "name": "Truchet",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "tiles",
+        "params": {
+          "style": "truchet",
+          "cells": 12,
+          "flipOn": "hat",
+          "flipAmount": 0.08,
+          "ease": 0.4,
+          "stroke": 0.14,
+          "colors": 4,
+          "pulse": 0.04
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.8,
+            "threshold": 0.6,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Intensity",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.flipAmount",
+          "range": [
+            0.02,
+            0.14
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.ease",
+          "range": [
+            0.8,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Color",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.hue",
+          "range": [
+            -90,
+            90
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaos",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.pulse",
+          "range": [
+            0,
+            0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cells",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cells",
+          "range": [
+            6,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Line",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stroke",
+          "range": [
+            0.06,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Punch",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.pulse",
+          "range": [
+            0,
+            0.12
+          ]
+        }
+      ]
+    }
+  ],
+  "bpmHint": [
+    124,
+    140
+  ],
+  "description": "An endless neon maze of quarter-arc tiles; every hi-hat rewires a few corners."
+}

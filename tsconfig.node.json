@@ -35,9 +35,10 @@
     "src/main/**/*",
     "src/preload/**/*",
     "src/shared/**/*",
-    "tests/**/*",
-    "src/renderer/src/audio/dsp/**/*",
-    "src/renderer/src/audio/tempo/bpm.ts",
-    "src/renderer/src/audio/tempo/beatClock.ts"
+    "scripts/**/*.ts",
+    "src/renderer/src/engine/presetIO.ts",
+    "src/renderer/src/engine/registry.ts",
+    "src/renderer/src/engine/palettes.ts",
+    "src/renderer/src/engine/modulation.ts"
   ]
 }

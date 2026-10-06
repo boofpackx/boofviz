@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type DragEvent } from 'react'
 import type { InputDevice } from '@/audio/AudioEngine';
 import { engine } from '../runtime';
 import { useControl } from '../store';
+import { useShow } from '../show';
 import { useTicker } from '../hooks';
 import { Button, Section } from './ui';
 
@@ -50,7 +51,15 @@ export function useFileDrop() {
       if (e.dataTransfer.types.includes('Files')) e.preventDefault();
     },
     onDrop: (e: DragEvent) => {
-      const file = Array.from(e.dataTransfer.files).find((f) => AUDIO_EXT.test(f.name));
+      const files = Array.from(e.dataTransfer.files);
+      // Preset files: import into the user library and load the first one.
+      const presets = files.filter((f) => /\.json$/i.test(f.name) && f.size < 2 * 1024 * 1024);
+      if (presets.length) {
+        e.preventDefault();
+        void Promise.all(presets.map((f) => f.text())).then((jsons) => useShow.getState().importFiles(jsons));
+        return;
+      }
+      const file = files.find((f) => AUDIO_EXT.test(f.name));
       if (!file) return;
       e.preventDefault();
       void loadFile(file);
