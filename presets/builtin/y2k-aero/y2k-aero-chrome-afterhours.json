@@ -1,0 +1,214 @@
+{
+  "schema": 1,
+  "name": "Mercury Afterhours",
+  "category": "Y2K & Aero",
+  "tags": [
+    "y2k",
+    "chrome",
+    "club",
+    "neon",
+    "liquid",
+    "3d"
+  ],
+  "energy": 4,
+  "palette": "Afterhours Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "chrome",
+      "name": "Liquid chrome",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "liquidChrome",
+        "params": {
+          "formation": "cycle",
+          "count": "cycle",
+          "cycleBars": 2,
+          "droplets": 4,
+          "size": 1,
+          "goo": 0.4,
+          "punch": 1.2,
+          "ripple": 1.2,
+          "spin": -0.18,
+          "iridescence": 0.75,
+          "holo": 1,
+          "room": 0,
+          "grid": 1.2,
+          "mirror": 0.75,
+          "starburst": 0.9,
+          "quality": "high"
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 1,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1.1,
+            "saturation": 1.1,
+            "hue": 0,
+            "temperature": 0
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.4,
+            "size": 0.8,
+            "softness": 0.55
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.025,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Goo",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.goo",
+          "range": [
+            0.1,
+            0.7
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.6,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick wobble",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.punch",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Thin film",
+      "value": 0.75,
+      "targets": [
+        {
+          "path": "layers.0.source.params.iridescence",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            -0.6,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Floor mirror",
+      "value": 0.75,
+      "targets": [
+        {
+          "path": "layers.0.source.params.mirror",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grid",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.grid",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Afterhours Neon": [
+      "#05040b",
+      "#241446",
+      "#36c8ff",
+      "#ff5fd2",
+      "#f6f2ff"
+    ]
+  },
+  "description": "Chrome metaballs hang in a dark club lit by cyan and magenta strip lights above a glowing grid floor, merging through gooey necks over two bars and bursting on the downbeat, with orbiting droplets stepping on the beat and the grid lighting up in rainbow foil on the drop."
+}

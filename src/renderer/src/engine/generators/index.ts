@@ -7,6 +7,7 @@ import { Dots } from './Dots';
 import type { Generator } from './Generator';
 import { KineticType } from './KineticType';
 import { Lines } from './Lines';
+import { LiquidChrome } from './LiquidChrome';
 import { Lyrics } from './Lyrics';
 import { Memphis } from './Memphis';
 import { OpArt } from './OpArt';
@@ -48,6 +49,7 @@ const FACTORIES: Record<string, () => Generator> = {
   codeRain: () => new CodeRain(),
   warp: () => new Warp(),
   orb: () => new Orb(),
+  liquidChrome: () => new LiquidChrome(),
   ricochet: () => new Ricochet(),
   twistCube: () => new TwistCube(),
   background: () => new Background(),
