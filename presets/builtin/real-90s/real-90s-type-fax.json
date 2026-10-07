@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "name": "Fax Transmission",
+  "category": "Real 90s",
+  "tags": [
+    "type",
+    "fax",
+    "paper",
+    "dither",
+    "words"
+  ],
+  "energy": 1,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "INCOMING TRANSMISSION · PAGE 1 OF 1 · DO NOT REPLY ·",
+          "source": "lyrics",
+          "mode": "stack",
+          "font": "mono",
+          "rows": 12,
+          "speed": 0.15,
+          "size": 0.8,
+          "stretch": 0.2,
+          "outline": 0.6,
+          "wordBeats": 1,
+          "skew": 0,
+          "punch": 0.15
+        }
+      },
+      "fx": [
+        {
+          "type": "gradientMap",
+          "enabled": true,
+          "params": {
+            "mix": 1,
+            "offset": 0,
+            "contrast": 1.4
+          }
+        },
+        {
+          "type": "retroPalette",
+          "enabled": true,
+          "params": {
+            "palette": "mono",
+            "pixel": 1.5,
+            "dither": 1
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.08,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.417,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.537,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            -2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dither",
+      "value": 0.667,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.dither",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grain",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.amount",
+          "range": [
+            0,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#3a3a3a",
+      "#9a9a9a",
+      "#f2efe6",
+      "#ffffff"
+    ]
+  },
+  "description": "Rows of text creeping across a dithered thermal-paper page, alternating directions, like a fax arriving at 3am."
+}

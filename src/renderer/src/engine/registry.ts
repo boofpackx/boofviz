@@ -574,6 +574,18 @@ export const EFFECTS: ModuleDef[] = [
     params: [i('tiles', 'Tiles', 2, 1, 6), f('hueStep', 'Hue step', 1.2, 0, 3.14), i('levels', 'Levels', 4, 2, 8)],
   },
   {
+    kind: 'retroPalette',
+    label: 'Old hardware',
+    description: 'Chunky pixels squeezed into the colours of an old machine (4-colour PC, amber or green monitor, teletext, 1-bit desktop, handheld LCD, or the colours of the current look) with ordered dithering.',
+    params: [e('palette', 'Machine', 'cga', ['cga', 'ega', 'amber', 'green', 'teletext', 'mono', 'lcd', 'look']), f('pixel', 'Pixel size', 4, 1, 16, 0.5), f('dither', 'Dither', 1, 0, 1.5)],
+  },
+  {
+    kind: 'vhs',
+    label: 'Worn tape',
+    description: 'A played-to-death video tape: line jitter, wobble, a rolling tracking band, head-switching noise at the bottom, colour bleed and tape grain.',
+    params: [f('amount', 'Wear', 1, 0, 2), f('tracking', 'Tracking band', 0.5, 0, 1), f('noise', 'Noise', 0.6, 0, 1.5), f('bleed', 'Colour bleed', 1, 0, 2)],
+  },
+  {
     kind: 'crt',
     label: 'CRT',
     description: 'Old tube monitor: curved glass, scanlines, an RGB shadow mask and dark corners.',

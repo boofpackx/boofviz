@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "name": "Attract Mode",
+  "category": "Real 90s",
+  "tags": [
+    "type",
+    "arcade",
+    "rainbow",
+    "wave",
+    "words"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "wave",
+          "source": "lyrics",
+          "text": "INSERT / COIN / HIGH SCORE / PLAYER ONE",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1.1,
+          "position": "center",
+          "depth": 0.7,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.6,
+          "colorMode": "rainbow",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [
+        {
+          "type": "retroPalette",
+          "enabled": true,
+          "params": {
+            "palette": "ega",
+            "pixel": 3,
+            "dither": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.45,
+            "scanlines": 0.6,
+            "mask": 0.4,
+            "vignette": 0.5
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.5,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.471,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pixel size",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.pixel",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.strength",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#0000aa",
+      "#aa00aa",
+      "#ffff55",
+      "#ffffff"
+    ]
+  },
+  "description": "Rainbow letters ride a wave that bounces on the kick, in sixteen-colour arcade pixels, like a cabinet waiting for coins."
+}

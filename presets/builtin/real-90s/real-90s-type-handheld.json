@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "name": "Handheld Words",
+  "category": "Real 90s",
+  "tags": [
+    "type",
+    "lcd",
+    "handheld",
+    "green",
+    "words"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "drop",
+          "source": "lyrics",
+          "text": "PRESS / START / LEVEL / UP",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1.5,
+          "position": "center",
+          "depth": 0.6,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.2,
+          "colorMode": "white",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [
+        {
+          "type": "gradientMap",
+          "enabled": true,
+          "params": {
+            "mix": 1,
+            "offset": 0,
+            "contrast": 1.2
+          }
+        },
+        {
+          "type": "retroPalette",
+          "enabled": true,
+          "params": {
+            "palette": "lcd",
+            "pixel": 5,
+            "dither": 0.8
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.03,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.706,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pixel size",
+      "value": 0.375,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.pixel",
+          "range": [
+            2,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dither",
+      "value": 0.533,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.dither",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#c4cfa1",
+      "#9bbc0f",
+      "#8bac0f",
+      "#306230",
+      "#0f380f"
+    ]
+  },
+  "description": "Chunky dark words bounce down onto a light four-shade green handheld screen, shadows dithered, like a pocket console title screen."
+}

@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "name": "Home Video Title",
+  "category": "Retro Type",
+  "tags": [
+    "type",
+    "vhs",
+    "tape",
+    "home video",
+    "words"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "zoomthrough",
+          "source": "lyrics",
+          "text": "Summer / Tape Two / Do Not Erase",
+          "lineBeats": 8,
+          "font": "serif",
+          "size": 1.1,
+          "position": "center",
+          "depth": 0.3,
+          "outline": 0,
+          "glow": 0.5,
+          "shadow": 0.4,
+          "colorMode": "palette",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": false
+        }
+      },
+      "fx": [
+        {
+          "type": "vhs",
+          "enabled": true,
+          "params": {
+            "amount": 1,
+            "tracking": 0.6,
+            "noise": 0.7,
+            "bleed": 1.2
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.06,
+            "size": 1
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.5,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.471,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape wear",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tracking",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.tracking",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Noise",
+      "value": 0.467,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.noise",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#05040a",
+      "#2a1840",
+      "#c07a3a",
+      "#ffe0b0",
+      "#fff8ee"
+    ]
+  },
+  "description": "Warm serif words drift out of the dark on a worn home-video tape: tracking wobble, colour bleed and head noise at the bottom."
+}

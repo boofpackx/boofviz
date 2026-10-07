@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "name": "Four-Colour Boot",
+  "category": "Real 90s",
+  "tags": [
+    "type",
+    "pc",
+    "cga",
+    "glitch",
+    "words"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "glitch",
+          "source": "lyrics",
+          "text": "BOOT / DISK ERROR / ABORT RETRY / IGNORE / OK",
+          "lineBeats": 8,
+          "font": "mono",
+          "size": 1.1,
+          "position": "center",
+          "depth": 0.4,
+          "outline": 0,
+          "glow": 0.3,
+          "shadow": 0.6,
+          "colorMode": "rainbow",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [
+        {
+          "type": "retroPalette",
+          "enabled": true,
+          "params": {
+            "palette": "cga",
+            "pixel": 4,
+            "dither": 0.8
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.4,
+            "scanlines": 0.55,
+            "mask": 0.35,
+            "vignette": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.471,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pixel size",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.pixel",
+          "range": [
+            1,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dither",
+      "value": 0.533,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.dither",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#55ffff",
+      "#ff55ff",
+      "#ffffff",
+      "#ffffff"
+    ]
+  },
+  "description": "Words glitch into place in the four colours an early PC could show, cyan, magenta, white on black, dithered and scanlined."
+}

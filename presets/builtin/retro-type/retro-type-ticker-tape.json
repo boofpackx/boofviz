@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "name": "Ticker Tape",
+  "category": "Retro Type",
+  "tags": [
+    "type",
+    "led",
+    "amber",
+    "ticker",
+    "words"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "BEATS UP · BASS UP · CROWD UP · MARKETS CLOSED ·",
+          "source": "lyrics",
+          "mode": "marquee",
+          "font": "heavy",
+          "rows": 5,
+          "speed": 0.6,
+          "size": 0.45,
+          "stretch": 0.2,
+          "outline": 0,
+          "wordBeats": 1,
+          "skew": 0,
+          "punch": 0.15
+        }
+      },
+      "fx": [
+        {
+          "type": "ledScreen",
+          "enabled": true,
+          "params": {
+            "cell": 12,
+            "gap": 0.25,
+            "glow": 1.3
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.9,
+            "threshold": 0.4,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.125,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.65,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            -2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LED size",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.cell",
+          "range": [
+            6,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#2a0f00",
+      "#ff7a00",
+      "#ffb347",
+      "#fff0d0"
+    ]
+  },
+  "description": "An amber LED ticker crawling across the frame, every letter built from glowing dots, like a stock board from another era."
+}

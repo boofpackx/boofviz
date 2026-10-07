@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "name": "Green Mainframe",
+  "category": "Real 90s",
+  "tags": [
+    "type",
+    "terminal",
+    "green",
+    "scrolling",
+    "words"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "SYSTEM ONLINE · ALL CIRCUITS NOMINAL · AWAITING INPUT ·",
+          "source": "lyrics",
+          "mode": "stack",
+          "font": "mono",
+          "rows": 9,
+          "speed": 0.3,
+          "size": 0.8,
+          "stretch": 0.2,
+          "outline": 0.3,
+          "wordBeats": 1,
+          "skew": 0,
+          "punch": 0.15
+        }
+      },
+      "fx": [
+        {
+          "type": "retroPalette",
+          "enabled": true,
+          "params": {
+            "palette": "green",
+            "pixel": 2,
+            "dither": 0.7
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.5,
+            "scanlines": 0.7,
+            "mask": 0.4,
+            "vignette": 0.55
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.7,
+            "threshold": 0.5,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.417,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.575,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            -2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pixel size",
+      "value": 0.143,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.pixel",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tube",
+      "value": 0.417,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.curvature",
+          "range": [
+            0,
+            1.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.467,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.strength",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#002200",
+      "#00a020",
+      "#33ff66",
+      "#c8ffd4"
+    ]
+  },
+  "description": "Rows of green mainframe text crawling sideways in alternating directions, the sung line taking over every row, on a phosphor tube."
+}

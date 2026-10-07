@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "name": "Teletext Page",
+  "category": "Real 90s",
+  "tags": [
+    "type",
+    "teletext",
+    "blocky",
+    "broadcast",
+    "words"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "PAGE 100 / NEWS / SPORT / WEATHER / TONIGHT",
+          "source": "lyrics",
+          "mode": "words",
+          "font": "mono",
+          "rows": 5,
+          "speed": 1,
+          "size": 0.75,
+          "stretch": 0.2,
+          "outline": 0,
+          "wordBeats": 2,
+          "skew": 0,
+          "punch": 0.08
+        }
+      },
+      "fx": [
+        {
+          "type": "retroPalette",
+          "enabled": true,
+          "params": {
+            "palette": "teletext",
+            "pixel": 9,
+            "dither": 0
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.25,
+            "scanlines": 0.4,
+            "mask": 0.25,
+            "vignette": 0.35
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.375,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.75,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            -2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Block size",
+      "value": 0.417,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.pixel",
+          "range": [
+            4,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tube",
+      "value": 0.208,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.curvature",
+          "range": [
+            0,
+            1.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#0000ff",
+      "#ff0000",
+      "#ffff00",
+      "#ffffff"
+    ]
+  },
+  "description": "Huge blocky words in eight hard broadcast colours, one per two beats, like a teletext page from the 90s living room."
+}

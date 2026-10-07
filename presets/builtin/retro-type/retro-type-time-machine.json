@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "name": "Time Machine",
+  "category": "Retro Type",
+  "tags": [
+    "type",
+    "tunnel",
+    "trails",
+    "time travel",
+    "words"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "zoomthrough",
+          "source": "lyrics",
+          "text": "1985 / 1994 / 1999 / 2026 / NOW",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1.2,
+          "position": "center",
+          "depth": 0.6,
+          "outline": 0,
+          "glow": 0.6,
+          "shadow": 0.6,
+          "colorMode": "rainbow",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.88,
+            "zoom": 0.02,
+            "rotate": 0.004,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0.01,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "rgbSplit",
+          "enabled": true,
+          "params": {
+            "amount": 0.004,
+            "angle": 0,
+            "radial": 1
+          }
+        },
+        {
+          "type": "vhs",
+          "enabled": true,
+          "params": {
+            "amount": 0.5,
+            "tracking": 0.3,
+            "noise": 0.4,
+            "bleed": 0.8
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.529,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trails",
+      "value": 0.844,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0.5,
+            0.95
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tunnel zoom",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.zoom",
+          "range": [
+            0,
+            0.05
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape wear",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.amount",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#02000a",
+      "#1b0a4a",
+      "#00c2ff",
+      "#ff3df2",
+      "#fff2b0"
+    ]
+  },
+  "description": "Years and words hurtle out of a rainbow time tunnel, each one leaving streaking trails as it flies past, recorded on old tape."
+}

@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "name": "Neon Diner",
+  "category": "Retro Type",
+  "tags": [
+    "type",
+    "neon",
+    "sign",
+    "vintage",
+    "words"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "OPEN / LATE / EAT / DANCE",
+          "source": "lyrics",
+          "mode": "words",
+          "font": "serif",
+          "rows": 5,
+          "speed": 1,
+          "size": 0.75,
+          "stretch": 0.2,
+          "outline": 1,
+          "wordBeats": 4,
+          "skew": 0,
+          "punch": 0.05
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 1.3,
+            "threshold": 0.25,
+            "radius": 0.85,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.05,
+            "size": 1
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.5,
+            "size": 0.8,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": [
+        {
+          "target": "opacity",
+          "source": "random",
+          "amount": -0.2,
+          "hz": 5,
+          "randomMode": "smooth"
+        }
+      ]
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.375,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.75,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            -2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.455,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#05020a",
+      "#1a0626",
+      "#ff2e88",
+      "#3ff5ff",
+      "#fff0f8"
+    ]
+  },
+  "description": "Outlined neon tubing words buzzing on a dark wall, flickering like an old roadside diner sign, one word every bar."
+}

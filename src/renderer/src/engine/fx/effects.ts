@@ -288,6 +288,64 @@ void main() {
 
 // ---------------------------------------------------------------------------
 
+
+const RETRO_PALETTE = `${HEADER}
+uniform float uPixel; uniform float uDither; uniform vec3 uCols[8]; uniform int uCount;
+// Display-ish space for colour matching (input is linear HDR).
+vec3 disp(vec3 c) { return pow(c / (1.0 + c), vec3(1.0 / 2.2)); }
+float bayer4(vec2 p) {
+  ivec2 i = ivec2(mod(p, 4.0));
+  int m[16] = int[16](0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5);
+  return (float(m[i.y * 4 + i.x]) + 0.5) / 16.0;
+}
+void main() {
+  vec2 cell = floor(gl_FragCoord.xy / uPixel);
+  vec2 uv = (cell + 0.5) * uPixel / uRes;
+  vec4 src = texture(uInput, uv);
+  vec3 c = disp(src.rgb) + (bayer4(cell) - 0.5) * 0.35 * uDither;
+  vec3 best = uCols[0];
+  float bd = 1e9;
+  for (int i = 0; i < 8; i++) {
+    if (i >= uCount) break;
+    vec3 d = c - disp(uCols[i]);
+    float dd = dot(d, d);
+    if (dd < bd) { bd = dd; best = uCols[i]; }
+  }
+  fragColor = vec4(best, max(src.a, 1.0));
+}`;
+
+const VHS = `${HEADER}
+uniform float uAmount; uniform float uTracking; uniform float uNoise; uniform float uBleed; uniform float uTime; uniform float uKick;
+void main() {
+  vec2 uv = vUv;
+  float line = floor(uv.y * 240.0);
+  float t = floor(uTime * 30.0);
+  // Line jitter, a slow wobble, and a tracking band rolling down the frame.
+  float jitter = (hash21(vec2(line, t)) - 0.5) * 0.0025 * uAmount;
+  float wobble = sin(uv.y * 9.0 + uTime * 1.7) * 0.0012 * uAmount;
+  float bandY = 1.0 - fract(uTime * 0.07);
+  float band = smoothstep(0.04, 0.0, abs(uv.y - bandY)) * uTracking;
+  float head = smoothstep(0.06, 0.0, uv.y) * uAmount;   // head-switching noise at the bottom
+  float shift = jitter + wobble + band * (hash21(vec2(line, t + 3.0)) - 0.3) * 0.04 + head * (hash21(vec2(line, t)) * 0.05) + uKick * 0.002 * uAmount;
+  uv.x += shift;
+  // Chroma bleeds sideways; luma stays sharper (tape's low colour bandwidth).
+  float b = 0.004 * uBleed;
+  vec3 c = texture(uInput, uv).rgb;
+  vec3 cl = (texture(uInput, uv - vec2(b, 0.0)).rgb + texture(uInput, uv - vec2(2.0 * b, 0.0)).rgb) * 0.5;
+  vec3 cr = (texture(uInput, uv + vec2(b, 0.0)).rgb + texture(uInput, uv + vec2(2.0 * b, 0.0)).rgb) * 0.5;
+  float y = luma(c);
+  vec3 chroma = (cl + cr) * 0.5 - luma((cl + cr) * 0.5);
+  vec3 col = vec3(y) + chroma * 0.9 + vec3(cl.r - c.r, 0.0, cr.b - c.b) * 0.5 * uBleed;
+  // Tape noise: fine grain, sparse dropout streaks, snow in the band and head area.
+  float n = hash21(gl_FragCoord.xy + t * 7.0) - 0.5;
+  col += n * 0.06 * uNoise;
+  float drop = step(0.998 - 0.002 * uNoise, hash21(vec2(line, t * 1.3)));
+  col += drop * vec3(0.8) * smoothstep(0.0, 0.2, hash21(vec2(floor(uv.x * 60.0), line)));
+  col = mix(col, vec3(hash21(gl_FragCoord.xy * 0.5 + t)), clamp((band * 0.35 + head * 0.6) * uNoise, 0.0, 1.0));
+  col *= 0.94 + 0.06 * sin(gl_FragCoord.y * 3.14159);
+  fragColor = vec4(max(col, 0.0), 1.0);
+}`;
+
 const FEEDBACK = `${HEADER}
 uniform sampler2D uPrev;
 uniform float uAmount; uniform float uZoom; uniform float uRotate; uniform vec2 uShift; uniform float uHue; uniform int uBlend;
@@ -498,6 +556,18 @@ function setPal(u: Record<string, THREE.IUniform>, pal: Float32Array): void {
   for (let i = 0; i < 5; i++) v[i].set(pal[i * 3], pal[i * 3 + 1], pal[i * 3 + 2]);
 }
 
+
+/** Colour sets of old machines (sRGB), for the retroPalette effect. */
+const RETRO_SETS: Record<string, string[]> = {
+  cga: ['#000000', '#55ffff', '#ff55ff', '#ffffff'],
+  ega: ['#000000', '#0000aa', '#00aa00', '#00aaaa', '#aa0000', '#aa00aa', '#ffff55', '#ffffff'],
+  amber: ['#000000', '#3a1f00', '#a65e00', '#ffb000'],
+  green: ['#000000', '#003300', '#00a020', '#33ff66'],
+  teletext: ['#000000', '#ff0000', '#00ff00', '#ffff00', '#0000ff', '#ff00ff', '#00ffff', '#ffffff'],
+  mono: ['#000000', '#ffffff'],
+  lcd: ['#0f380f', '#306230', '#8bac0f', '#9bbc0f'],
+};
+
 export function createEffect(kind: string): Effect | null {
   switch (kind) {
     case 'feedback':
@@ -575,6 +645,33 @@ export function createEffect(kind: string): Effect | null {
         u.uScan.value = n(p.scanlines, 0.6);
         u.uMask.value = n(p.mask, 0.4);
         u.uVig.value = n(p.vignette, 0.5);
+      });
+    case 'retroPalette':
+      return new SimpleEffect('retroPalette', RETRO_PALETTE, { uPixel: { value: 4 }, uDither: { value: 1 }, uCols: { value: Array.from({ length: 8 }, () => new THREE.Vector3()) }, uCount: { value: 4 } }, (u, p, ctx) => {
+        u.uPixel.value = Math.max(1, n(p.pixel, 4) * (u.uRes.value as THREE.Vector2).y / 1080);
+        u.uDither.value = n(p.dither, 1);
+        const cols = u.uCols.value as THREE.Vector3[];
+        const set = String(p.palette ?? 'cga');
+        if (set === 'look') {
+          for (let i = 0; i < 5; i++) cols[i].set(ctx.palette[i * 3], ctx.palette[i * 3 + 1], ctx.palette[i * 3 + 2]);
+          u.uCount.value = 5;
+        } else {
+          const hex = RETRO_SETS[set] ?? RETRO_SETS.cga;
+          hex.forEach((h, i) => {
+            const c = new THREE.Color(h);
+            cols[i].set(c.r, c.g, c.b);
+          });
+          u.uCount.value = hex.length;
+        }
+      });
+    case 'vhs':
+      return new SimpleEffect('vhs', VHS, { uAmount: { value: 1 }, uTracking: { value: 0.5 }, uNoise: { value: 0.6 }, uBleed: { value: 1 }, uTime: { value: 0 }, uKick: { value: 0 } }, (u, p, ctx) => {
+        u.uAmount.value = n(p.amount, 1);
+        u.uTracking.value = n(p.tracking, 0.5);
+        u.uNoise.value = n(p.noise, 0.6);
+        u.uBleed.value = n(p.bleed, 1);
+        u.uTime.value = ctx.time;
+        u.uKick.value = ctx.kick;
       });
     default:
       return null;

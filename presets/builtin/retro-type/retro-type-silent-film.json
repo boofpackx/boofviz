@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "name": "Silent Film Card",
+  "category": "Retro Type",
+  "tags": [
+    "type",
+    "silent film",
+    "sepia",
+    "vintage",
+    "words"
+  ],
+  "energy": 1,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "stack",
+          "source": "lyrics",
+          "text": "And then / the lights / went down",
+          "lineBeats": 8,
+          "font": "serif",
+          "size": 1,
+          "position": "center",
+          "depth": 0,
+          "outline": 0,
+          "glow": 0.15,
+          "shadow": 0.3,
+          "colorMode": "white",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": false
+        }
+      },
+      "fx": [
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": -0.1,
+            "contrast": 1.2,
+            "saturation": 0,
+            "hue": 0,
+            "temperature": 0.6
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.16,
+            "size": 1.6
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.65,
+            "size": 0.75,
+            "softness": 0.6
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": [
+        {
+          "target": "opacity",
+          "source": "random",
+          "amount": -0.12,
+          "hz": 9,
+          "randomMode": "smooth"
+        }
+      ]
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.412,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grain",
+      "value": 0.533,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.amount",
+          "range": [
+            0,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Vignette",
+      "value": 0.65,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.amount",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0b0805",
+      "#2e2418",
+      "#7d6a50",
+      "#d9c8a6",
+      "#fff6e2"
+    ]
+  },
+  "description": "White serif words stacked like an intertitle in a hundred-year-old film: sepia, heavy grain, vignette and a flickering projector lamp."
+}

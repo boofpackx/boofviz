@@ -1,0 +1,168 @@
+{
+  "schema": 1,
+  "name": "Photocopy Zine",
+  "category": "Retro Type",
+  "tags": [
+    "type",
+    "xerox",
+    "punk",
+    "halftone",
+    "words"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "type",
+      "name": "Type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "NO FUTURE / NO PAST / ONLY NOW",
+          "source": "lyrics",
+          "mode": "stack",
+          "font": "condensed",
+          "rows": 4,
+          "speed": 0.6,
+          "size": 0.9,
+          "stretch": 0.2,
+          "outline": 0.5,
+          "wordBeats": 1,
+          "skew": -0.12,
+          "punch": 0.25
+        }
+      },
+      "fx": [
+        {
+          "type": "halftone",
+          "enabled": true,
+          "params": {
+            "mode": "ink",
+            "cell": 6,
+            "angle": 30,
+            "mix": 1
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1.4,
+            "saturation": 1,
+            "hue": 0,
+            "temperature": 0
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.1,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.3,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.65,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            -2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dot size",
+      "value": 0.231,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.cell",
+          "range": [
+            3,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grain",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.amount",
+          "range": [
+            0,
+            0.25
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0a0a0a",
+      "#3a3a3a",
+      "#e11d1d",
+      "#f4f1e8",
+      "#ffffff"
+    ]
+  },
+  "description": "Slanted condensed type photocopied to death: halftone ink on cheap paper, crunchy contrast, like a punk zine cover in motion."
+}
