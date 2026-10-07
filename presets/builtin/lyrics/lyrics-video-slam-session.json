@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "name": "Slam Session",
+  "category": "Lyrics",
+  "tags": [
+    "lyric video",
+    "3d text",
+    "slam",
+    "club",
+    "punchy"
+  ],
+  "energy": 5,
+  "palette": "Red Room",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Room",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "radial",
+          "from": 0.35,
+          "to": 0,
+          "intensity": 0.8,
+          "motion": 0.2,
+          "pulse": 0.5
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyric video",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "slam",
+          "source": "lyrics",
+          "text": "BOOFVIZ / LYRIC VIDEO",
+          "lineBeats": 8,
+          "font": "condensed",
+          "size": 1.3,
+          "position": "center",
+          "depth": 0.8,
+          "outline": 0,
+          "glow": 0.4,
+          "shadow": 0.6,
+          "colorMode": "palette",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1.6,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.533,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.speed",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Depth",
+      "value": 0.8,
+      "targets": [
+        {
+          "path": "layers.1.source.params.depth",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.267,
+      "targets": [
+        {
+          "path": "layers.1.source.params.glow",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shadow",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.1.source.params.shadow",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick punch",
+      "value": 0.533,
+      "targets": [
+        {
+          "path": "layers.1.source.params.punch",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dim sung words",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.1.source.params.dimPast",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Red Room": [
+      "#070102",
+      "#3a0508",
+      "#d4141c",
+      "#ff6a3d",
+      "#fff1e6"
+    ]
+  },
+  "description": "Every word slams in huge, snaps to size and shakes the frame: big condensed 3D type for the peak of the night."
+}

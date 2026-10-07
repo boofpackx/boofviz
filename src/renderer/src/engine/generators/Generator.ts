@@ -26,6 +26,8 @@ export interface GenContext {
   beat: number;
   palette: Float32Array;
   params: ParamBag;
+  /** The look's preset category, when known (styles that adapt to the look). */
+  category?: string;
   globals: GlobalControls;
   width: number;
   height: number;

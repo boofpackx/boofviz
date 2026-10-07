@@ -1,0 +1,197 @@
+{
+  "schema": 1,
+  "name": "Orbit Hook",
+  "category": "Lyrics",
+  "tags": [
+    "lyric video",
+    "3d",
+    "orbit",
+    "cube",
+    "y2k"
+  ],
+  "energy": 3,
+  "palette": "Candy Y2K",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Cube",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "twistCube",
+        "params": {
+          "style": "candy",
+          "colors": "classic",
+          "turnsPerBar": 2,
+          "cyclePhrases": 1,
+          "snap": 0.3,
+          "slices": true,
+          "tumble": true,
+          "spin": 0.1,
+          "size": 0.7,
+          "punch": 0.05,
+          "explode": 1,
+          "round": 0.16,
+          "glow": 0.8,
+          "shadow": 0.4,
+          "tilt": 0.5
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyric video",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "orbit3d",
+          "source": "lyrics",
+          "text": "BOOFVIZ / LYRIC VIDEO",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1,
+          "position": "center",
+          "depth": 0.8,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.6,
+          "colorMode": "white",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.speed",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Depth",
+      "value": 0.8,
+      "targets": [
+        {
+          "path": "layers.1.source.params.depth",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.133,
+      "targets": [
+        {
+          "path": "layers.1.source.params.glow",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shadow",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.1.source.params.shadow",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick punch",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.punch",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dim sung words",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.1.source.params.dimPast",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Candy Y2K": [
+      "#2a2440",
+      "#7b3fe4",
+      "#ff8fd0",
+      "#8ff3ff",
+      "#fff9fe"
+    ]
+  },
+  "description": "The words of each line ride a 3D ring that turns to bring the sung word to the front, circling a twisting candy cube."
+}

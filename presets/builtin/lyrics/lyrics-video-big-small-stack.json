@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "name": "Big Small Stack",
+  "category": "Lyrics",
+  "tags": [
+    "lyric video",
+    "typography",
+    "stack",
+    "memphis",
+    "bouncy"
+  ],
+  "energy": 3,
+  "palette": "Memphis",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Confetti",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "memphis",
+        "params": {
+          "density": 0.8,
+          "scale": 1,
+          "drift": 0.3,
+          "jitter": 0.3,
+          "squiggle": 0.5,
+          "outline": 0.5,
+          "background": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyric video",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "stack",
+          "source": "lyrics",
+          "text": "BOOFVIZ / LYRIC VIDEO",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1,
+          "position": "center",
+          "depth": 0.7,
+          "outline": 0.45,
+          "glow": 0.2,
+          "shadow": 0.8,
+          "colorMode": "gradient",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.speed",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Depth",
+      "value": 0.7,
+      "targets": [
+        {
+          "path": "layers.1.source.params.depth",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.133,
+      "targets": [
+        {
+          "path": "layers.1.source.params.glow",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shadow",
+      "value": 0.8,
+      "targets": [
+        {
+          "path": "layers.1.source.params.shadow",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick punch",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.punch",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dim sung words",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.1.source.params.dimPast",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Memphis": [
+      "#1b1b3a",
+      "#ff4f79",
+      "#2ec4b6",
+      "#ffd23f",
+      "#fff9ec"
+    ]
+  },
+  "description": "Lyrics build a stack of big and small words, each sliding in from the side, like a typography music video."
+}

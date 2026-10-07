@@ -1,0 +1,199 @@
+{
+  "schema": 1,
+  "name": "Word Drop",
+  "category": "Lyrics",
+  "tags": [
+    "lyric video",
+    "3d text",
+    "drop",
+    "synthwave",
+    "sing-along"
+  ],
+  "energy": 3,
+  "palette": "Synthwave",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Sunset",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "synthSunset",
+        "params": {
+          "sun": 0.22,
+          "stripes": 9,
+          "horizon": 0.42,
+          "mountains": 1,
+          "glow": 0.8,
+          "stars": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.5,
+            "threshold": 0.8,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyric video",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "drop",
+          "source": "lyrics",
+          "text": "BOOFVIZ / LYRIC VIDEO",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1,
+          "position": "center",
+          "depth": 0.7,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.6,
+          "colorMode": "palette",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.speed",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Depth",
+      "value": 0.7,
+      "targets": [
+        {
+          "path": "layers.1.source.params.depth",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.133,
+      "targets": [
+        {
+          "path": "layers.1.source.params.glow",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shadow",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.1.source.params.shadow",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick punch",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.punch",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dim sung words",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.1.source.params.dimPast",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Synthwave": [
+      "#0b0122",
+      "#2a0a5e",
+      "#ff1f8e",
+      "#ff7b3a",
+      "#ffe14d"
+    ]
+  },
+  "description": "The sung words drop into place one by one and bounce on landing, chunky 3D letters over a synthwave sunset."
+}

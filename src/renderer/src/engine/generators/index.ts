@@ -10,6 +10,7 @@ import { KineticType } from './KineticType';
 import { Lines } from './Lines';
 import { LiquidChrome } from './LiquidChrome';
 import { Lyrics } from './Lyrics';
+import { LyricVideo } from './LyricVideo';
 import { Memphis } from './Memphis';
 import { OpArt } from './OpArt';
 import { Orb } from './Orb';
@@ -40,6 +41,7 @@ const FACTORIES: Record<string, () => Generator> = {
   memphis: () => new Memphis(),
   kineticType: () => new KineticType(),
   lyrics: () => new Lyrics(),
+  lyricVideo: () => new LyricVideo(),
   prism: () => new Prism(),
   synthSunset: () => new SynthSunset(),
   opArt: () => new OpArt(),

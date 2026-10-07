@@ -238,11 +238,28 @@ function LyricsSection() {
   );
 }
 
+const VIDEO_STYLES: Array<[string, string]> = [
+  ['auto', 'Auto (matches the look)'],
+  ['drop', 'Drop: words fall into place'],
+  ['slam', 'Slam: huge, then snap to size'],
+  ['pop', 'Pop: big then small'],
+  ['shuffle', 'Shuffle: letters fly into order'],
+  ['flip', 'Flip: letters flip up in 3D'],
+  ['spin3d', 'Spin: words turn in like cards'],
+  ['zoomthrough', 'Zoom: words fly through you'],
+  ['stack', 'Stack: big/small word stack'],
+  ['wave', 'Wave: letters ride the beat'],
+  ['glitch', 'Glitch: jittery arrival'],
+  ['scatter', 'Scatter: words thrown around'],
+  ['orbit3d', 'Orbit: words circle in 3D'],
+];
+
 function OverlaySection() {
   const overlay = useControl((s) => s.settings.lyrics.overlay);
   const textLooks = useControl((s) => s.settings.lyrics.textLooks);
   const update = useControl((s) => s.update);
   const p = overlay.params;
+  const video = p.kind === 'lyricVideo';
   const set = (params: Record<string, string | number>): void => update({ lyrics: { overlay: { params } } });
   return (
     <Section title="Overlay">
@@ -254,15 +271,48 @@ function OverlaySection() {
         onChange={(textLooks) => update({ lyrics: { textLooks } })}
       />
       <Segmented
-        value={String(p.mode ?? 'karaoke')}
-        onChange={(mode) => set({ mode })}
+        value={video ? 'lyricVideo' : 'lyrics'}
+        onChange={(kind) => set({ kind })}
         options={[
-          { value: 'karaoke', label: 'Karaoke' },
-          { value: 'punch', label: 'Punch' },
-          { value: 'typewriter', label: 'Typewriter' },
+          { value: 'lyricVideo', label: 'Music video' },
+          { value: 'lyrics', label: 'Classic' },
         ]}
       />
-      <Slider label="Size" value={typeof p.size === 'number' ? p.size : 0.8} min={0.3} max={1.6} defaultValue={0.7} onChange={(size) => set({ size })} />
+      {video ? (
+        <>
+          <label className="flex items-center justify-between gap-2 text-[11px] text-ink-300">
+            <span>Style</span>
+            <select className="rounded border border-ink-600 bg-ink-800 px-1 py-0.5 text-[11px] text-ink-100" value={String(p.style ?? 'auto')} onChange={(e) => set({ style: e.target.value })}>
+              {VIDEO_STYLES.map(([v, l]) => (
+                <option key={v} value={v}>
+                  {l}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center justify-between gap-2 text-[11px] text-ink-300">
+            <span>Colour</span>
+            <select className="rounded border border-ink-600 bg-ink-800 px-1 py-0.5 text-[11px] text-ink-100" value={String(p.colorMode ?? 'palette')} onChange={(e) => set({ colorMode: e.target.value })}>
+              <option value="palette">From the look</option>
+              <option value="gradient">Gradient</option>
+              <option value="white">White</option>
+              <option value="rainbow">Rainbow</option>
+            </select>
+          </label>
+          <Slider label="3D depth" value={typeof p.depth === 'number' ? p.depth : 0.5} min={0} max={1} defaultValue={0.5} onChange={(depth) => set({ depth })} />
+        </>
+      ) : (
+        <Segmented
+          value={String(p.mode ?? 'karaoke')}
+          onChange={(mode) => set({ mode })}
+          options={[
+            { value: 'karaoke', label: 'Karaoke' },
+            { value: 'punch', label: 'Punch' },
+            { value: 'typewriter', label: 'Typewriter' },
+          ]}
+        />
+      )}
+      <Slider label="Size" value={typeof p.size === 'number' ? p.size : 0.8} min={0.3} max={video ? 2.5 : 1.6} defaultValue={video ? 1 : 0.7} onChange={(size) => set({ size })} />
       <Segmented
         value={String(p.position ?? 'lower')}
         onChange={(position) => set({ position })}

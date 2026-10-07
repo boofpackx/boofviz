@@ -114,6 +114,8 @@ export interface Scene {
   customPalettes?: Record<string, string[]>;
   macros: Macro[];
   camera?: CameraSpec;
+  /** The preset category this look came from (lets lyric styles adapt). */
+  category?: string;
 }
 
 // ---------------------------------------------------------------------------

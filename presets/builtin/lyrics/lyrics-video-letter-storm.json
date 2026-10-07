@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "name": "Letter Storm",
+  "category": "Lyrics",
+  "tags": [
+    "lyric video",
+    "letters",
+    "shuffle",
+    "op art",
+    "monochrome"
+  ],
+  "energy": 4,
+  "palette": "Mono",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Waves",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "opArt",
+        "params": {
+          "mode": "waves",
+          "frequency": 0.9,
+          "amplitude": 0.5,
+          "contrast": 0.6,
+          "colorize": 0,
+          "motion": 0.6
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyric video",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "shuffle",
+          "source": "lyrics",
+          "text": "BOOFVIZ / LYRIC VIDEO",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1,
+          "position": "center",
+          "depth": 0.5,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.85,
+          "colorMode": "white",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.speed",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Depth",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.depth",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.133,
+      "targets": [
+        {
+          "path": "layers.1.source.params.glow",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shadow",
+      "value": 0.85,
+      "targets": [
+        {
+          "path": "layers.1.source.params.shadow",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick punch",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.1.source.params.punch",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dim sung words",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.1.source.params.dimPast",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "description": "Letters fly in from everywhere, spinning, and lock into the sung word, then scatter when the next line comes, over drifting op-art stripes."
+}

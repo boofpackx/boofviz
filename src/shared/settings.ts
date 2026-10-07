@@ -107,7 +107,7 @@ export const DEFAULT_SETTINGS: Settings = {
   },
   spotify: { clientId: '' },
   // Overlay params are a partial bag: the lyrics generator's defaults fill the rest.
-  lyrics: { offsetMs: 0, online: true, textLooks: false, overlay: { enabled: false, params: { mode: 'karaoke', position: 'lower', size: 0.7, backdrop: 0.45 } } },
+  lyrics: { offsetMs: 0, online: true, textLooks: false, overlay: { enabled: false, params: { kind: 'lyricVideo', style: 'auto', mode: 'karaoke', position: 'center', size: 1, backdrop: 0.45 } } },
 };
 
 type DeepPartial<T> = T extends readonly unknown[] ? T : T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;

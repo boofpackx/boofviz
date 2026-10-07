@@ -224,6 +224,7 @@ export function sceneOf(p: Preset): Scene {
   const scene: Scene = { layers: p.layers, palette: p.palette, paletteCycle: p.paletteCycle, hueRotate: p.hueRotate, macros: p.macros };
   if (p.customPalettes) scene.customPalettes = p.customPalettes;
   if (p.camera) scene.camera = p.camera;
+  if (p.category) scene.category = p.category;
   return scene;
 }
 

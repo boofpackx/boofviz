@@ -5,6 +5,7 @@ import { createEffect, hdrTarget, type Effect, type FxContext } from '../fx/effe
 import type { AudioEnv, GenContext, Generator } from '../generators/Generator';
 import { createGenerator } from '../generators';
 import type { Lyrics, LyricsRenderInfo } from '../generators/Lyrics';
+import type { LyricVideo } from '../generators/LyricVideo';
 import { alignedBeat, ModulationEngine } from '../modulation';
 import { defaultParams, generatorDef } from '../registry';
 import { PaletteRuntime } from '../palettes';
@@ -120,7 +121,7 @@ export class Compositor {
   private trails: Effect | null = null;
   /** Global lyrics overlay: drawn over every look, after the scene's layers and trails. */
   private overlayParams: ParamBag | null = null;
-  private overlayGen: Lyrics | null = null;
+  private overlayGen: Lyrics | LyricVideo | null = null;
   private sceneHasLyrics = false;
   private w = 1;
   private h = 1;
@@ -163,7 +164,13 @@ export class Compositor {
 
   /** Lyrics over every look (null: off). Partial params are filled with the generator's defaults. */
   setOverlay(params: ParamBag | null): void {
-    this.overlayParams = params && { ...defaultParams(generatorDef('lyrics')), ...params };
+    // kind 'lyricVideo': music-video letters; otherwise the classic karaoke / punch / typewriter lines.
+    const kind = params?.kind === 'lyricVideo' ? 'lyricVideo' : 'lyrics';
+    this.overlayParams = params && { ...defaultParams(generatorDef(kind)), ...params, kind };
+    if (this.overlayGen && this.overlayGen.kind !== kind) {
+      this.overlayGen.dispose();
+      this.overlayGen = null;
+    }
   }
 
   /** What the lyrics overlay showed last frame (null when it is off). */
@@ -174,7 +181,7 @@ export class Compositor {
   setScene(scene: Scene): void {
     this.plan = new ScenePlan(scene);
     // A look that already shows lyrics doesn't get a second copy from the overlay.
-    this.sceneHasLyrics = scene.layers.some((l) => l.enabled && l.source.kind === 'lyrics');
+    this.sceneHasLyrics = scene.layers.some((l) => l.enabled && (l.source.kind === 'lyrics' || l.source.kind === 'lyricVideo'));
     this.palette.setScene(this.plan.scene);
     this.maskRefs = new Set(this.plan.scene.layers.filter((l) => l.enabled && l.mask?.type === 'luma' && l.mask.layer !== undefined).map((l) => l.mask!.layer!));
     this.mods.retain(this.plan.modKeys);
@@ -259,7 +266,7 @@ export class Compositor {
     const fxCtx: FxContext = { palette, dt, time, beat, beatsPerBar: frame.beatsPerBar, kick: this.env.kick, frameIndex: this.frameIndex };
     const maskRefs = this.maskRefs;
 
-    const ctx: GenContext = { frame, env: this.env, dt, time, beat, palette, params: {}, globals, width: this.w, height: this.h };
+    const ctx: GenContext = { frame, env: this.env, dt, time, beat, palette, params: {}, globals, width: this.w, height: this.h, category: this.plan?.scene.category };
     plan.layers.forEach((rl, index) => {
       const layer = rl.layer;
       const rt = this.runtimes.get(layer.id);
@@ -338,7 +345,7 @@ export class Compositor {
   /** Composite the lyrics overlay (premultiplied over, full opacity, unmasked) onto `base`. */
   private renderOverlay(base: THREE.WebGLRenderTarget, ctx: GenContext, params: ParamBag): THREE.WebGLRenderTarget {
     const r = this.renderer;
-    this.overlayGen ??= createGenerator('lyrics') as Lyrics;
+    this.overlayGen ??= createGenerator(params.kind === 'lyricVideo' ? 'lyricVideo' : 'lyrics') as Lyrics | LyricVideo;
     ctx.params = params;
     this.overlayGen.update(ctx);
     this.overlayGen.render(r, this.layerA);

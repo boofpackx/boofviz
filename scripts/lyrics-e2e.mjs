@@ -92,6 +92,8 @@ try {
   check(outLyr === lyr?.lines, `output window received the same lyrics (${outLyr} lines)`);
 
   // ---- Overlay: same line in preview and output -------------------------------
+  // The classic line overlay first (new installs default to music-video lyrics, checked further down).
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { params: { kind: 'lyrics' } } } }));
   await control.getByRole('button', { name: /Show lyrics over every look/ }).click();
   const on = await waitFor(output, () => window.__BOOFVIZ_DEBUG__.lyricsOverlay(), 8000);
   check(!!on, 'overlay is on in the output window');
@@ -135,6 +137,20 @@ try {
   await control.getByRole('button', { name: /Put lyrics into text looks/ }).click();
   await control.getByRole('button', { name: /Show lyrics over every look/ }).click();
   await waitFor(output, () => window.__BOOFVIZ_DEBUG__.lyricsOverlay(), 8000);
+
+  // ---- Music-video lyrics over a look -------------------------------------------
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.load('builtin:twist-cube'));
+  for (const style of ['drop', 'slam', 'shuffle', 'zoomthrough', 'stack', 'orbit3d']) {
+    await dbg(control, (st) => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { params: { kind: 'lyricVideo', style: st } } } }), style);
+    await sleep(1800);
+    await output.screenshot({ path: join(outDir, `lyrics-video-${style}.png`) });
+  }
+  const vid = await dbg(output, () => ({ info: window.__BOOFVIZ_DEBUG__.lyricsOverlay(), at: window.__BOOFVIZ_DEBUG__.lyricsAt(Date.now()) }));
+  check(!!vid.info && vid.info.index >= 0 && Math.abs(vid.info.index - vid.at.index) <= 1 && !!vid.info.text, `music-video lyrics show the sung line over the look ("${vid.info?.text ?? ''}")`);
+  const [va, vb] = await Promise.all([dbg(control, () => window.__BOOFVIZ_DEBUG__.lyricsOverlay()), dbg(output, () => window.__BOOFVIZ_DEBUG__.lyricsOverlay())]);
+  check(!!va && !!vb && Math.abs(va.index - vb.index) <= 1, `preview and output agree on the music-video line (${va?.index} / ${vb?.index})`);
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { params: { kind: 'lyrics' } } } }));
+  await sleep(600);
 
   // ---- Pause freezes the position ---------------------------------------------
   await button('Pause').click();
