@@ -73,8 +73,72 @@ Target: about 150 looks with about 60 of them 90s, so roughly **30–35 new look
 - Home video, disposable-camera flash, photo-booth strips, instant-photo stacks,
   cassette decks, CD-ROM menus
 
-These overlap with the proposed **found-footage / lost-media** pack (tape damage,
-timecode, "do not erase" labels), so they can share effects.
+Many of these share the Lost Media engine in section C.
+
+---
+
+## C. Lost Media: real vintage found footage
+
+The goal: footage that feels like it came off a real tape found in an attic, not
+a cheap "VHS filter". Real lost media convinces because of **layered,
+physically correct damage**, **broadcast and recording details**, and **events**
+(the tape switching, getting recorded over, losing signal). All of it is
+procedural and deterministic: the damage is seeded by song position, so preview
+and output match exactly.
+
+### C1. The engine: four building blocks
+
+| Block | What it simulates |
+|---|---|
+| **Tape stack** (`tapeStack` effect) | Real VHS / Betamax / Hi8 physics: chroma bleed and delay, luma noise, head-switching noise bar at the bottom, tracking wobble, dropouts (white streaks), edge ringing, interlace combing, a crushed colour gamut, and **generation loss** (1st copy is clean, 6th copy is soup). |
+| **Film stock** (`filmStock` effect) | Super 8, 16 mm and archive nitrate: gate weave, grain per stock, dust, hair in the gate, vertical scratches, lamp flicker, sprocket holes, splice bumps, colour fade (magenta-shifted), nitrate decay blooms and burn-through. |
+| **Digital rot** (`digitalRot` effect) | Early digital: macroblocking, datamosh smears on cuts, low-bitrate colour banding, buffering stalls, a frozen frame with live audio, 240p letterboxing. |
+| **Broadcast layer** (`broadcast` overlay) | Everything printed on top: camcorder REC dot, battery icon and date stamp, timecode, channel bug, lower thirds, closed-caption boxes, "PLEASE STAND BY" slates, test cards, countdown leaders, sign-off cards and a handwritten tape label on the intro. |
+
+### C2. Tape events (what makes it feel found)
+
+Events trigger on the music, so they look intentional:
+- **Recorded over**: a previous recording bleeds through for a few bars (two looks mixed, with tracking noise at the seam). Uses the dual compositor.
+- **Rewind / fast-forward**: the scene scrubs backwards with horizontal noise bands on a breakdown, and fast-forwards into the drop.
+- **Pause jitter**: on held notes the frame freezes and shakes, like a paused VCR.
+- **Signal loss**: a cut to blue screen or snow, then a hard return on the downbeat.
+- **Tape eat**: the picture stretches and warps, then snaps back.
+- **Camcorder moments**: auto-focus hunting, iris pumping and a zoom rocker push-in.
+- **Splice / missing frames**: jump cuts with a leader flash (film stocks only).
+
+Each has a frequency slider and an on/off switch, so it can range from rare and subtle to full chaos.
+
+### C3. Options on every lost-media look
+
+- **Era**: 70s film, 80s broadcast, 90s camcorder, 2000s early digital.
+- **Format**: Super 8, 16 mm, VHS, Betamax, Hi8, cable TV, low-bitrate web video.
+- **Generation**: copies deep, from 1 to 8.
+- **Damage**: amount of wear (clean → barely watchable).
+- **Mood**: cozy and nostalgic → eerie. Eerie tints colours cold, slows events and adds subliminal frames, but stays tasteful.
+- **Custom text**: date stamp, channel bug, tape label and station name. This is the spot for your own trademark or brand.
+- **Lyrics as**: closed captions, teletext subtitles, karaoke-tape colour wipe, handwritten slate, or off.
+- **"Make it lost media"**: a one-click toggle that runs *any* look (and later your own clips from Phase 5) through the tape stack.
+
+### C4. Themes (16 lost-media looks)
+
+1. **Birthday Tape '94**: camcorder home video, date stamp, a cake-candle glow scene.
+2. **Public Access Midnight**: a cable-access show set with a cheap chroma-key backdrop and a call-in number bug.
+3. **Station Sign-Off**: an anthem-style flag-free sign-off with a tower silhouette, then test card, then snow.
+4. **Overnight Forecast**: a local weather channel with a smooth-jazz feel, a scrolling city list and a retro radar map.
+5. **The Pilot That Never Aired**: a kids'-show set made of primitive puppet shapes and a wobbly logo (eerie mood available).
+6. **Mall CCTV**: a four-camera split screen, timestamp, fish-eye and a dead-mall fountain.
+7. **Super 8 Summer**: a family-reel colour fade, light leaks, sprockets and a lake scene.
+8. **Orientation Video**: a corporate training tape with title cards, a dissolving logo and a "Module 3" slate.
+9. **Karaoke Tape**: a karaoke-bar video with the lyric wipe, generic scenic backdrops and a song-number bug.
+10. **Recorded Over**: two shows fighting for the tape all song long.
+11. **Numbers Station**: a shortwave oscilloscope, spoken-number cards and a frequency dial.
+12. **Archive Reel 1931**: nitrate film, a decayed silent-era intertitle and burn-through.
+13. **Shareware Demo**: a lost CD-ROM attract loop with dithered video in a small window.
+14. **Buffering…**: early web video, macroblocks, a progress bar and stalls on the drop.
+15. **Music TV Dedication**: a late-night video show with a lower third that shows the real song title and artist from Spotify, plus a dedication ticker.
+16. **Emergency Test Pattern**: colour bars, a 1 kHz-tone feel and a "this is only a test" card (generic, no real alert logos).
+
+A **Lost media** playlist and a `lost media` tag hook all of these into shuffle and auto-play.
 
 ---
 
@@ -82,8 +146,9 @@ timecode, "do not erase" labels), so they can share effects.
 
 1. **Lyric Cinema engine + 6 styles**: song map, hero words, camera and materials, then styles 1–6.
 2. **Real 90s batch A**: about 12 looks (screensavers, console, demoscene, camcorder, Web 1.0).
-3. **Lyric styles 7–12 + found-footage effects**.
-4. **Neo-90s + vintage batch**: about 12 looks, bringing the 90s share past 40%.
+3. **Lost Media**: tape stack, film stock, digital rot, broadcast layer and events, then the 16 themes and the "make it lost media" toggle.
+4. **Lyric styles 7–12** (they reuse the Lost Media materials).
+5. **Neo-90s + vintage batch**: about 12 looks, bringing the 90s share past 40%.
 
 Each batch ships with tour screenshots, tests and its own commit.
 
