@@ -19,6 +19,8 @@ const env = (key: string, fallback: string): string => (process.env[key] || fall
 const BASE = env('BOOFVIZ_ARCHIVE_URL', 'https://archive.org');
 const CACHE_LIMIT = 3 * 1024 * 1024 * 1024;
 const SLOT_MEMORY = 64;
+/** How long a slot waits for fresh footage before falling back to the cache. */
+const FRESH_WAIT_MS = Number(process.env.BOOFVIZ_ARCHIVE_WAIT_MS || 7000);
 
 interface Doc {
   identifier: string;
@@ -50,15 +52,32 @@ export class ArchiveService {
     const key = `${archiveQuery(req)}|${Math.round(req.slot)}`;
     let p = this.slots.get(key);
     if (!p) {
-      p = this.resolve(req).catch((err) => {
+      // Fresh footage when it arrives in time; otherwise something already on disk, so
+      // the screen always has a picture (the download carries on and fills the cache).
+      const fresh = this.resolve(req).catch((err) => {
         console.warn('BOOFVIZ archive:', String(err));
-        this.slots.delete(key);
         return null;
+      });
+      const wait = new Promise<null>((r) => setTimeout(() => r(null), FRESH_WAIT_MS));
+      p = Promise.race([fresh, wait]).then(async (clip) => clip ?? (await this.cachedClip(req.slot)) ?? (await fresh));
+      p.then((clip) => {
+        if (!clip) this.slots.delete(key);
       });
       this.slots.set(key, p);
       if (this.slots.size > SLOT_MEMORY) this.slots.delete(this.slots.keys().next().value!);
     }
     return p;
+  }
+
+  /** A clip already in the download cache, or one of the user's own (for offline and slow moments). */
+  private async cachedClip(slot: number): Promise<ArchiveClip | null> {
+    const cached = (await fs.readdir(this.dir).catch(() => [] as string[])).filter((n) => VIDEO_EXT.test(n)).sort();
+    if (cached.length) {
+      const name = cached[Math.floor(hashSlot(slot + 31) * cached.length)];
+      const id = name.split('__')[0];
+      return { id, title: id.replace(/[_-]+/g, ' ').replace(/([a-z])([A-Z0-9])/g, '$1 $2'), year: null, url: `${ARCHIVE_SCHEME}://cache/${encodeURIComponent(name)}`, duration: 0, seed: hashSlot(slot + 97) };
+    }
+    return this.localClip(slot);
   }
 
   /** A clip from the user's videos folder: the same file for the same slot, never the same one twice running. */

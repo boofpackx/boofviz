@@ -18,6 +18,8 @@ export interface PickContext {
   energy: number;
   /** 0..1, one per pick. */
   rand: number;
+  /** How many times each look has played (fair shuffle: the least-played go first). */
+  plays?: Record<string, number>;
 }
 
 const WORD_KINDS = new Set(['lyrics', 'lyricVideo', 'kineticType', 'platinumType']);
@@ -87,6 +89,9 @@ export function energyTarget(energy: number): number {
   return 1 + Math.round(Math.min(1, Math.max(0, energy)) * 4);
 }
 
+/** Energy-match weight by distance between a look's energy rating and the music's (0..4). */
+const ENERGY_WEIGHT = [1, 0.7, 0.45, 0.3, 0.2];
+
 /** The next look to play, or null when the pool has nothing but the current one. */
 export function pickNext(lib: LibrarySettings, ctx: PickContext): PresetEntry | null {
   const { entries } = resolvePool(lib, ctx);
@@ -101,9 +106,15 @@ export function pickNext(lib: LibrarySettings, ctx: PickContext): PresetEntry | 
   if (!others.length) return null;
   const window = Math.min(Math.max(0, lib.noRepeat), others.length - 1);
   const keepOut = new Set(window > 0 ? ctx.recent.slice(-window) : []);
-  const choices = others.filter((e) => !keepOut.has(e.id));
+  const allowed = others.filter((e) => !keepOut.has(e.id));
+  // Shuffle bag: only the least-played looks are in the running, so every look in
+  // the pool plays once before any plays twice.
+  const plays = ctx.plays ?? {};
+  const least = Math.min(...allowed.map((e) => plays[e.id] ?? 0));
+  const choices = allowed.filter((e) => (plays[e.id] ?? 0) === least);
+  // Energy only steers the order within the round (gently), it never starves a look.
   const target = energyTarget(ctx.energy);
-  const weights = choices.map((e) => (lib.energyMatch ? 1 / Math.pow(1 + 1.5 * Math.abs(e.preset.energy - target), 2) : 1));
+  const weights = choices.map((e) => (lib.energyMatch ? ENERGY_WEIGHT[Math.min(4, Math.abs(e.preset.energy - target))] : 1));
   const total = weights.reduce((a, b) => a + b, 0);
   let r = Math.min(0.999999, Math.max(0, ctx.rand)) * total;
   for (let i = 0; i < choices.length; i++) {

@@ -4,10 +4,23 @@ import { ARCHIVE_COLLECTIONS } from '@shared/archive';
 import { GEN_HEADER } from '../shaders/common';
 import { hash2 } from '../lostMedia';
 import type { GenContext } from './Generator';
+import { LostScene } from './LostScene';
 import { num, ShaderGenerator } from './ShaderGenerator';
 
 /** What the archive layer is showing (read by the broadcast text's 'archive' kit in the same window). */
-export const archiveNow = { title: '', year: null as number | null, source: '', slotStart: 0, showing: false, channel: 0 };
+export const archiveNow = { title: '', year: null as number | null, source: '', slotStart: 0, showing: false, channel: 0, filler: false };
+
+/** Procedural "filler programming" shown until real footage is on hand (never a screen of snow). */
+const FILLER: Array<{ scene: string; variant: number; title: string }> = [
+  { scene: 'studio', variant: 1, title: 'Local Access Hour' },
+  { scene: 'globe', variant: 0, title: 'Corporate Orientation' },
+  { scene: 'scenic', variant: 0, title: 'Scenic Interlude' },
+  { scene: 'puppet', variant: 0, title: 'Morning Puppet Show' },
+  { scene: 'lake', variant: 0, title: 'Home Movies' },
+  { scene: 'radar', variant: 0, title: 'Overnight Weather' },
+  { scene: 'cctv', variant: 0, title: 'Security Feed' },
+  { scene: 'candles', variant: 1, title: 'Birthday Tape' },
+];
 
 /** Channel numbers for surfing (the collections a set of old channels would have carried). */
 export const CHANNEL_NUMBERS: Record<string, number> = { cartoons: 3, classictv: 4, commercials: 5, ephemeral: 7, newsreels: 9, space: 11, government: 13, homemovies: 22, custom: 30, myvideos: 99 };
@@ -80,6 +93,8 @@ export class ArchiveFootage extends ShaderGenerator {
   private readonly players = new Map<number, Player>();
   private queryKey = '';
   private shown: Player | null = null;
+  private filler: LostScene | null = null;
+  private fillerOn = false;
   private readonly blank: THREE.DataTexture;
   /** Debug hooks: what is loaded. */
   info = { slot: 0, title: '', ready: false, time: 0 };
@@ -169,7 +184,8 @@ export class ArchiveFootage extends ShaderGenerator {
     const slot = raw + Math.round(num(p.skip, 0)) * 100000;
     const slotStart = raw * every;
     const cur = this.ensure(p, slot);
-    if ((ctx.beat - slotStart) / every > 0.5) this.ensure(p, slot + 1);
+    // Fetch the next clip straight away, so it has the whole slot to arrive.
+    this.ensure(p, slot + 1);
     for (const [s, pl] of this.players) {
       if (s !== slot && s !== slot + 1 && pl !== this.shown) {
         this.drop(pl);
@@ -220,11 +236,24 @@ export class ArchiveFootage extends ShaderGenerator {
       archiveNow.channel = CHANNEL_NUMBERS[col] ?? 0;
       archiveNow.slotStart = show.slot === slot ? slotStart : archiveNow.slotStart;
       archiveNow.showing = true;
+      archiveNow.filler = false;
+      this.fillerOn = false;
       this.info = { slot, title: show.clip.title, ready: true, time: v.currentTime };
     } else {
       u.uVideo.value = this.blank;
       u.uHas.value = 0;
-      archiveNow.showing = false;
+      // Nothing on hand yet (first run, offline): filler programming instead of snow.
+      const fill = FILLER[((raw % FILLER.length) + FILLER.length) % FILLER.length];
+      this.filler ??= new LostScene();
+      this.filler.update({ ...ctx, params: { scene: fill.scene, variant: fill.variant, react: 1, tint: 0, eerie: 0, spin: 0.5 } });
+      archiveNow.title = fill.title;
+      archiveNow.year = null;
+      archiveNow.source = 'Local programming';
+      archiveNow.channel = CHANNEL_NUMBERS[collectionFor(p, slot)] ?? 3;
+      archiveNow.slotStart = slotStart;
+      archiveNow.showing = true;
+      archiveNow.filler = true;
+      this.fillerOn = true;
       this.info = { slot, title: '', ready: false, time: 0 };
     }
     u.uFit.value = p.fit === 'contain' ? 1 : 0;
@@ -234,7 +263,13 @@ export class ArchiveFootage extends ShaderGenerator {
     u.uChange.value = num(p.switchStatic, 0) * (since >= 0 && since < 0.6 ? 1 - since / 0.6 : 0);
   }
 
+  render(renderer: THREE.WebGLRenderer, target: THREE.WebGLRenderTarget): void {
+    if (this.fillerOn && this.filler) this.filler.render(renderer, target);
+    else super.render(renderer, target);
+  }
+
   dispose(): void {
+    this.filler?.dispose();
     for (const pl of this.players.values()) this.drop(pl);
     if (this.shown) this.drop(this.shown);
     this.players.clear();

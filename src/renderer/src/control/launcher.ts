@@ -58,6 +58,31 @@ export function favoriteEntries(): PresetEntry[] {
 
 const recent: string[] = [];
 
+/** Play counts per look (kept between sessions) so shuffle gives every look its turn. */
+const PLAYS_KEY = 'boofviz.plays';
+const plays: Record<string, number> = (() => {
+  try {
+    const v = JSON.parse(localStorage.getItem(PLAYS_KEY) ?? '{}') as unknown;
+    return v && typeof v === 'object' ? (v as Record<string, number>) : {};
+  } catch {
+    return {};
+  }
+})();
+let playsSaveTimer: number | undefined;
+
+/** Count a look as played (shuffle, auto-play or launched by hand). */
+export function notePlayed(id: string): void {
+  plays[id] = (plays[id] ?? 0) + 1;
+  window.clearTimeout(playsSaveTimer);
+  playsSaveTimer = window.setTimeout(() => {
+    try {
+      localStorage.setItem(PLAYS_KEY, JSON.stringify(plays));
+    } catch {
+      // Storage unavailable: counts still work for this session.
+    }
+  }, 2000);
+}
+
 function pickContext(): PickContext {
   return {
     all: libraryEntries().presets.length ? libraryEntries().presets : BUILTIN_PRESETS,
@@ -66,6 +91,7 @@ function pickContext(): PickContext {
     recent,
     energy: engine.builder.frame.energy,
     rand: Math.random(),
+    plays,
   };
 }
 
@@ -80,6 +106,7 @@ export function pickShuffle(): PresetEntry | null {
   if (pick) {
     recent.push(pick.id);
     if (recent.length > 32) recent.shift();
+    notePlayed(pick.id);
   }
   return pick;
 }

@@ -87,6 +87,7 @@ export function startMockServices({ port = 43890, host = '127.0.0.1' } = {}) {
     Object.assign(player, { anchorProgress: p, anchorAt: Date.now() }, patch);
   };
   let base = '';
+  let archiveStalled = false;
 
   const send = (res, status, body, headers = {}) => {
     const isJson = body !== undefined && typeof body !== 'string';
@@ -115,6 +116,12 @@ export function startMockServices({ port = 43890, host = '127.0.0.1' } = {}) {
     const q = url.searchParams;
 
     // ---- Internet Archive ------------------------------------------------------
+    if (path === '/archive/__stall') {
+      archiveStalled = q.get('on') === '1';
+      return send(res, 200, { stalled: archiveStalled });
+    }
+    // A stalled connection: requests hang (the app should fall back to its cache).
+    if (archiveStalled && path.startsWith('/archive/')) return;
     if (path === '/archive/advancedsearch.php') {
       const rows = Number(q.get('rows') ?? 50);
       return send(res, 200, { response: { numFound: ARCHIVE_ITEMS.length, docs: rows ? ARCHIVE_ITEMS.map(({ identifier, title, year }) => ({ identifier, title, year })) : [] } });

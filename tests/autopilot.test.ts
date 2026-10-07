@@ -90,3 +90,35 @@ describe('premade playlists', () => {
     expect(r.label).toContain('With lyrics');
   });
 });
+
+describe('fair shuffle', () => {
+  it('plays every look once before any look plays twice, even with energy matching', () => {
+    const many = Array.from({ length: 30 }, (_, i) => entry(`p${i}`, 'Equalizers', 1 + (i % 5)));
+    const plays: Record<string, number> = {};
+    const recent: string[] = [];
+    let current: string | null = null;
+    let seed = 1;
+    const rand = (): number => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    for (let n = 0; n < 300; n++) {
+      const pick: PresetEntry = pickNext(lib({ shufflePool: "all", noRepeat: 4, energyMatch: true }), { all: many, view: many, currentId: current, recent, energy: 0.9, rand: rand(), plays })!;
+      plays[pick.id] = (plays[pick.id] ?? 0) + 1;
+      recent.push(pick.id);
+      current = pick.id;
+      const counts = many.map((e) => plays[e.id] ?? 0);
+      expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
+    }
+    const counts = many.map((e) => plays[e.id]);
+    expect(Math.min(...counts)).toBe(10);
+    expect(Math.max(...counts)).toBe(10);
+  });
+
+  it('still leans toward matching energy within a round', () => {
+    const many = Array.from({ length: 10 }, (_, i) => entry(`q${i}`, 'Equalizers', i < 5 ? 1 : 5));
+    let firstHigh = 0;
+    for (let t = 0; t < 200; t++) {
+      const pick = pickNext(lib({ shufflePool: 'all', noRepeat: 0, energyMatch: true }), { all: many, view: many, currentId: null, recent: [], energy: 1, rand: (t + 0.5) / 200, plays: {} })!;
+      if (pick.preset.energy === 5) firstHigh++;
+    }
+    expect(firstHigh).toBeGreaterThan(130);
+  });
+});

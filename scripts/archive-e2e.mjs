@@ -31,7 +31,7 @@ const check = (ok, msg) => {
 
 const args = [root];
 if (process.platform === 'linux') args.unshift('--no-sandbox', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist');
-const env = { ...process.env, XDG_CONFIG_HOME: configDir, BOOFVIZ_ARCHIVE_URL: `${mock.url}/archive`, NO_PROXY: '127.0.0.1,localhost', no_proxy: '127.0.0.1,localhost' };
+const env = { ...process.env, XDG_CONFIG_HOME: configDir, BOOFVIZ_ARCHIVE_URL: `${mock.url}/archive`, BOOFVIZ_ARCHIVE_WAIT_MS: '2500', NO_PROXY: '127.0.0.1,localhost', no_proxy: '127.0.0.1,localhost' };
 const app = await electron.launch({ executablePath: electronPath, args, env, cwd: root });
 const errors = [];
 let control;
@@ -58,15 +58,21 @@ try {
   await sleep(1000);
   const ok = await control.evaluate(() => window.__BOOFVIZ_DEBUG__.load('builtin:archive-ad-break'));
   check(ok, 'archive preset loads');
+  // Before any footage has arrived the screen shows filler programming, not snow.
+  const early = (await waitFor(output, () => {
+    const s = window.__BOOFVIZ_DEBUG__.archive();
+    return s.showing ? s : null;
+  }, 5000)) ?? { showing: false };
+  check(!!early.showing, `something is on screen before the first clip arrives (${early.filler ? `filler: ${early.title}` : early.title || 'nothing'})`);
 
   const a = await waitFor(output, () => {
     const s = window.__BOOFVIZ_DEBUG__.archive();
-    return s.showing ? s : null;
+    return s.showing && !s.filler ? s : null;
   }, 40000);
   check(!!a, `output plays an archive clip (${a ? `${a.title}, ${a.year}` : 'nothing'})`);
   const b = await waitFor(control, () => {
     const s = window.__BOOFVIZ_DEBUG__.archive();
-    return s.showing ? s : null;
+    return s.showing && !s.filler ? s : null;
   }, 20000);
   check(!!b && b.title === a?.title, `preview plays the same clip (${b?.title ?? 'nothing'})`);
   check(/invented/.test(a?.title ?? ''), 'clip came from the (mock) archive search');
@@ -82,22 +88,33 @@ try {
   let switched = null;
   for (const end = Date.now() + 30000; Date.now() < end && !switched; await sleep(200)) {
     const s = await output.evaluate(() => window.__BOOFVIZ_DEBUG__.archive());
-    if (s.showing && s.title !== a?.title) switched = s.title;
+    if (s.showing && !s.filler && s.title !== a?.title) switched = s.title;
   }
   check(!!switched, `Next clip switches the output to another film (${switched ?? 'still the same'})`);
   let previewSwitched = null;
   for (const end = Date.now() + 15000; Date.now() < end && !previewSwitched; await sleep(200)) {
     const s = await control.evaluate(() => window.__BOOFVIZ_DEBUG__.archive());
-    if (s.showing && s.title === switched) previewSwitched = s.title;
+    if (s.showing && !s.filler && s.title === switched) previewSwitched = s.title;
   }
   check(!!previewSwitched, 'the preview switches to the same film');
   await output.screenshot({ path: join(outDir, 'archive-output-next.png') });
+
+  // A stalled connection: the next clip falls back to footage already in the cache.
+  await fetch(`${mock.url}/archive/__stall?on=1`);
+  await control.evaluate(() => window.__BOOFVIZ_DEBUG__.show().setMacro(1, 0.1));
+  let fallback = null;
+  for (const end = Date.now() + 12000; Date.now() < end && !fallback; await sleep(250)) {
+    const s = await output.evaluate(() => window.__BOOFVIZ_DEBUG__.archive());
+    if (s.showing && !s.filler && s.title !== switched) fallback = s.title;
+  }
+  check(!!fallback, `with the connection stalled, a cached clip plays instead of static (${fallback ?? 'none'})`);
+  await fetch(`${mock.url}/archive/__stall?on=0`);
 
   // Channel surfing on a TV set: a channel number, and the set drawn around the picture.
   check(await control.evaluate(() => window.__BOOFVIZ_DEBUG__.load('builtin:retro-tv-channel-surfing-88')), 'retro TV preset loads');
   const ch = await waitFor(output, () => {
     const s = window.__BOOFVIZ_DEBUG__.archive();
-    return s.showing && s.channel ? s : null;
+    return s.showing && !s.filler && s.channel ? s : null;
   }, 30000);
   check(!!ch, `channel surfing shows a channel (${ch ? `CH ${ch.channel}: ${ch.title}` : 'none'})`);
   await sleep(2500);
@@ -112,7 +129,7 @@ try {
   check(await control.evaluate(() => window.__BOOFVIZ_DEBUG__.load('builtin:retro-tv-my-music-videos')), 'my-videos look loads');
   const mine = await waitFor(output, () => {
     const s = window.__BOOFVIZ_DEBUG__.archive();
-    return s.showing && /My Band Live/.test(s.title) ? s : null;
+    return s.showing && !s.filler && /My Band Live/.test(s.title) ? s : null;
   }, 20000);
   check(!!mine, `plays the clip from the videos folder (${mine?.title ?? 'nothing'})`);
   await sleep(2000);

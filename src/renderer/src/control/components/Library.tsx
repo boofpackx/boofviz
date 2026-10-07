@@ -3,7 +3,7 @@ import type { PresetEntry } from '@/engine/library';
 import { libraryEntries, useShow } from '../show';
 import { useControl } from '../store';
 import { PLAYLISTS } from '../autopilot';
-import { createPool, deletePool, launchQuantized, renamePool, toggleFavorite, togglePoolMember } from '../launcher';
+import { createPool, deletePool, launchQuantized, notePlayed, renamePool, toggleFavorite, togglePoolMember } from '../launcher';
 import { contextMenu } from './ContextMenu';
 import { Swatch } from './Inspector';
 import { Button, Segmented } from './ui';
@@ -45,7 +45,10 @@ export function Library() {
   const update = useControl((s) => s.update);
   const [renaming, setRenaming] = useState<string | null>(null);
   const { deleteUser, importFiles } = useShow.getState();
-  const load = (e: PresetEntry): void => launchQuantized(e);
+  const load = (e: PresetEntry): void => {
+    notePlayed(e.id);
+    launchQuantized(e);
+  };
   Object.assign(libraryView, { tab, query, category, tag });
 
   const entries = useMemo(() => filteredEntries(tab, query, category, tag), [tab, query, category, tag, userPresets, favorites, pools]); // eslint-disable-line react-hooks/exhaustive-deps
