@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "name": "Music TV Dedication",
+  "category": "Lost Media",
+  "tags": [
+    "lost media",
+    "found footage",
+    "music tv",
+    "late night",
+    "90s",
+    "vhs",
+    "dedication",
+    "chrome"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "set",
+      "name": "Set",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "synthSunset",
+        "params": {
+          "sun": 0.22,
+          "stripes": 9,
+          "horizon": 0.42,
+          "mountains": 1,
+          "glow": 1,
+          "stars": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "text",
+      "name": "On screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "broadcast",
+        "params": {
+          "kit": "tv",
+          "captions": "off",
+          "date": "JUN 14 1994",
+          "station": "VIDEO NITE",
+          "title": "",
+          "ticker": "DEDICATIONS · THIS ONE GOES OUT TO EVERYONE STILL AWAKE · REQUEST LINE OPEN",
+          "events": 0,
+          "eventList": "all",
+          "seed": 0,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tape",
+      "name": "Tape",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "broadcast",
+            "generation": 2,
+            "wear": 0.7,
+            "events": 0.15,
+            "eventList": "signal,eat",
+            "overwrite": 0,
+            "mood": 0.2,
+            "seed": 41
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Wear",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape events",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.events",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mood",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.mood",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Copies deep",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.generation",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0b0420",
+      "#3b0a6b",
+      "#ff2fa8",
+      "#22e0d0",
+      "#fff6c8"
+    ]
+  },
+  "description": "A late-night music-video show taped off the air: a chrome-and-neon set, a lower third with the song actually playing, and a dedications ticker crawling along the bottom."
+}

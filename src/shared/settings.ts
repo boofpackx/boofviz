@@ -71,6 +71,20 @@ export interface LyricsSettings {
   textLooks: boolean;
 }
 
+/** "Make it lost media": ages whatever look is playing (tape, film or early web video). */
+export interface LostMediaSettings {
+  enabled: boolean;
+  style: 'camcorder' | 'vhs' | 'broadcast' | 'super8' | 'archive' | 'web';
+  /** 0..2 */
+  wear: number;
+  /** Tape events, 0..1. */
+  events: number;
+  /** 0 cozy · 1 eerie */
+  mood: number;
+  date: string;
+  station: string;
+}
+
 export interface Settings {
   version: 1;
   input: InputSettings;
@@ -81,6 +95,7 @@ export interface Settings {
   library: LibrarySettings;
   spotify: { clientId: string };
   lyrics: LyricsSettings;
+  lostMedia: LostMediaSettings;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -108,6 +123,7 @@ export const DEFAULT_SETTINGS: Settings = {
   spotify: { clientId: '' },
   // Overlay params are a partial bag: the lyrics generator's defaults fill the rest.
   lyrics: { offsetMs: 0, online: true, textLooks: false, overlay: { enabled: false, params: { kind: 'lyricVideo', style: 'auto', mode: 'karaoke', position: 'center', size: 1, backdrop: 0.45 } } },
+  lostMedia: { enabled: false, style: 'vhs', wear: 1, events: 0.3, mood: 0.3, date: 'JUN 14 1994', station: 'CHANNEL 9' },
 };
 
 type DeepPartial<T> = T extends readonly unknown[] ? T : T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;

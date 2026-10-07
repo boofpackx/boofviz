@@ -6,6 +6,7 @@ import type { AudioEnv, GenContext, Generator } from '../generators/Generator';
 import { createGenerator } from '../generators';
 import type { Lyrics, LyricsRenderInfo } from '../generators/Lyrics';
 import type { LyricVideo } from '../generators/LyricVideo';
+import type { PostSpec } from '../lostMedia';
 import { alignedBeat, ModulationEngine } from '../modulation';
 import { defaultParams, generatorDef } from '../registry';
 import { PaletteRuntime } from '../palettes';
@@ -123,6 +124,11 @@ export class Compositor {
   private overlayParams: ParamBag | null = null;
   private overlayGen: Lyrics | LyricVideo | null = null;
   private sceneHasLyrics = false;
+  /** Global post chain ("make it lost media"): over everything, including the lyrics overlay. */
+  private post: PostSpec | null = null;
+  private postFx: Array<{ type: string; effect: Effect | null }> = [];
+  private postUnder: Generator | null = null;
+  private postOver: Generator | null = null;
   private w = 1;
   private h = 1;
   private frameIndex = 0;
@@ -173,6 +179,26 @@ export class Compositor {
     }
   }
 
+  setPost(spec: PostSpec | null): void {
+    this.post = spec;
+    const types = spec?.fx.map((f) => f.type) ?? [];
+    this.postFx = types.map((type, i) => {
+      const prev = this.postFx[i];
+      if (prev && prev.type === type) return prev;
+      prev?.effect?.dispose();
+      return { type, effect: createEffect(type) };
+    });
+    for (let i = types.length; i < this.postFx.length; i++) this.postFx[i]?.effect?.dispose();
+    if (!spec?.under) {
+      this.postUnder?.dispose();
+      this.postUnder = null;
+    }
+    if (!spec?.over) {
+      this.postOver?.dispose();
+      this.postOver = null;
+    }
+  }
+
   /** What the lyrics overlay showed last frame (null when it is off). */
   get overlayInfo(): LyricsRenderInfo | null {
     return this.overlayParams && this.overlayGen && !this.sceneHasLyrics ? this.overlayGen.info : null;
@@ -181,7 +207,9 @@ export class Compositor {
   setScene(scene: Scene): void {
     this.plan = new ScenePlan(scene);
     // A look that already shows lyrics doesn't get a second copy from the overlay.
-    this.sceneHasLyrics = scene.layers.some((l) => l.enabled && (l.source.kind === 'lyrics' || l.source.kind === 'lyricVideo'));
+    this.sceneHasLyrics = scene.layers.some(
+      (l) => l.enabled && (l.source.kind === 'lyrics' || l.source.kind === 'lyricVideo' || (l.source.kind === 'broadcast' && !!l.source.params.captions && l.source.params.captions !== 'off')),
+    );
     this.palette.setScene(this.plan.scene);
     this.maskRefs = new Set(this.plan.scene.layers.filter((l) => l.enabled && l.mask?.type === 'luma' && l.mask.layer !== undefined).map((l) => l.mask!.layer!));
     this.mods.retain(this.plan.modKeys);
@@ -275,8 +303,14 @@ export class Compositor {
       if (!needed) return;
 
       ctx.params = rl.source;
-      rt.gen.update(ctx);
-      rt.gen.render(r, this.layerA);
+      if (rt.kind === 'adjust') {
+        // Adjustment layer: its FX work on everything composited so far.
+        this.copy.material.uniforms.uInput.value = this.accA.texture;
+        this.copy.render(r, this.layerA);
+      } else {
+        rt.gen.update(ctx);
+        rt.gen.render(r, this.layerA);
+      }
       let cur = this.layerA;
       let spare = this.layerB;
       layer.fx.forEach((fx, i) => {
@@ -339,7 +373,53 @@ export class Compositor {
       out = res;
     }
     if (this.overlayParams && !this.sceneHasLyrics) out = this.renderOverlay(out, ctx, this.overlayParams);
+    if (this.post) out = this.renderPost(out, ctx, fxCtx, this.post);
     return out;
+  }
+
+  /** Draw a generator over `base` (straight alpha), returning the other accumulation target. */
+  private stamp(base: THREE.WebGLRenderTarget, gen: Generator, ctx: GenContext, params: ParamBag): THREE.WebGLRenderTarget {
+    const r = this.renderer;
+    ctx.params = params;
+    gen.update(ctx);
+    gen.render(r, this.layerA);
+    const u = this.blend.material.uniforms;
+    u.uBase.value = base.texture;
+    u.uLayer.value = this.layerA.texture;
+    u.uMode.value = 0;
+    u.uOpacity.value = 1;
+    u.uMask.value = 0;
+    u.uMaskTex.value = null;
+    (u.uRes.value as THREE.Vector2).set(this.w, this.h);
+    const dst = base === this.accB ? this.accA : this.accB;
+    this.blend.render(r, dst);
+    return dst;
+  }
+
+  private renderPost(base: THREE.WebGLRenderTarget, ctx: GenContext, fxCtx: FxContext, spec: PostSpec): THREE.WebGLRenderTarget {
+    const r = this.renderer;
+    let cur = base;
+    if (spec.under) {
+      this.postUnder ??= createGenerator('broadcast');
+      cur = this.stamp(cur, this.postUnder, ctx, spec.under);
+    }
+    spec.fx.forEach((f, i) => {
+      const effect = this.postFx[i]?.effect;
+      if (!effect) return;
+      const spare = cur === this.accA ? this.accB : this.accA;
+      const res = effect.render(r, cur, spare, f.params, fxCtx);
+      if (res === spare) cur = spare;
+      else if (res !== cur) {
+        this.copy.material.uniforms.uInput.value = res.texture;
+        this.copy.render(r, spare);
+        cur = spare;
+      }
+    });
+    if (spec.over) {
+      this.postOver ??= createGenerator('broadcast');
+      cur = this.stamp(cur, this.postOver, ctx, spec.over);
+    }
+    return cur;
   }
 
   /** Composite the lyrics overlay (premultiplied over, full opacity, unmasked) onto `base`. */
@@ -362,6 +442,7 @@ export class Compositor {
   }
 
   dispose(): void {
+    this.setPost(null);
     for (const rt of this.runtimes.values()) {
       rt.gen?.dispose();
       rt.fx.forEach((f) => f.effect?.dispose());

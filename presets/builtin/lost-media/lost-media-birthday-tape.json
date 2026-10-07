@@ -1,0 +1,197 @@
+{
+  "schema": 1,
+  "name": "Birthday Tape '94",
+  "category": "Lost Media",
+  "tags": [
+    "lost media",
+    "found footage",
+    "home video",
+    "camcorder",
+    "vhs",
+    "90s",
+    "birthday",
+    "cozy"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "set",
+      "name": "Set",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lostScene",
+        "params": {
+          "scene": "candles",
+          "variant": 1,
+          "react": 1,
+          "tint": 0.25,
+          "eerie": 0,
+          "spin": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "text",
+      "name": "On screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "broadcast",
+        "params": {
+          "kit": "camcorder",
+          "captions": "off",
+          "date": "JUN 14 1994",
+          "station": "CHANNEL 9",
+          "title": "",
+          "ticker": "",
+          "events": 0,
+          "eventList": "all",
+          "seed": 0,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tape",
+      "name": "Tape",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "hi8",
+            "generation": 2,
+            "wear": 0.8,
+            "events": 0.35,
+            "eventList": "focus,pause,signal,rewind",
+            "overwrite": 0,
+            "mood": 0.1,
+            "seed": 3
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Wear",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape events",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.events",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mood",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.mood",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Copies deep",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.generation",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Candles",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#1a0f08",
+      "#5c2a14",
+      "#d0643a",
+      "#f2b56b",
+      "#fff1d6"
+    ]
+  },
+  "description": "A camcorder pointed at a birthday cake in a dark living room: REC light, date stamp, warm candle glow, focus hunting and the odd pause, on a Hi8 tape dubbed once."
+}

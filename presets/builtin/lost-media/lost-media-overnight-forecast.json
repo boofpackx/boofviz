@@ -1,0 +1,197 @@
+{
+  "schema": 1,
+  "name": "Overnight Forecast",
+  "category": "Lost Media",
+  "tags": [
+    "lost media",
+    "found footage",
+    "weather",
+    "radar",
+    "cable",
+    "90s",
+    "smooth",
+    "vhs"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "set",
+      "name": "Set",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lostScene",
+        "params": {
+          "scene": "radar",
+          "variant": 0,
+          "react": 1,
+          "tint": 0,
+          "eerie": 0,
+          "spin": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "text",
+      "name": "On screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "broadcast",
+        "params": {
+          "kit": "weather",
+          "captions": "off",
+          "date": "JUN 14 1994",
+          "station": "WEATHER 24",
+          "title": "",
+          "ticker": "",
+          "events": 0,
+          "eventList": "all",
+          "seed": 2,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tape",
+      "name": "Tape",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "vhs",
+            "generation": 3,
+            "wear": 0.9,
+            "events": 0.2,
+            "eventList": "eat,overwrite,ffwd",
+            "overwrite": 0,
+            "mood": 0.2,
+            "seed": 13
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Wear",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape events",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.events",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mood",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.mood",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Copies deep",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.generation",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Storms",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#020812",
+      "#0b2a4a",
+      "#2f7fbf",
+      "#9fd8ff",
+      "#f2fbff"
+    ]
+  },
+  "description": "The 3am local forecast: a radar map with storm cells pulsing to the bass, a sweep that turns once a bar, a list of towns and temperatures, recorded off cable onto a tired tape."
+}

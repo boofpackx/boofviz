@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BAND_NAMES, DEFAULT_ANALYSIS_SETTINGS, type BandName } from '@shared/types/audio';
+import type { LostMediaSettings } from '@shared/settings';
 import { useControl } from '../store';
 import { Section, Segmented, Slider, Toggle } from './ui';
 
@@ -157,9 +158,54 @@ export function MasterPanel() {
         <Slider label="Hue shift" value={g.hueShift} min={-180} max={180} step={1} unit="°" defaultValue={0} onChange={(v) => setGlobals({ hueShift: v })} />
         <p className="text-[11px] leading-snug text-ink-400">Double-click a slider to reset it. Speed scales every beat-synced motion (×0.25 to ×4 of the BPM).</p>
       </Section>
+      <LostMediaSection />
       <Section title="Output">
         <Slider label="Render scale" value={scale} min={0.5} max={2} step={0.05} defaultValue={1} format={(v) => `${Math.round(v * 100)}%`} onChange={(v) => update({ output: { renderScale: v } })} />
       </Section>
     </div>
+  );
+}
+
+const LOST_STYLES: Array<{ value: LostMediaSettings['style']; label: string; title: string }> = [
+  { value: 'camcorder', label: 'Camcorder', title: 'Home video: REC, date stamp, focus hunting' },
+  { value: 'vhs', label: 'VHS', title: 'A worn rental tape with the VCR display' },
+  { value: 'broadcast', label: 'TV', title: 'Off-air recording with a channel bug and lower third' },
+  { value: 'super8', label: 'Super 8', title: 'Home movie film: 18 fps, dust, light leaks' },
+  { value: 'archive', label: 'Archive', title: 'Decaying nitrate reel, sepia or black and white' },
+  { value: 'web', label: 'Web', title: 'Early internet video: tiny, blocky, buffering' },
+];
+
+function LostMediaSection() {
+  const lm = useControl((s) => s.settings.lostMedia);
+  const update = useControl((s) => s.update);
+  const set = (patch: Partial<LostMediaSettings>): void => update({ lostMedia: patch });
+  return (
+    <Section title="Lost media (over any look)">
+      <Toggle label="Make it lost media" checked={lm.enabled} onChange={(v) => set({ enabled: v })} hint="Runs whatever is playing (and the lyrics) through an old tape, film reel or early web video" />
+      <div className="grid grid-cols-3 gap-1">
+        {LOST_STYLES.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            title={o.title}
+            onClick={() => set({ style: o.value, enabled: true })}
+            className={`rounded border px-1 py-0.5 text-[10px] ${lm.style === o.value ? 'border-accent-2 bg-ink-600 text-ink-100' : 'border-ink-600 text-ink-400 hover:text-ink-200'}`}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+      <Slider label="Wear" value={lm.wear} min={0} max={2} defaultValue={1} onChange={(v) => set({ wear: v })} />
+      <Slider label="Tape events" value={lm.events} min={0} max={1} defaultValue={0.3} onChange={(v) => set({ events: v })} />
+      <Slider label="Mood" value={lm.mood} min={0} max={1} defaultValue={0.3} format={(v) => (v < 0.35 ? 'cozy' : v > 0.65 ? 'eerie' : 'neutral')} onChange={(v) => set({ mood: v })} />
+      <label className="grid grid-cols-[84px_1fr] items-center gap-2 text-ink-300">
+        Date stamp
+        <input className="rounded border border-ink-600 bg-ink-850 px-1.5 py-0.5 text-ink-100" value={lm.date} onChange={(e) => set({ date: e.target.value })} />
+      </label>
+      <label className="grid grid-cols-[84px_1fr] items-center gap-2 text-ink-300">
+        Station / brand
+        <input className="rounded border border-ink-600 bg-ink-850 px-1.5 py-0.5 text-ink-100" value={lm.station} onChange={(e) => set({ station: e.target.value })} />
+      </label>
+    </Section>
   );
 }

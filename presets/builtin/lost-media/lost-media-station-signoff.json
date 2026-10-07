@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "name": "Station Sign-Off",
+  "category": "Lost Media",
+  "tags": [
+    "lost media",
+    "found footage",
+    "broadcast",
+    "night",
+    "tower",
+    "80s",
+    "90s",
+    "eerie"
+  ],
+  "energy": 1,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "set",
+      "name": "Set",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lostScene",
+        "params": {
+          "scene": "tower",
+          "variant": 1,
+          "react": 1,
+          "tint": 0,
+          "eerie": 0,
+          "spin": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "text",
+      "name": "On screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "broadcast",
+        "params": {
+          "kit": "signoff",
+          "captions": "off",
+          "date": "JUN 14 1994",
+          "station": "KXBV 9",
+          "title": "THIS CONCLUDES OUR BROADCAST DAY",
+          "ticker": "",
+          "events": 0,
+          "eventList": "all",
+          "seed": 0,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tape",
+      "name": "Tape",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "broadcast",
+            "generation": 2,
+            "wear": 0.9,
+            "events": 0.15,
+            "eventList": "signal,eat",
+            "overwrite": 0,
+            "mood": 0.55,
+            "seed": 11
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Wear",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape events",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.events",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mood",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.mood",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Copies deep",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.generation",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0c0907",
+      "#3b2c20",
+      "#8a6a4b",
+      "#d9c3a0",
+      "#f6efe2"
+    ]
+  },
+  "description": "The end of the broadcast day: a transmitter tower against a dusk sky, warning lights blinking on the beat, a sign-off card fading in, and an off-air recording slowly losing signal."
+}

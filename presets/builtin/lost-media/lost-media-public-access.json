@@ -1,0 +1,197 @@
+{
+  "schema": 1,
+  "name": "Public Access Midnight",
+  "category": "Lost Media",
+  "tags": [
+    "lost media",
+    "found footage",
+    "cable",
+    "public access",
+    "90s",
+    "studio",
+    "vhs",
+    "chroma key"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "set",
+      "name": "Set",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lostScene",
+        "params": {
+          "scene": "studio",
+          "variant": 1,
+          "react": 1.2,
+          "tint": 0,
+          "eerie": 0,
+          "spin": 0.6
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "text",
+      "name": "On screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "broadcast",
+        "params": {
+          "kit": "tv",
+          "captions": "cc",
+          "date": "JUN 14 1994",
+          "station": "CABLE 23 ACCESS",
+          "title": "",
+          "ticker": "CALL IN NOW · LINES ARE OPEN · 555-0123 · TAPE DELAY IN EFFECT",
+          "events": 0,
+          "eventList": "all",
+          "seed": 0,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tape",
+      "name": "Tape",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "cable",
+            "generation": 3,
+            "wear": 1,
+            "events": 0.25,
+            "eventList": "signal,eat,overwrite",
+            "overwrite": 0,
+            "mood": 0.35,
+            "seed": 7
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Wear",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape events",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.events",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mood",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.mood",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Copies deep",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.generation",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Swirl",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0b0420",
+      "#3b0a6b",
+      "#ff2fa8",
+      "#22e0d0",
+      "#fff6c8"
+    ]
+  },
+  "description": "A late-night cable-access show: a cheap swirling chroma-key backdrop, a checkerboard floor and a desk, a call-in ticker, and the lyrics as closed captions."
+}

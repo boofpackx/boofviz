@@ -1,4 +1,6 @@
+import { Adjust } from './Adjust';
 import { Background } from './Background';
+import { Broadcast } from './Broadcast';
 import { BarCity } from './BarCity';
 import { CodeRain } from './CodeRain';
 import { DemoParts } from './DemoParts';
@@ -8,6 +10,7 @@ import type { Generator } from './Generator';
 import { GlassMeadow } from './GlassMeadow';
 import { KineticType } from './KineticType';
 import { Lines } from './Lines';
+import { LostScene } from './LostScene';
 import { LiquidChrome } from './LiquidChrome';
 import { Lyrics } from './Lyrics';
 import { LyricVideo } from './LyricVideo';
@@ -57,6 +60,9 @@ const FACTORIES: Record<string, () => Generator> = {
   ricochet: () => new Ricochet(),
   twistCube: () => new TwistCube(),
   background: () => new Background(),
+  lostScene: () => new LostScene(),
+  broadcast: () => new Broadcast(),
+  adjust: () => new Adjust(),
 };
 
 export function createGenerator(kind: string): Generator {

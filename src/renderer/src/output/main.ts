@@ -44,6 +44,7 @@ const applyLyricsSettings = (s: Settings): void => {
   lyricsFeed.offsetMs = s.lyrics.offsetMs;
   lyricsFeed.textLooks = s.lyrics.textLooks;
   renderer?.setLyricsOverlay(s.lyrics.overlay);
+  renderer?.setLostMedia(s.lostMedia);
 };
 
 // Register before any await so the analysis port can't arrive unheard.

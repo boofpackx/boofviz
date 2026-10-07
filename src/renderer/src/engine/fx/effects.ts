@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { ParamBag } from '@shared/types/engine';
 import { FULLSCREEN_VERT, PALETTE_GLSL, UTIL_GLSL } from '../shaders/common';
 import { FullscreenPass } from '../three/fullscreen';
+import { createTapeEffect } from './tapeFx';
 
 export interface FxContext {
   palette: Float32Array;
@@ -674,6 +675,6 @@ export function createEffect(kind: string): Effect | null {
         u.uKick.value = ctx.kick;
       });
     default:
-      return null;
+      return createTapeEffect(kind);
   }
 }

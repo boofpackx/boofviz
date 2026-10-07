@@ -1,0 +1,204 @@
+{
+  "schema": 1,
+  "name": "The Pilot That Never Aired",
+  "category": "Lost Media",
+  "tags": [
+    "lost media",
+    "found footage",
+    "kids tv",
+    "puppet",
+    "eerie",
+    "vhs",
+    "90s",
+    "lost episode"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "set",
+      "name": "Set",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lostScene",
+        "params": {
+          "scene": "puppet",
+          "variant": 0,
+          "react": 1,
+          "tint": 0,
+          "eerie": 0.15,
+          "spin": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "text",
+      "name": "On screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "broadcast",
+        "params": {
+          "kit": "tv",
+          "captions": "cc",
+          "date": "JUN 14 1994",
+          "station": "PILOT · NOT FOR AIR",
+          "title": "",
+          "ticker": "",
+          "events": 0,
+          "eventList": "all",
+          "seed": 0,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tape",
+      "name": "Tape",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "vhs",
+            "generation": 5,
+            "wear": 1.2,
+            "events": 0.4,
+            "eventList": "pause,eat,signal,overwrite",
+            "overwrite": 0,
+            "mood": 0.6,
+            "seed": 17
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Eerie",
+      "value": 0.15,
+      "targets": [
+        {
+          "path": "layers.0.source.params.eerie",
+          "range": [
+            0,
+            1
+          ]
+        },
+        {
+          "path": "layers.2.fx.0.params.mood",
+          "range": [
+            0.3,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wear",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape events",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.events",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mood",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.mood",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Copies deep",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.generation",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#1a0b2e",
+      "#ff5aa5",
+      "#ffd23f",
+      "#3bceac",
+      "#ffffff"
+    ]
+  },
+  "description": "A children's show nobody remembers: a felt puppet that sings along to the track under a smiling sun. Turn up Eerie and the colour drains, the eyes stop moving and the tape starts to go wrong."
+}

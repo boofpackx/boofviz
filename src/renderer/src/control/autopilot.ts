@@ -21,20 +21,22 @@ export interface PickContext {
 }
 
 const WORD_KINDS = new Set(['lyrics', 'lyricVideo', 'kineticType', 'platinumType']);
-const hasWords = (e: PresetEntry): boolean => e.preset.layers.some((l) => l.enabled && WORD_KINDS.has(l.source.kind));
+const hasWords = (e: PresetEntry): boolean =>
+  e.preset.layers.some((l) => l.enabled && (WORD_KINDS.has(l.source.kind) || (l.source.kind === 'broadcast' && !!l.source.params.captions && l.source.params.captions !== 'off')));
 const tagged = (e: PresetEntry, tags: string[]): boolean => e.preset.tags.some((t) => tags.includes(t));
 
 /** Premade playlists: rules, not fixed lists, so new presets join automatically. */
 export const PLAYLISTS: Array<{ id: string; name: string; test: (e: PresetEntry) => boolean }> = [
   { id: 'lyrics', name: 'With lyrics', test: hasWords },
   { id: 'nowords', name: 'No words', test: (e) => !hasWords(e) && e.preset.layers.every((l) => l.source.kind !== 'demoParts') },
-  { id: 'nineties', name: '90s night', test: (e) => ['Real 90s', 'Retro Type', 'Retro / Glitch'].includes(e.preset.category) || tagged(e, ['90s', 'arcade', 'crt', 'vhs', 'lcd', 'terminal', 'old hardware', '8-bit', 'screensaver', 'dial-up']) },
+  { id: 'nineties', name: '90s night', test: (e) => ['Real 90s', 'Retro Type', 'Retro / Glitch'].includes(e.preset.category) || tagged(e, ['90s', 'arcade', 'crt', 'vhs', 'lcd', 'terminal', 'old hardware', '8-bit', 'screensaver', 'dial-up', 'camcorder', 'home video', 'cable']) },
   { id: 'vintage', name: 'Vintage & analog', test: (e) => e.preset.category === 'Retro Type' || tagged(e, ['vintage', 'film', 'sepia', 'tape', 'vhs', 'photocopy', 'neon', 'silent film', 'home video']) },
   { id: 'y2k', name: 'Y2K & glossy', test: (e) => e.preset.category === 'Y2K & Aero' || tagged(e, ['y2k', 'chrome', 'glossy', 'candy', 'vaporwave', 'synthwave']) },
   { id: 'chill', name: 'Chill', test: (e) => e.preset.energy <= 2 },
   { id: 'peak', name: 'Peak time', test: (e) => e.preset.energy >= 4 },
   { id: 'space', name: '3D & trippy', test: (e) => ['3D Worlds', 'Trippy / Psychedelic'].includes(e.preset.category) || tagged(e, ['3d', 'space', 'psychedelic', 'trippy', 'tunnel']) },
   { id: 'eq', name: 'Classic EQ', test: (e) => e.preset.category === 'Equalizers' },
+  { id: 'lostmedia', name: 'Lost media', test: (e) => e.preset.category === 'Lost Media' || tagged(e, ['lost media', 'found footage', 'archive']) },
 ];
 
 export interface ResolvedPool {

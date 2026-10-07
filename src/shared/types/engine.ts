@@ -212,6 +212,7 @@ export const PRESET_CATEGORIES = [
   'Y2K & Aero',
   'Retro Type',
   'Lyrics',
+  'Lost Media',
 ] as const;
 export type PresetCategory = (typeof PRESET_CATEGORIES)[number];
 

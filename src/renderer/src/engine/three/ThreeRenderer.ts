@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import type { LostMediaSettings } from '@shared/settings';
+import { lostMediaPost } from '../lostMedia';
 import type { AudioFrame } from '@shared/types/audio';
 import type { ParamBag, Renderer, RendererOptions, RenderContext, RenderStats, Scene } from '@shared/types/engine';
 import type { LyricsRenderInfo } from '../generators/Lyrics';
@@ -162,6 +164,13 @@ export class ThreeRenderer implements Renderer {
   setLyricsOverlay(overlay: { enabled: boolean; params: ParamBag } | null): void {
     this.compositor.setOverlay(overlay?.enabled ? overlay.params : null);
     this.spare.setOverlay(overlay?.enabled ? overlay.params : null);
+  }
+
+  /** "Make it lost media" over every look (settings.lostMedia). */
+  setLostMedia(s: LostMediaSettings | undefined): void {
+    const spec = lostMediaPost(s);
+    this.compositor.setPost(spec);
+    this.spare.setPost(spec);
   }
 
   /** What the lyrics overlay showed last frame (debug hooks). */

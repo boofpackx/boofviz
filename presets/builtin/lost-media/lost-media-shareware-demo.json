@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "name": "Shareware Demo",
+  "category": "Lost Media",
+  "tags": [
+    "lost media",
+    "found footage",
+    "cd-rom",
+    "desktop",
+    "90s",
+    "pc",
+    "fmv",
+    "old hardware"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "set",
+      "name": "Set",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lostScene",
+        "params": {
+          "scene": "desktop",
+          "variant": 0,
+          "react": 1,
+          "tint": 0,
+          "eerie": 0,
+          "spin": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "text",
+      "name": "On screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "broadcast",
+        "params": {
+          "kit": "desktop",
+          "captions": "off",
+          "date": "JUN 14 1994",
+          "station": "CHANNEL 9",
+          "title": "DEMO.EXE",
+          "ticker": "",
+          "events": 0,
+          "eventList": "all",
+          "seed": 0,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tape",
+      "name": "Tape",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "digitalRot",
+          "enabled": true,
+          "params": {
+            "lowres": 0.15,
+            "blocks": 0.25,
+            "bitrate": 0.55,
+            "mosh": 0,
+            "buffering": 0,
+            "seed": 1
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.45,
+            "scanlines": 0.55,
+            "mask": 0.35,
+            "vignette": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Compression",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.blocks",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Banding",
+      "value": 0.55,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.bitrate",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Curve",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.2.fx.1.params.curvature",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#1a0b2e",
+      "#ff5aa5",
+      "#ffd23f",
+      "#3bceac",
+      "#ffffff"
+    ]
+  },
+  "description": "A lost CD-ROM running its attract loop: a grey bevelled window on a teal desktop, a tiny dithered video pulsing to the kick, all on a curved CRT."
+}

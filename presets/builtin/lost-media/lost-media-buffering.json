@@ -1,0 +1,186 @@
+{
+  "schema": 1,
+  "name": "Buffering…",
+  "category": "Lost Media",
+  "tags": [
+    "lost media",
+    "found footage",
+    "web",
+    "early internet",
+    "2000s",
+    "y2k",
+    "datamosh",
+    "compression"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "set",
+      "name": "Set",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lostScene",
+        "params": {
+          "scene": "player",
+          "variant": 0,
+          "react": 1,
+          "tint": 0,
+          "eerie": 0,
+          "spin": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tape",
+      "name": "Tape",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "digitalRot",
+          "enabled": true,
+          "params": {
+            "lowres": 0.3,
+            "blocks": 0.6,
+            "bitrate": 0.45,
+            "mosh": 0.5,
+            "buffering": 0.35,
+            "seed": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "text",
+      "name": "On screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "broadcast",
+        "params": {
+          "kit": "web",
+          "captions": "off",
+          "date": "JUN 14 1994",
+          "station": "CHANNEL 9",
+          "title": "",
+          "ticker": "",
+          "events": 0.35,
+          "eventList": "all",
+          "seed": 0,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Compression",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.blocks",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Datamosh",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.mosh",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stalls",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.buffering",
+          "range": [
+            0,
+            1
+          ]
+        },
+        {
+          "path": "layers.2.source.params.events",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#020812",
+      "#0b2a4a",
+      "#2f7fbf",
+      "#9fd8ff",
+      "#f2fbff"
+    ]
+  },
+  "description": "A video on an early web page: a small blocky picture, a progress bar creeping along, datamosh smears every few bars, and stalls where it freezes and shows Buffering… with a percentage."
+}
