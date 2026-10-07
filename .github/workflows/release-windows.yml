@@ -1,15 +1,37 @@
 name: Release (Windows)
 
-# Push a version tag (v0.1.0, v0.2.0, …) to build the Windows installer and publish it as a GitHub release.
+# Publishes a Windows installer as a GitHub release. Either push a version tag (v0.2.0),
+# or bump "version" in package.json and push its notes as docs/releases/v<version>.md:
+# the release (and its tag) is created on that commit. A version already released is skipped.
 on:
   push:
     tags: ['v*']
+    branches: ['**']
+    paths: ['docs/releases/*.md', '.github/workflows/release-windows.yml']
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.v.outputs.tag }}
+      skip: ${{ steps.v.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then tag="$GITHUB_REF_NAME"; else tag="v$(node -p "require('./package.json').version")"; fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then echo "skip=true" >> "$GITHUB_OUTPUT"; echo "$tag is already released"; else echo "skip=false" >> "$GITHUB_OUTPUT"; fi
+
   test:
+    needs: prepare
+    if: needs.prepare.outputs.skip != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +44,7 @@ jobs:
       - run: npm test
 
   windows:
-    needs: test
+    needs: [prepare, test]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +62,7 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ needs.prepare.outputs.tag }}
         run: |
           notes="docs/releases/$TAG.md"
           if [ -f "$notes" ]; then set -- --notes-file "$notes"; else set -- --generate-notes; fi
