@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { IPC } from '@shared/ipc';
 import { EMPTY_LYRICS, type NowPlaying, type SpotifyCommand, type TrackLyrics } from '@shared/lyrics';
 import { LyricsService, type TrackInfo } from './lyrics';
+import { createMediaSource } from './smtc';
 import { SpotifyClient, type TokenStore } from './spotify';
 import { dataDir, type SettingsStore } from './settingsStore';
 
@@ -45,7 +46,8 @@ function secureTokenStore(file: string): TokenStore {
 /**
  * Spotify now-playing + lyrics, published to both windows. `broadcast` sends
  * to the control and output windows and replays the latest value whenever one
- * of them (re)loads.
+ * of them (re)loads. On Windows the media session (SMTC) follows the song and
+ * the Web API only checks; BOOFVIZ_SMTC_URL swaps in a mock media session.
  */
 export class NowPlayingService {
   private readonly spotify: SpotifyClient;
@@ -80,6 +82,7 @@ export class NowPlayingService {
         else await shell.openExternal(url);
       },
       publish: (s) => this.publish(s),
+      media: createMediaSource({ platform: process.platform, env: process.env, scriptPath: join(dataDir(), 'smtc.ps1'), fetch: (...a) => fetch(...a), now: () => Date.now() }),
       onTrack: (t) => {
         this.track = t && { id: t.id, title: t.title, artists: t.artists, album: t.album, durationMs: t.durationMs };
         void this.loadLyrics();

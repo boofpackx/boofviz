@@ -26,6 +26,7 @@ Other commands:
 | `npm test` | Unit tests: DSP (FFT, loudness, onsets, BPM, phase lock, drops) and engine (every preset valid and lossless through JSON, macros, modulation, palette cycling) |
 | `npm run smoke` | End-to-end test: launches the built app, plays a synthetic 128 BPM track, checks tempo lock and output sync, then drives the UI (load a preset, right-click → Modulate by → Bass, drag a macro, undo, Save as) |
 | `npm run lyrics:e2e` | End-to-end test of Spotify login, now playing and synced lyrics against local mock services (`scripts/mock-services.mjs`) |
+| `npm run lyrics:smtc:e2e` | The same with a mock Windows media session (`BOOFVIZ_SMTC_URL`): hybrid mode, request counts against polling, a rate limit, Spotify closing and reopening |
 | `npm run tour` | Loads every preset and template in the running app and screenshots the output window into `test-output/tour/` (`npm run tour -- lyrics` tours only matching presets) |
 | `npm run presets:format` | Rewrites every file in `presets/` in canonical form (`presets:check` only reports) |
 | `npm run typecheck` | TypeScript checks for the main and renderer code |
@@ -57,6 +58,8 @@ BOOFVIZ can show the synced lyrics of whatever is playing in Spotify, either as 
 3. Turn on **Show lyrics over every look**, or load a preset from the **Lyrics** category. The lyrics generator (karaoke sweep, punch-in lines or typewriter) can also be added as a layer to any look.
 
 How lyrics are found, in order: your own `.lrc` files in the lyrics folder (`%APPDATA%/BOOFVIZ/lyrics`, named `Artist - Title.lrc`; **Open lyrics folder**, or drop an `.lrc` on the Lyrics tab to attach it to the playing track), then a local cache, then [LRCLIB](https://lrclib.net) (free, community-made synced lyrics). Titles like "Song - 2011 Remaster" or "Song (feat. X)" are cleaned up for the search. Turn off **Search lyrics online** to stay offline.
+
+On Windows, BOOFVIZ follows the Spotify desktop app through the Windows media session (the one behind the volume flyout): track changes, play / pause and seeks arrive at once, and the Spotify Web API is only asked to name each new song and to check the position now and then (a few requests a minute instead of one every few seconds), which keeps clear of Spotify's rate limit. If Spotify does rate-limit BOOFVIZ anyway, songs and lyrics keep coming from the media session. Without the desktop app (Spotify on another device, macOS) BOOFVIZ asks the Web API every few seconds instead. A small background PowerShell process reads the media session; set `BOOFVIZ_SMTC=off` to turn it off.
 
 If lines land early or late, use the **Offset** slider (±2 s, +100 ms steps; + shows lines earlier). Spotify's reported position, your audio output latency and the projector all add a little delay, and the right offset depends on your setup.
 

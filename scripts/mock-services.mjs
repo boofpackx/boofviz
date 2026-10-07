@@ -1,5 +1,6 @@
-// Local stand-ins for the Spotify accounts service, the Spotify Web API and
-// LRCLIB, for offline end-to-end tests (scripts/lyrics-e2e.mjs).
+// Local stand-ins for the Spotify accounts service, the Spotify Web API,
+// Spotify's Windows media session (SMTC) and LRCLIB, for offline end-to-end
+// tests (scripts/lyrics-e2e.mjs, scripts/lyrics-smtc-e2e.mjs).
 //
 //   node scripts/mock-services.mjs [port]      (default 43890)
 //
@@ -7,8 +8,14 @@
 //   BOOFVIZ_SPOTIFY_ACCOUNTS_URL=http://127.0.0.1:<port>/accounts
 //   BOOFVIZ_SPOTIFY_API_URL=http://127.0.0.1:<port>/v1
 //   BOOFVIZ_LRCLIB_URL=http://127.0.0.1:<port>/lrclib
+//   BOOFVIZ_SMTC_URL=http://127.0.0.1:<port>/smtc   (the media session, as the
+//     PowerShell reader reports it; same player as the Web API)
 //   BOOFVIZ_ARCHIVE_URL=http://127.0.0.1:<port>/archive   (Internet Archive search,
 //     metadata and downloads; clips are ffmpeg test patterns)
+//
+// Test controls: /__player?action=pause|play|next|previous|seek[&ms=]
+// (acting in Spotify itself, not through the Web API), /smtc/__set?app=0|1
+// (Spotify closed / open), /__limit?s=N (the Web API answers 429 for N s).
 //
 // All lyric lines are invented placeholder text.
 import { createHash, randomBytes } from 'node:crypto';
@@ -75,8 +82,11 @@ export function startMockServices({ port = 43890, host = '127.0.0.1' } = {}) {
   const codes = new Map(); // code → { challenge, clientId, redirectUri }
   const access = new Set();
   const refresh = new Set();
-  // Player state: progress advances in real time while playing.
+  // Player state: progress advances in real time while playing. The anchor moves
+  // on every play / pause / seek / skip, like the media session's timeline.
   const player = { index: 0, playing: true, anchorProgress: 0, anchorAt: Date.now() };
+  const smtc = { app: true };
+  let limitedUntil = 0;
   const progress = () => {
     const t = TRACKS[player.index];
     const p = player.anchorProgress + (player.playing ? Date.now() - player.anchorAt : 0);
@@ -178,12 +188,41 @@ export function startMockServices({ port = 43890, host = '127.0.0.1' } = {}) {
       return send(res, 400, { error: 'unsupported_grant_type' });
     }
 
+    // ---- Media session (SMTC) and test controls -------------------------------
+    if (path === '/smtc') {
+      const now = Date.now();
+      if (!smtc.app) return send(res, 200, { ok: true, app: null, title: '', artist: '', album: '', status: 'closed', positionMs: null, startMs: null, endMs: null, updatedEpochMs: null, sampleEpochMs: now });
+      const t = TRACKS[player.index];
+      const p = progress();
+      const ended = player.playing && p >= t.durationMs;
+      return send(res, 200, { ok: true, app: 'Spotify.exe', title: t.name, artist: t.artist, album: t.album, status: player.playing && !ended ? 'playing' : 'paused', positionMs: Math.round(player.anchorProgress), startMs: 0, endMs: t.durationMs, updatedEpochMs: player.anchorAt, sampleEpochMs: now });
+    }
+    if (path === '/smtc/__set') {
+      if (q.has('app')) smtc.app = q.get('app') === '1';
+      return send(res, 200, { ...smtc });
+    }
+    if (path === '/__limit') {
+      limitedUntil = Date.now() + Number(q.get('s') ?? 0) * 1000;
+      return send(res, 200, { limitedUntil });
+    }
+    if (path === '/__player') {
+      const action = q.get('action');
+      if (action === 'pause' || action === 'play') setPlayer({ playing: action === 'play' });
+      else if (action === 'seek') Object.assign(player, { anchorProgress: Math.max(0, Number(q.get('ms') ?? 0)), anchorAt: Date.now() });
+      else if (action === 'next') Object.assign(player, { index: (player.index + 1) % TRACKS.length, playing: true, anchorProgress: 0, anchorAt: Date.now() });
+      else if (action === 'previous') Object.assign(player, { index: (player.index + TRACKS.length - 1) % TRACKS.length, playing: true, anchorProgress: 0, anchorAt: Date.now() });
+      else return send(res, 400, { error: 'unknown action' });
+      return send(res, 200, { ...player, progress: progress() });
+    }
+
     // ---- Web API ------------------------------------------------------------
     if (path.startsWith('/v1/')) {
       const auth = (req.headers.authorization ?? '').replace(/^Bearer /, '');
       if (!access.has(auth)) return send(res, 401, { error: { status: 401, message: 'Invalid access token' } });
       if (path === '/v1/me/player/currently-playing' && req.method === 'GET') {
         apiTimes.push(Date.now());
+        const wait = limitedUntil - Date.now();
+        if (wait > 0) return send(res, 429, { error: { status: 429, message: 'API rate limit exceeded' } }, { 'Retry-After': String(Math.ceil(wait / 1000)) });
         const t = TRACKS[player.index];
         return send(res, 200, {
           timestamp: Date.now(),

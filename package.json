@@ -19,6 +19,7 @@
     "smoke": "node scripts/smoke.mjs",
     "link:e2e": "node scripts/link-e2e.mjs",
     "lyrics:e2e": "node scripts/lyrics-e2e.mjs",
+    "lyrics:smtc:e2e": "node scripts/lyrics-smtc-e2e.mjs",
     "soak": "node scripts/soak.mjs",
     "make-test-track": "node scripts/make-test-track.mjs test-output/test-128bpm.wav",
     "presets:format": "esbuild scripts/format-presets.ts --tsconfig=tsconfig.node.json --bundle --platform=node --format=esm --log-level=warning --outfile=out/tools/format-presets.mjs && node out/tools/format-presets.mjs",

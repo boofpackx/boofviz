@@ -1,10 +1,14 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { createServer, type ServerResponse } from 'node:http';
 import { EMPTY_NOW_PLAYING, SPOTIFY_REDIRECT_PORT, SPOTIFY_REDIRECT_URI, type NowPlaying, type SpotifyCommand } from '@shared/lyrics';
+import { HybridNowPlaying, SMTC_ID_PREFIX, sameSong, type HybridHost } from './hybrid';
+import type { MediaSessionSource } from './smtc';
 
 /**
  * Spotify Web API client: Authorization Code + PKCE login (no client secret),
- * token refresh, ~1 Hz now-playing polling and playback control. No Electron
+ * token refresh, now playing and playback control. While a media session
+ * (Windows SMTC, see hybrid.ts) shows Spotify, it follows the song and the Web
+ * API is only asked for exact checks; otherwise adaptive polling. No Electron
  * imports: storage, the browser and the clock are injected (see nowPlaying.ts),
  * so this is unit-testable with a mocked fetch.
  */
@@ -50,7 +54,20 @@ export interface SpotifyDeps {
   /** The track changed (null: nothing / not a track). */
   onTrack?: (t: SpotifyTrack | null) => void;
   redirectPort?: number;
+  /** Windows media session: while it shows Spotify it leads, and polling stops. */
+  media?: MediaSessionSource | null;
 }
+
+/** One currently-playing answer. */
+export type CurrentlyPlaying =
+  | { kind: 'track'; track: SpotifyTrack; playing: boolean; progressMs: number; sampleEpochMs: number }
+  /** A podcast, an ad or a local file. */
+  | { kind: 'other'; title: string; playing: boolean; progressMs: number; durationMs: number; sampleEpochMs: number }
+  | { kind: 'idle'; sampleEpochMs: number }
+  /** 429: the slow-down message is set; no requests for `waitMs`. */
+  | { kind: 'limited'; waitMs: number }
+  /** `stop`: the session is gone (back to Connect). */
+  | { kind: 'error'; message: string; stop?: boolean };
 
 interface TokenResponse {
   access_token: string;
@@ -207,13 +224,45 @@ export class SpotifyClient {
   private lastSendMs = 0;
   private generation = 0;
   private lastTrackId: string | null = null;
+  /** Retry-After of the last 429: no Web API requests before this (hybrid checks, polling after a fallback). */
+  private limitedUntil = 0;
+  private readonly hybrid: HybridNowPlaying | null;
 
-  constructor(private readonly deps: SpotifyDeps) {}
+  constructor(private readonly deps: SpotifyDeps) {
+    const host: HybridHost = {
+      now: () => this.deps.now(),
+      state: () => this.state,
+      set: (patch) => this.set(patch),
+      track: (t) => this.applyTrack(t),
+      art: (id, images) => this.fetchArt(id, images),
+      current: () => this.current(),
+      limitedUntil: () => this.limitedUntil,
+      polling: (on) => (on ? this.beginPolling(Math.max(0, this.limitedUntil - this.deps.now())) : this.stopPolling()),
+    };
+    this.hybrid = deps.media ? new HybridNowPlaying(host, deps.media) : null;
+  }
 
-  /** Resume a stored session (if any) and start polling. */
+  /** The media session leads (hybrid mode) rather than polling. */
+  get hybridActive(): boolean {
+    return this.hybrid?.active ?? false;
+  }
+
+  /** Resume a stored session (if any) and start following Spotify. */
   start(): void {
     this.refreshToken = this.deps.tokens.load();
-    if (this.refreshToken && this.deps.clientId().trim()) this.beginPolling();
+    if (this.refreshToken && this.deps.clientId().trim()) this.run();
+  }
+
+  /** Poll now; the media session (if any) takes over once it shows Spotify. */
+  private run(): void {
+    this.hybrid?.stop();
+    this.beginPolling();
+    this.hybrid?.start();
+  }
+
+  private halt(): void {
+    this.hybrid?.stop();
+    this.stopPolling();
   }
 
   private set(patch: Partial<NowPlaying>): void {
@@ -245,7 +294,7 @@ export class SpotifyClient {
         throw err;
       }
       this.set({ connected: true, connecting: false, error: undefined });
-      this.beginPolling();
+      this.run();
     } catch (err) {
       const msg = (err as Error).message;
       // A newer connect() or a disconnect() closed this login: stay quiet.
@@ -260,7 +309,7 @@ export class SpotifyClient {
   disconnect(): void {
     this.login?.close();
     this.login = null;
-    this.stopPolling();
+    this.halt();
     this.refreshToken = null;
     this.accessToken = null;
     this.deps.tokens.clear();
@@ -301,7 +350,7 @@ export class SpotifyClient {
 
   /** The refresh token was revoked or belongs to another client id: back to "Connect". */
   private authLost(): void {
-    this.stopPolling();
+    this.halt();
     this.refreshToken = null;
     this.accessToken = null;
     this.deps.tokens.clear();
@@ -327,17 +376,19 @@ export class SpotifyClient {
     return res;
   }
 
-  private beginPolling(): void {
+  /** Adaptive polling; `delayMs` holds the first request back (a Retry-After still running). */
+  private beginPolling(delayMs = 0): void {
     this.stopPolling();
     const gen = ++this.generation;
     this.failures = 0;
-    this.set({ connected: true, error: undefined });
+    this.set(delayMs > 0 ? { connected: true } : { connected: true, error: undefined });
     const loop = async (): Promise<void> => {
       const delay = await this.pollOnce();
       if (gen !== this.generation || delay < 0) return;
       this.timer = setTimeout(() => void loop(), delay);
     };
-    void loop();
+    if (delayMs > 0) this.timer = setTimeout(() => void loop(), delayMs);
+    else void loop();
   }
 
   private stopPolling(): void {
@@ -372,15 +423,14 @@ export class SpotifyClient {
     return Math.min(MAX_BACKOFF_MS, POLL_MS * 2 ** this.failures);
   }
 
-  /** One currently-playing request. Returns the delay before the next one (−1: stop). */
-  async pollOnce(): Promise<number> {
-    if (!this.refreshToken) return -1;
+  /** One currently-playing request, parsed. A 429 also sets the slow-down message and the Retry-After. */
+  async current(): Promise<CurrentlyPlaying> {
     let res: Response;
     try {
       res = await this.api('GET', '/me/player/currently-playing');
     } catch (err) {
-      if (err instanceof SpotifyAuthError) return this.refreshToken ? this.backoff(`Spotify: ${err.message}`) : -1;
-      return this.backoff('Spotify unreachable. Retrying…');
+      if (err instanceof SpotifyAuthError) return this.refreshToken ? { kind: 'error', message: `Spotify: ${err.message}` } : { kind: 'error', message: err.message, stop: true };
+      return { kind: 'error', message: 'Spotify unreachable. Retrying…' };
     }
     // Sample time: midpoint of send and receive.
     const sampleEpochMs = Math.round((this.lastSendMs + this.deps.now()) / 2);
@@ -388,18 +438,14 @@ export class SpotifyClient {
       const after = Number(res.headers.get('retry-after'));
       const wait = Math.max(POLL_MS, (Number.isFinite(after) && after > 0 ? after : 5) * 1000);
       this.slowUntil = this.deps.now() + POLL.slowForMs;
+      this.limitedUntil = this.deps.now() + wait;
       const secs = Math.round(wait / 1000);
       this.set({ error: `Spotify asked us to slow down; checking again in ${secs >= 90 ? `${Math.round(secs / 60)} min` : `${secs} s`}. Lyrics keep running.` });
-      return wait;
+      return { kind: 'limited', waitMs: wait };
     }
-    if (res.status >= 500) return this.backoff(`Spotify error ${res.status}. Retrying…`);
-    if (res.status === 204 || res.status === 202) {
-      this.failures = 0;
-      this.applyTrack(null);
-      this.set({ error: undefined, playing: false, trackId: null, title: '', artists: [], album: '', artDataUrl: undefined, durationMs: 0, progressMs: 0, sampleEpochMs });
-      return this.steady('idle');
-    }
-    if (!res.ok) return this.backoff(`Spotify error ${res.status}.`);
+    if (res.status >= 500) return { kind: 'error', message: `Spotify error ${res.status}. Retrying…` };
+    if (res.status === 204 || res.status === 202) return { kind: 'idle', sampleEpochMs };
+    if (!res.ok) return { kind: 'error', message: `Spotify error ${res.status}.` };
     type Body = {
       is_playing?: boolean;
       progress_ms?: number | null;
@@ -407,16 +453,12 @@ export class SpotifyClient {
       item?: { id?: string; name?: string; duration_ms?: number; artists?: Array<{ name: string }>; album?: { name?: string; images?: SpotifyTrack['images'] } } | null;
     };
     const body = (await res.json().catch(() => ({}))) as Body;
-    this.failures = 0;
     const item = body.item;
     const playing = body.is_playing === true;
     const progressMs = Math.max(0, body.progress_ms ?? 0);
     if (body.currently_playing_type !== 'track' || !item?.id) {
-      // Podcast, ad or unknown: show what we can, no lyrics.
-      this.applyTrack(null);
       const label = body.currently_playing_type === 'ad' ? 'Advertisement' : body.currently_playing_type === 'episode' ? 'Podcast episode' : '';
-      this.set({ error: undefined, playing, trackId: null, title: item?.name ?? label, artists: [], album: '', artDataUrl: undefined, durationMs: item?.duration_ms ?? 0, progressMs, sampleEpochMs });
-      return playing ? this.steady('playing', progressMs, item?.duration_ms ?? 0) : this.steady('paused');
+      return { kind: 'other', title: item?.name ?? label, playing, progressMs, durationMs: item?.duration_ms ?? 0, sampleEpochMs };
     }
     const track: SpotifyTrack = {
       id: item.id,
@@ -426,6 +468,31 @@ export class SpotifyClient {
       durationMs: item.duration_ms ?? 0,
       images: item.album?.images ?? [],
     };
+    return { kind: 'track', track, playing, progressMs, sampleEpochMs };
+  }
+
+  /** One poll (adaptive polling). Returns the delay before the next one (−1: stop). */
+  async pollOnce(): Promise<number> {
+    if (!this.refreshToken) return -1;
+    const r = await this.current();
+    // The media session took over while the request was out.
+    if (this.hybrid?.active) return -1;
+    if (r.kind === 'error') return r.stop ? -1 : this.backoff(r.message);
+    if (r.kind === 'limited') return r.waitMs;
+    this.failures = 0;
+    if (r.kind === 'idle') {
+      this.applyTrack(null);
+      this.set({ error: undefined, playing: false, trackId: null, title: '', artists: [], album: '', artDataUrl: undefined, durationMs: 0, progressMs: 0, sampleEpochMs: r.sampleEpochMs });
+      return this.steady('idle');
+    }
+    if (r.kind === 'other') {
+      // Podcast, ad or unknown: show what we can, no lyrics.
+      this.applyTrack(null);
+      this.set({ error: undefined, playing: r.playing, trackId: null, title: r.title, artists: [], album: '', artDataUrl: undefined, durationMs: r.durationMs, progressMs: r.progressMs, sampleEpochMs: r.sampleEpochMs });
+      return r.playing ? this.steady('playing', r.progressMs, r.durationMs) : this.steady('paused');
+    }
+    const { playing, progressMs, sampleEpochMs } = r;
+    const track = this.keepSmtcId(r.track);
     const changed = track.id !== this.state.trackId;
     this.set({
       error: undefined,
@@ -443,15 +510,25 @@ export class SpotifyClient {
     return playing ? this.steady('playing', progressMs, track.durationMs) : this.steady('paused');
   }
 
+  /** Back to polling mid-song: a song published under a media-session id keeps it (no second lyrics load). */
+  private keepSmtcId(track: SpotifyTrack): SpotifyTrack {
+    const s = this.state;
+    return s.trackId?.startsWith(SMTC_ID_PREFIX) && sameSong(track, { title: s.title, artist: s.artists.join(', ') }) ? { ...track, id: s.trackId } : track;
+  }
+
   private applyTrack(track: SpotifyTrack | null): void {
     const id = track?.id ?? null;
     if (id === this.lastTrackId) return;
     this.lastTrackId = id;
     this.deps.onTrack?.(track);
-    const art = track && pickArt(track.images);
-    if (!track || !art) return;
+    if (track) this.fetchArt(track.id, track.images);
+  }
+
+  private fetchArt(trackId: string, images: SpotifyTrack['images']): void {
+    const art = pickArt(images);
+    if (!art) return;
     void fetchDataUrl(this.deps.fetch, art).then((dataUrl) => {
-      if (dataUrl && this.state.trackId === track.id) this.set({ artDataUrl: dataUrl });
+      if (dataUrl && this.state.trackId === trackId) this.set({ artDataUrl: dataUrl });
     });
   }
 
@@ -459,8 +536,9 @@ export class SpotifyClient {
   async control(cmd: SpotifyCommand): Promise<string | null> {
     if (!this.refreshToken) return 'Not connected to Spotify.';
     if (cmd === 'sync') {
-      // Check now (after seeking or switching songs in Spotify itself).
-      this.schedule(0);
+      // The audio changed (a seek or a skip in Spotify itself): check now, or soon in hybrid mode.
+      if (this.hybrid?.active) this.hybrid.sync();
+      else this.schedule(0);
       return null;
     }
     const route: Record<Exclude<SpotifyCommand, 'sync'>, ['PUT' | 'POST', string]> = {
@@ -486,13 +564,15 @@ export class SpotifyClient {
       const s = this.state;
       const progressMs = s.playing ? Math.min(s.durationMs || Infinity, s.progressMs + (now - s.sampleEpochMs)) : s.progressMs;
       this.set({ playing: cmd === 'play', progressMs, sampleEpochMs: now });
+      this.hybrid?.expect(cmd === 'play');
     }
-    this.schedule(cmd === 'next' || cmd === 'previous' ? 250 : 400);
+    // In hybrid mode the media session reports the result itself.
+    if (!this.hybrid?.active) this.schedule(cmd === 'next' || cmd === 'previous' ? 250 : 400);
     return null;
   }
 
   dispose(): void {
     this.login?.close();
-    this.stopPolling();
+    this.halt();
   }
 }

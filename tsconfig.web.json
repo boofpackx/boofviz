@@ -38,6 +38,8 @@
     "src/preload/api.d.ts",
     "src/main/lyrics.ts",
     "src/main/spotify.ts",
+    "src/main/hybrid.ts",
+    "src/main/smtc.ts",
     "tests/**/*"
   ]
 }
