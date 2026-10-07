@@ -60,6 +60,7 @@
         "params": {
           "style": "stack",
           "material": "auto",
+          "melt": 0.7,
           "hero": 1,
           "camera": 0.15,
           "drama": 0.7,

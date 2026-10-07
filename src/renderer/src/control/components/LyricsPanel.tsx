@@ -264,6 +264,8 @@ const VIDEO_STYLES: Array<[string, string]> = [
   ['highscore', 'High score: letters spin and lock in'],
   ['explosion', 'Chorus explosion: small verses, huge chorus'],
   ['shatterdrop', 'Shatter drop: the drop breaks the line'],
+  ['jelly', 'Jelly: gummy letters drop in and wobble'],
+  ['glitter', 'Glitter: flakes swirl together into the words'],
 ];
 
 const MATERIALS: Array<[string, string]> = [
@@ -278,6 +280,9 @@ const MATERIALS: Array<[string, string]> = [
   ['mimeo', 'Mimeograph ink'],
   ['rubdown', 'Rub-down letters'],
   ['laser', 'Laser beam'],
+  ['holo', 'Holographic foil'],
+  ['jelly', 'Gummy jelly'],
+  ['melt', 'Melting'],
 ];
 
 function OverlaySection() {

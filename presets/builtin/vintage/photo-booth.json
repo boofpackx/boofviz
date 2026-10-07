@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "name": "Photo Booth",
+  "category": "Vintage",
+  "tags": [
+    "photo booth",
+    "strip",
+    "flash",
+    "film",
+    "lyrics",
+    "words",
+    "vintage"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "prints",
+      "name": "Prints",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "prints",
+        "params": {
+          "mode": "booth",
+          "every": 2,
+          "captions": true,
+          "react": 1,
+          "source": "lyrics",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT",
+          "lineBeats": 8,
+          "uppercase": true,
+          "lead": 120
+        }
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.05,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#2a1a10",
+      "#6a4a2a",
+      "#e8b06a",
+      "#f5e2c0",
+      "#ffffff"
+    ]
+  },
+  "description": "A photo-booth strip shot four frames to the beat behind the velvet curtain, every pose holding up a hand-lettered word of the line."
+}

@@ -59,6 +59,7 @@
         "params": {
           "style": "slam",
           "material": "stencil",
+          "melt": 0.7,
           "hero": 0.8,
           "camera": 0.2,
           "drama": 0.7,

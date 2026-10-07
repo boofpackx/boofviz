@@ -24,7 +24,7 @@ export interface PickContext {
 
 const WORD_KINDS = new Set(['lyrics', 'lyricVideo', 'kineticType', 'platinumType']);
 /** Generators that show the sung line when their source is lyrics. */
-const LYRIC_SOURCE_KINDS = new Set(['desktop90', 'neoBrutal']);
+const LYRIC_SOURCE_KINDS = new Set(['desktop90', 'neoBrutal', 'neo90', 'prints', 'tapeDeck', 'sketchScreen']);
 const hasWords = (e: PresetEntry): boolean =>
   e.preset.layers.some((l) => l.enabled && (WORD_KINDS.has(l.source.kind) || (LYRIC_SOURCE_KINDS.has(l.source.kind) && l.source.params.source !== 'text' && !['pet', 'numbers', 'eq', 'data', 'stickers'].includes(String(l.source.params.mode))) || (l.source.kind === 'broadcast' && !!l.source.params.captions && l.source.params.captions !== 'off')));
 const tagged = (e: PresetEntry, tags: string[]): boolean => e.preset.tags.some((t) => tags.includes(t));
@@ -33,13 +33,14 @@ const tagged = (e: PresetEntry, tags: string[]): boolean => e.preset.tags.some((
 export const PLAYLISTS: Array<{ id: string; name: string; test: (e: PresetEntry) => boolean }> = [
   { id: 'lyrics', name: 'With lyrics', test: hasWords },
   { id: 'nowords', name: 'No words', test: (e) => !hasWords(e) && e.preset.layers.every((l) => l.source.kind !== 'demoParts') },
-  { id: 'nineties', name: '90s night', test: (e) => ['Real 90s', 'Retro Type', 'Retro / Glitch'].includes(e.preset.category) || tagged(e, ['90s', 'arcade', 'crt', 'vhs', 'lcd', 'terminal', 'old hardware', '8-bit', 'screensaver', 'dial-up', 'camcorder', 'home video', 'cable']) },
-  { id: 'vintage', name: 'Vintage & analog', test: (e) => e.preset.category === 'Retro Type' || tagged(e, ['vintage', 'film', 'sepia', 'tape', 'vhs', 'photocopy', 'neon', 'silent film', 'home video']) },
+  { id: 'nineties', name: '90s night', test: (e) => ['Real 90s', 'Retro Type', 'Retro / Glitch', 'Neo 90s'].includes(e.preset.category) || tagged(e, ['90s', 'arcade', 'crt', 'vhs', 'lcd', 'terminal', 'old hardware', '8-bit', 'screensaver', 'dial-up', 'camcorder', 'home video', 'cable']) },
+  { id: 'vintage', name: 'Vintage & analog', test: (e) => e.preset.category === 'Retro Type' || e.preset.category === 'Vintage' || tagged(e, ['vintage', 'film', 'sepia', 'tape', 'vhs', 'photocopy', 'neon', 'silent film', 'home video']) },
   { id: 'y2k', name: 'Y2K & glossy', test: (e) => e.preset.category === 'Y2K & Aero' || tagged(e, ['y2k', 'chrome', 'glossy', 'candy', 'vaporwave', 'synthwave']) },
   { id: 'chill', name: 'Chill', test: (e) => e.preset.energy <= 2 },
   { id: 'peak', name: 'Peak time', test: (e) => e.preset.energy >= 4 },
   { id: 'space', name: '3D & trippy', test: (e) => ['3D Worlds', 'Trippy / Psychedelic'].includes(e.preset.category) || tagged(e, ['3d', 'space', 'psychedelic', 'trippy', 'tunnel']) },
   { id: 'retrotv', name: 'Retro TV', test: (e) => e.preset.category === 'Retro TV' || e.preset.layers.some((l) => l.enabled && l.fx.some((f) => f.enabled && f.type === 'tvSet')) },
+  { id: 'neo90s', name: 'Neo 90s', test: (e) => e.preset.category === 'Neo 90s' || tagged(e, ['holographic', 'lava lamp', 'stereogram', 'lenticular', 'jelly', 'glitter']) },
   { id: 'brutalist', name: 'Brutalist', test: (e) => e.preset.category === 'Brutalist' || tagged(e, ['brutalist', 'concrete', 'neo-brutal']) },
   { id: 'eq', name: 'Classic EQ', test: (e) => e.preset.category === 'Equalizers' },
   { id: 'lostmedia', name: 'Lost media', test: (e) => e.preset.category === 'Lost Media' || e.preset.category === 'Retro TV' || tagged(e, ['lost media', 'found footage', 'archive']) },

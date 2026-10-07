@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "name": "Sketch Screen",
+  "category": "Vintage",
+  "tags": [
+    "drawing toy",
+    "knobs",
+    "line drawing",
+    "lyrics",
+    "words",
+    "vintage",
+    "toy"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "toy",
+      "name": "Toy",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "sketchScreen",
+        "params": {
+          "cols": 16,
+          "shake": 1,
+          "react": 1,
+          "source": "lyrics",
+          "text": "DRAW / SHAKE / DRAW AGAIN",
+          "lineBeats": 8,
+          "uppercase": true,
+          "lead": 120
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Shake",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.shake",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Letters per row",
+      "value": 0.42,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cols",
+          "range": [
+            6,
+            30
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#1a1030",
+      "#c8202a",
+      "#f3ecd8",
+      "#bfc0bc",
+      "#ffffff"
+    ]
+  },
+  "description": "The red drawing toy: each lyric line drawn as one unbroken line, the stylus reaching each word as it is sung and the white knobs turning with it, then the toy is shaken clear for the next line."
+}

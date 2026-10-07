@@ -60,14 +60,14 @@ void main() {
 const FRAG = /* glsl */ `
 precision highp float;
 uniform sampler2D uAtlas;
-uniform float uOutline, uGlow, uShadow, uTime, uShine, uDot;
+uniform float uOutline, uGlow, uShadow, uTime, uShine, uDot, uMelt;
 uniform vec2 uRes;
 uniform vec3 uOutlineCol, uGlowCol;
 in vec2 vUv;
 in vec2 vLocal;
 in vec4 vCol;
 in vec2 vKind;
-in vec4 vFx;     // x material (0 plain 1 chrome 2 neon 3 paper 4 led 5 phosphor 6 stencil 7 mimeo 8 rub-down) · y burn · z per-letter random · w solid card
+in vec4 vFx;     // x material (0 plain 1 chrome 2 neon 3 paper 4 led 5 phosphor 6 stencil 7 mimeo 8 rub-down 9 laser 10 holo 11 jelly 12 melt) · y burn · z per-letter random · w solid card
 out vec4 fragColor;
 ${UTIL_GLSL}
 void main() {
@@ -88,6 +88,21 @@ void main() {
   float cover = face;
   vec3 col = vCol.rgb;
   bool front = vKind.x < 0.5;
+  if (mat == 12) {
+    // Melting: the letter sags in waves and drips run down from its lower edges (side layers sag with it).
+    float gh = length(vec2(dFdx(vUv.y), dFdy(vUv.y))) / max(1e-5, length(vec2(dFdx(vLocal.y), dFdy(vLocal.y))));
+    float sag = uMelt * gh * 0.09 * (0.5 + 0.5 * sin(vLocal.x * 9.0 + vFx.z * 20.0));
+    vec2 uv2 = vUv - vec2(0.0, sag * (1.0 - vLocal.y));
+    d = texture(uAtlas, uv2).r - 0.5;
+    face = smoothstep(-w, w, d);
+    float colr = hash21(vec2(floor(vLocal.x * 13.0), vFx.z * 7.0));
+    float len = uMelt * gh * 0.3 * colr * colr;
+    float drip = 0.0;
+    for (int k = 1; k <= 6; k++) drip = max(drip, step(0.0, texture(uAtlas, uv2 - vec2(0.0, len * float(k) / 6.0)).r - 0.5));
+    float thin = step(abs(fract(vLocal.x * 13.0) - 0.5), 0.3 - 0.2 * smoothstep(0.0, 1.0, colr));
+    face = max(face, drip * thin * step(0.55, colr) * step(vLocal.y, 0.5));
+    cover = face;
+  }
   if (front && mat == 1) {
     // Chrome: sky above a hard horizon, warm ground below, and a shine sweeping across.
     float y = vLocal.y;
@@ -143,6 +158,27 @@ void main() {
     float scan = 0.7 + 0.3 * step(0.5, fract(gl_FragCoord.y * 0.5 + uTime * 47.0));
     col = vCol.rgb * beam * 2.4 * scan + vec3(1.0) * smoothstep(0.015, 0.0, abs(d - 0.01)) * 0.7;
     cover = beam;
+  } else if (front && mat == 10) {
+    // Holographic foil: a rainbow that slides with position and time, fine diffraction lines, glitter twinkles.
+    vec2 sp = gl_FragCoord.xy / uRes;
+    float ph = sp.x * 1.3 + sp.y * 0.7 + vFx.z * 0.6 + uTime * 0.15 + vLocal.y * 0.35;
+    vec3 rb = 0.55 + 0.45 * cos(6.2832 * (ph + vec3(0.0, 0.33, 0.67)));
+    float lines = 0.86 + 0.14 * sin((sp.x - sp.y) * uRes.y * 0.9);
+    float tw = step(0.982, hash21(floor(gl_FragCoord.xy / 3.0) + floor(uTime * 8.0) * 0.37 + vFx.z * 11.0));
+    col = mix(rb * 1.25, vCol.rgb, 0.15) * lines * (0.85 + 0.25 * smoothstep(0.0, 0.2, d)) + vec3(2.2) * tw;
+  } else if (front && mat == 11) {
+    // Gummy: see-through, deeper colour where it's thick, a wet highlight and a bright rim.
+    float thick = smoothstep(0.0, 0.3, d);
+    float e = 0.004;
+    float gx = texture(uAtlas, vUv + vec2(e, 0.0)).r - texture(uAtlas, vUv - vec2(e, 0.0)).r;
+    float gy = texture(uAtlas, vUv - vec2(0.0, e)).r - texture(uAtlas, vUv + vec2(0.0, e)).r;
+    vec3 nrm = normalize(vec3(-gx, -gy, 0.03 + 0.25 * thick));
+    float spec = pow(max(dot(nrm, normalize(vec3(-0.45, 0.6, 0.8))), 0.0), 28.0);
+    float rim = smoothstep(0.06, 0.0, d) * face;
+    col = vCol.rgb * (0.5 + 0.7 * thick) + vec3(1.0) * spec * 1.4 + vCol.rgb * rim * 0.8;
+    cover = face * (0.55 + 0.35 * thick) + spec * face * 0.4;
+  } else if (front && mat == 12) {
+    col = vCol.rgb * (0.85 + 0.3 * smoothstep(0.0, 0.2, d));
   } else if (front && mat == 5) {
     // Phosphor: one glowing colour, scanlines, a slow persistence bloom.
     col = vCol.rgb * (1.2 + 0.4 * smoothstep(0.0, 0.25, d)) * (0.72 + 0.28 * sin(gl_FragCoord.y * 3.14159));
@@ -195,6 +231,8 @@ const AUTO_STYLE: Record<string, LyricStyle> = {
   'Retro Type': 'credits',
   'Lost Media': 'credits',
   'Retro TV': 'teletext',
+  'Neo 90s': 'glitter',
+  Vintage: 'jcard',
   Lyrics: 'drop',
 };
 
@@ -213,7 +251,7 @@ const PAPERS: Array<[number, number, number]> = [
   [0.06, 0.06, 0.06],
   [0.85, 0.2, 0.15],
 ];
-const MATERIAL_INDEX: Record<LetterMaterial, number> = { plain: 0, chrome: 1, neon: 2, paper: 3, led: 4, phosphor: 5, stencil: 6, mimeo: 7, rubdown: 8, laser: 9 };
+const MATERIAL_INDEX: Record<LetterMaterial, number> = { plain: 0, chrome: 1, neon: 2, paper: 3, led: 4, phosphor: 5, stencil: 6, mimeo: 7, rubdown: 8, laser: 9, holo: 10, jelly: 11, melt: 12 };
 
 /** Glyph quad centre offset from the pen position (em). */
 const qx0 = (g: { x: number; w: number; advance: number }): number => g.x + g.w / 2 - g.advance / 2;
@@ -305,6 +343,7 @@ export class LyricVideo implements Generator {
         uTime: { value: 0 },
         uShine: { value: -1 },
         uDot: { value: 6 },
+        uMelt: { value: 0.6 },
         uRes: { value: new THREE.Vector2(1, 1) },
         uOutlineCol: { value: new THREE.Vector3() },
         uGlowCol: { value: new THREE.Vector3(1, 1, 1) },
@@ -462,6 +501,8 @@ export class LyricVideo implements Generator {
     // Chrome shine: one sweep across the frame as each line arrives.
     u.uShine.value = sung ? -0.3 + ((now - sung.line.start) * speed) / 0.7 : -1;
     const matIndex = MATERIAL_INDEX[material];
+    // Melting letters sag and drip more as the line goes on, and all at once on the drop.
+    u.uMelt.value = Math.min(1.4, num(p.melt, 0.7) * (0.3 + 0.7 * Math.min(1, frac)) + ctx.env.drop * 0.5);
 
     // Director: camera per style and moment.
     const heroStart = sung && sung.hero >= 0 ? sung.line.words[sung.hero]?.start ?? null : null;
@@ -631,7 +672,7 @@ export class LyricVideo implements Generator {
         this.m.makeTranslation(pose.x * k, blockY + pose.y * k, pose.z * k);
         this.t.makeRotationFromEuler(this.e.set(pose.rx, pose.ry, pose.rz, 'XYZ'));
         this.m.multiply(this.t);
-        this.t.makeScale(pose.s * k * (style === 'teletext' && rel === 0 ? 0.9 : 1), pose.s * k * (style === 'teletext' && rel === 0 ? 1.6 : 1), pose.s * k);
+        this.t.makeScale(pose.s * k * (style === 'teletext' && rel === 0 ? 0.9 : 1) * (pose.sx ?? 1), pose.s * k * (style === 'teletext' && rel === 0 ? 1.6 : 1) * (pose.sy ?? 1), pose.s * k);
         this.m.multiply(this.t);
         this.t.makeTranslation(pose.ox, pose.oy, 0);
         this.m.multiply(this.t);
@@ -675,7 +716,11 @@ export class LyricVideo implements Generator {
         }
         // Burn eats the letter (positive); a reveal draws it left to right (negative).
         const burn = exit === 'burn' ? ot : pose.reveal !== undefined && pose.reveal < 1 ? -Math.max(0.001, pose.reveal) : 0;
-        const pieces = shatter ? 4 : 1;
+        // Pieces per side: quarters when shattering, glitter flakes when scattering.
+        const glitter = pose.scatter !== undefined && !shatter;
+        const n = shatter ? 2 : glitter ? 5 : 1;
+        const pieces = n * n;
+        const sc = glitter ? pose.scatter! : 0;
         // Neon alley: each letter reflected in the wet street below, rippling.
         if (style === 'neonalley' && !shatter) {
           const s = this.slot();
@@ -726,32 +771,41 @@ export class LyricVideo implements Generator {
           }
         }
         for (let piece = 0; piece < pieces; piece++) {
-          // Shatter: each letter breaks into quarters that fly apart, spin and fall.
-          const pu = piece % 2;
-          const pv = piece >> 1;
-          const du = shatter ? pu - 0.5 : 0;
-          const dv = shatter ? pv - 0.5 : 0;
+          // Shatter: each letter breaks into quarters that fly apart, spin and fall. Glitter: flakes swirl in from a cloud.
+          const pu = piece % n;
+          const pv = Math.floor(piece / n);
+          const cu = (pu + 0.5) / n - 0.5;
+          const cv = (pv + 0.5) / n - 0.5;
           const fly = shatter ? ot * (2.5 + 3 * hash2(L.index * 4 + piece, seed)) : 0;
-          for (let d = depthLayers; d >= 0; d--) {
+          const fr = (j: number): number => hash2(L.index * 37 + piece, seed * 3 + j);
+          for (let d = glitter ? 0 : depthLayers; d >= 0; d--) {
             const s = this.slot();
             if (!s) break;
             const mm = this.mm.copy(this.m);
             if (shatter) {
-              this.t.makeTranslation(du * g.w * 0.5 + du * fly, dv * g.h * 0.5 + dv * fly - ot * ot * 4, fly * 0.6);
+              this.t.makeTranslation(cu * g.w + 2 * cu * fly, cv * g.h + 2 * cv * fly - ot * ot * 4, fly * 0.6);
               mm.multiply(this.t);
-              this.t.makeRotationFromEuler(this.e.set(ot * 4 * dv, ot * 3 * du, ot * 6 * (hash2(piece, L.index) - 0.5)));
+              this.t.makeRotationFromEuler(this.e.set(ot * 8 * cv, ot * 6 * cu, ot * 6 * (hash2(piece, L.index) - 0.5)));
+              mm.multiply(this.t);
+            } else if (glitter) {
+              // Out in the cloud the flakes orbit the letter; they spiral in as the scatter falls to 0.
+              const r = sc * (1.2 + 2.4 * fr(1));
+              const ang = fr(2) * Math.PI * 2 + sc * 4 + now * 1.5 * sc;
+              this.t.makeTranslation(cu * g.w + Math.cos(ang) * r, cv * g.h + Math.sin(ang) * r * 0.7 + sc * (fr(3) - 0.3) * 1.5, sc * (fr(4) - 0.5) * 3);
+              mm.multiply(this.t);
+              this.t.makeRotationFromEuler(this.e.set(sc * 9 * (fr(5) - 0.5), sc * 9 * (fr(6) - 0.5), sc * 6 * (fr(7) - 0.5)));
               mm.multiply(this.t);
             }
             this.t.makeTranslation(qx, qy, -d * dz);
             mm.multiply(this.t);
-            this.t.makeScale(g.w / pieces ** 0.5, g.h / pieces ** 0.5, 1);
+            this.t.makeScale(g.w / n, g.h / n, 1);
             mm.multiply(this.t);
             s.z = mm.elements[14];
             s.m.set(mm.elements);
-            if (shatter) {
-              const u0 = g.u0 + (g.u1 - g.u0) * pu * 0.5;
-              const v0 = g.v0 + (g.v1 - g.v0) * (1 - pv) * 0.5;
-              s.uv.set([u0, v0, u0 + (g.u1 - g.u0) * 0.5, v0 + (g.v1 - g.v0) * 0.5]);
+            if (n > 1) {
+              const u0 = g.u0 + ((g.u1 - g.u0) * pu) / n;
+              const v0 = g.v0 + ((g.v1 - g.v0) * (n - 1 - pv)) / n;
+              s.uv.set([u0, v0, u0 + (g.u1 - g.u0) / n, v0 + (g.v1 - g.v0) / n]);
             } else s.uv.set([g.u0, g.v0, g.u1, g.v1]);
             // Sides shade darker toward the back; the face takes the glow.
             const shade = d === 0 ? 1 : 0.9 - 0.55 * (d / Math.max(1, depthLayers));
@@ -759,7 +813,7 @@ export class LyricVideo implements Generator {
             else s.col.set([side[0] * shade, side[1] * shade, side[2] * shade, alpha]);
             s.kind[0] = d === 0 ? 0 : 1;
             s.kind[1] = pose.glow;
-            s.fx.set([matIndex, burn, rand, 0]);
+            s.fx.set([matIndex, burn, glitter ? fr(8) : rand, 0]);
           }
         }
         if (this.drawCount >= MAX) break;

@@ -58,6 +58,7 @@
         "params": {
           "style": "neonalley",
           "material": "neon",
+          "melt": 0.7,
           "hero": 0.6,
           "camera": 0.3,
           "drama": 0.7,

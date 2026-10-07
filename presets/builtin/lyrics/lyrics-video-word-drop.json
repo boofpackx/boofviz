@@ -65,6 +65,7 @@
         "params": {
           "style": "drop",
           "material": "auto",
+          "melt": 0.7,
           "hero": 0.6,
           "camera": 0.5,
           "drama": 0.7,

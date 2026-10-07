@@ -68,6 +68,7 @@
         "params": {
           "style": "explosion",
           "material": "auto",
+          "melt": 0.7,
           "hero": 1,
           "camera": 1,
           "drama": 1,

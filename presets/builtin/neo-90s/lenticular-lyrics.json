@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "name": "Lenticular Lyrics",
+  "category": "Neo 90s",
+  "tags": [
+    "lenticular",
+    "flip card",
+    "prize",
+    "lyrics",
+    "words",
+    "neo-90s"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "neo",
+      "name": "Neo-90s",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "neo90",
+        "params": {
+          "scene": "lenticular",
+          "words": "line",
+          "font": "heavy",
+          "react": 1,
+          "lamp": true,
+          "melt": 0.5,
+          "reveal": 0,
+          "source": "lyrics",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT",
+          "lineBeats": 8,
+          "uppercase": true,
+          "lead": 120
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Music reaction",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#1a1030",
+      "#3a2a6a",
+      "#7fd8ff",
+      "#ff9ae8",
+      "#fff6c8"
+    ]
+  },
+  "description": "A ridged lenticular prize card flipping between two words of the line every two beats, the strips catching the light as it tilts."
+}

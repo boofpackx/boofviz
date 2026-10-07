@@ -10,14 +10,16 @@ export const LYRIC_STYLES = [
   // Lyric Cinema
   'highway', 'credits', 'infomercial', 'ransom', 'teletext', 'screensaver',
   'neonalley', 'jcard', 'laser', 'highscore', 'explosion', 'shatterdrop',
+  // Neo 90s
+  'jelly', 'glitter',
 ] as const;
 export type LyricStyle = (typeof LYRIC_STYLES)[number];
 
-export const LETTER_MATERIALS = ['plain', 'chrome', 'neon', 'paper', 'led', 'phosphor', 'stencil', 'mimeo', 'rubdown', 'laser'] as const;
+export const LETTER_MATERIALS = ['plain', 'chrome', 'neon', 'paper', 'led', 'phosphor', 'stencil', 'mimeo', 'rubdown', 'laser', 'holo', 'jelly', 'melt'] as const;
 export type LetterMaterial = (typeof LETTER_MATERIALS)[number];
 
 /** Material each style uses when the look leaves it on 'auto'. */
-export const STYLE_MATERIAL: Partial<Record<LyricStyle, LetterMaterial>> = { infomercial: 'chrome', screensaver: 'chrome', ransom: 'paper', neonalley: 'neon', laser: 'laser', shatterdrop: 'chrome' };
+export const STYLE_MATERIAL: Partial<Record<LyricStyle, LetterMaterial>> = { infomercial: 'chrome', screensaver: 'chrome', ransom: 'paper', neonalley: 'neon', laser: 'laser', shatterdrop: 'chrome', jelly: 'jelly', glitter: 'holo' };
 
 /** Styles that show several lines at once (a scrolling roll, a teletext page). */
 export const MULTI_LINE: ReadonlySet<LyricStyle> = new Set<LyricStyle>(['credits', 'teletext']);
@@ -80,6 +82,11 @@ export interface Pose {
   glow: number;
   /** 0..1 how much of the letter is drawn, left to right (handwriting, laser tracing). */
   reveal?: number;
+  /** Squash and stretch: extra width and height factors. */
+  sx?: number;
+  sy?: number;
+  /** Glitter: 0 = the letter whole, 1 = its flakes blown apart (the renderer splits it). */
+  scatter?: number;
 }
 
 /** Deterministic 0..1 hash of two integers. */
@@ -574,6 +581,33 @@ export function poseLetter(style: LyricStyle, L: LetterLayout, W: WordLayout, m:
       p.s = Math.max(0, a);
       p.y += Math.sin(m.beat * Math.PI * 0.5 + L.index * 0.35) * 0.05;
       p.a = clamp01(tw / 0.15) * (1 - outT);
+      break;
+    }
+    case 'jelly': {
+      // Gummy letters drop in one by one, land with a squash and wobble on a spring; every kick jiggles them.
+      const tl = (tw - L.li * 0.05) * 1;
+      if (tl < 0) return { ...p, a: 0 };
+      const fall = clamp01(tl / 0.2);
+      p.y += (1 - fall * fall) * 1.8;
+      const t2 = Math.max(0, tl - 0.2);
+      const wob = fall < 1 ? -0.25 * fall : Math.exp(-t2 * 5) * Math.cos(t2 * 22);
+      const jig = m.kick * 0.12 * (0.6 + 0.6 * I);
+      p.sy = (1 - 0.32 * wob) * (1 - jig) * (1 - outT * 0.75);
+      p.sx = (1 + 0.28 * wob) * (1 + jig * 0.8) * (1 + outT * 0.45);
+      // Squash about the baseline, not the middle.
+      p.y -= (1 - p.sy) * 0.36;
+      p.rz = Math.sin(m.beat * Math.PI + L.index * 0.9) * 0.05;
+      p.a = 1 - outT * outT;
+      break;
+    }
+    case 'glitter': {
+      // Each letter blows in as a cloud of glitter flakes that swirl together as the word is sung, and blows apart after.
+      const tl = tw - L.li * 0.035;
+      if (tl < -0.6) return { ...p, a: 0 };
+      p.scatter = Math.max(1 - outCubic((tl + 0.6) / 0.85), inCubic(outT));
+      p.y += Math.sin(m.beat * Math.PI * 0.5 + L.index * 0.5) * 0.03;
+      p.glow += 0.3 * (1 - (p.scatter ?? 0));
+      p.a = clamp01((tl + 0.6) / 0.3) * (1 - outT * outT);
       break;
     }
   }

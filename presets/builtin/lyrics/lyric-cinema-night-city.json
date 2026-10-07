@@ -58,6 +58,7 @@
         "params": {
           "style": "spin3d",
           "material": "auto",
+          "melt": 0.7,
           "hero": 0.8,
           "camera": 0.6,
           "drama": 0.7,

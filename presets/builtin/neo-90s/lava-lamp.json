@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "name": "Lava Lamp",
+  "category": "Neo 90s",
+  "tags": [
+    "lava lamp",
+    "wax",
+    "blobs",
+    "chill",
+    "neo-90s"
+  ],
+  "energy": 1,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "neo",
+      "name": "Neo-90s",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "neo90",
+        "params": {
+          "scene": "lava",
+          "words": "off",
+          "font": "heavy",
+          "react": 1,
+          "lamp": true,
+          "melt": 0.5,
+          "reveal": 0,
+          "source": "lyrics",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT",
+          "lineBeats": 8,
+          "uppercase": true,
+          "lead": 120
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Music reaction",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#12040a",
+      "#3a0a2a",
+      "#ff3a6a",
+      "#ff8a2a",
+      "#ffd04a"
+    ]
+  },
+  "description": "A lava lamp in a dark room: wax blobs rising, merging and sinking in the glow, swelling a little with the bass."
+}

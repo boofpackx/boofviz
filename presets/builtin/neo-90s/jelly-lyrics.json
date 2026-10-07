@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "name": "Jelly Lyrics",
+  "category": "Neo 90s",
+  "tags": [
+    "jelly",
+    "gummy",
+    "candy",
+    "lyrics",
+    "words",
+    "music video",
+    "neo-90s"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Pastel",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "radial",
+          "from": 0,
+          "to": 0.15,
+          "intensity": 0.5,
+          "motion": 0.2,
+          "pulse": 0.2
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyrics",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "jelly",
+          "material": "jelly",
+          "melt": 0.7,
+          "hero": 0.6,
+          "camera": 0.2,
+          "drama": 0.7,
+          "exit": "auto",
+          "source": "lyrics",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1.1,
+          "position": "center",
+          "depth": 0.4,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.3,
+          "colorMode": "rainbow",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Camera",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.1.source.params.camera",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#2a0a3a",
+      "#ff6ab0",
+      "#ffb03a",
+      "#6aff8a",
+      "#ffffff"
+    ]
+  },
+  "description": "See-through gummy letters dropping in one at a time as they are sung, landing with a squash and wobbling on a spring; every kick jiggles them."
+}

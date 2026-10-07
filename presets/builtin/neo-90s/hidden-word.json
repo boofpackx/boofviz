@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "name": "Hidden Word",
+  "category": "Neo 90s",
+  "tags": [
+    "stereogram",
+    "magic eye",
+    "hidden picture",
+    "lyrics",
+    "hero",
+    "neo-90s"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "neo",
+      "name": "Neo-90s",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "neo90",
+        "params": {
+          "scene": "stereogram",
+          "words": "hero",
+          "font": "heavy",
+          "react": 1,
+          "lamp": true,
+          "melt": 0.5,
+          "reveal": 0,
+          "source": "lyrics",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT",
+          "lineBeats": 8,
+          "uppercase": true,
+          "lead": 120
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Reveal",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.reveal",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#101820",
+      "#ff7a2a",
+      "#3ac8a0",
+      "#f5e04a",
+      "#5a7aff"
+    ]
+  },
+  "description": "One big hidden word per line in a stereogram poster: stare through it and the hero word stands out from the pattern."
+}

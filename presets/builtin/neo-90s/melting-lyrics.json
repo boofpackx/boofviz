@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "name": "Melting Lyrics",
+  "category": "Neo 90s",
+  "tags": [
+    "melt",
+    "drip",
+    "lyrics",
+    "words",
+    "music video",
+    "neo-90s"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Heat",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "vertical",
+          "from": 0.1,
+          "to": 0.4,
+          "intensity": 0.5,
+          "motion": 0.2,
+          "pulse": 0.2
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyrics",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "drop",
+          "material": "melt",
+          "melt": 0.8,
+          "hero": 0.6,
+          "camera": 0.5,
+          "drama": 0.7,
+          "exit": "auto",
+          "source": "lyrics",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1.15,
+          "position": "center",
+          "depth": 0.6,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.6,
+          "colorMode": "palette",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Melt",
+      "value": 0.57,
+      "targets": [
+        {
+          "path": "layers.1.source.params.melt",
+          "range": [
+            0,
+            1.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.39,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#12040a",
+      "#3a0a2a",
+      "#ff3a6a",
+      "#ff8a2a",
+      "#ffd04a"
+    ]
+  },
+  "description": "Heavy letters that sag and drip down the screen as the line goes on, the drips running long on the drop."
+}

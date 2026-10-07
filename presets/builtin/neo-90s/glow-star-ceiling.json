@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "name": "Glow-Star Ceiling",
+  "category": "Neo 90s",
+  "tags": [
+    "glow in the dark",
+    "stars",
+    "bedroom",
+    "ceiling",
+    "lyrics",
+    "words",
+    "neo-90s"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "neo",
+      "name": "Neo-90s",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "neo90",
+        "params": {
+          "scene": "stars",
+          "words": "line",
+          "font": "heavy",
+          "react": 1,
+          "lamp": true,
+          "melt": 0.5,
+          "reveal": 0,
+          "source": "lyrics",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT",
+          "lineBeats": 8,
+          "uppercase": true,
+          "lead": 120
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Music reaction",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#05060f",
+      "#151a3a",
+      "#4aff9a",
+      "#c8ffd8",
+      "#ffffff"
+    ]
+  },
+  "description": "A bedroom ceiling covered in glow-in-the-dark stickers: the lights flick on at each new phrase to charge them, then off, and the lyric is spelled out in little stars."
+}

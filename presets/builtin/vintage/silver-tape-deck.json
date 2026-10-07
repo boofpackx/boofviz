@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "name": "Silver Tape Deck",
+  "category": "Vintage",
+  "tags": [
+    "cassette",
+    "tape",
+    "hi-fi",
+    "vu meter",
+    "dot matrix",
+    "lyrics",
+    "words",
+    "vintage",
+    "80s"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "deck",
+      "name": "Deck",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "tapeDeck",
+        "params": {
+          "finish": "silver",
+          "deckB": "idle",
+          "label": "",
+          "labelB": "BLANK C90",
+          "speed": 1,
+          "react": 1,
+          "source": "lyrics",
+          "text": "SIDE A / TRACK ONE / PRESS PLAY",
+          "lineBeats": 8,
+          "uppercase": true,
+          "lead": 120
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Music reaction",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0a0a0c",
+      "#1c1c20",
+      "#46f2df",
+      "#ff6a3a",
+      "#ffffff"
+    ]
+  },
+  "description": "A brushed-silver cassette deck playing side A with deck B standing by, the needles swinging and the display spelling out the line."
+}

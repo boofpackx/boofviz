@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "name": "Glitter Lyrics",
+  "category": "Neo 90s",
+  "tags": [
+    "glitter",
+    "holographic",
+    "sparkle",
+    "lyrics",
+    "words",
+    "music video",
+    "neo-90s"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Night",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "radial",
+          "from": 0.05,
+          "to": 0.25,
+          "intensity": 0.4,
+          "motion": 0.3,
+          "pulse": 0.3
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyrics",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "glitter",
+          "material": "holo",
+          "melt": 0.7,
+          "hero": 0.6,
+          "camera": 0.5,
+          "drama": 0.7,
+          "exit": "auto",
+          "source": "lyrics",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1.1,
+          "position": "center",
+          "depth": 0,
+          "outline": 0,
+          "glow": 0.5,
+          "shadow": 0.6,
+          "colorMode": "palette",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "air",
+      "name": "Air",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.9,
+            "threshold": 0.6,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hero word",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.1.source.params.hero",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#08020f",
+      "#2a0a4a",
+      "#ff4ad8",
+      "#4ad8ff",
+      "#ffffff"
+    ]
+  },
+  "description": "Every word blows in as a cloud of holographic glitter flakes that swirl together into the letters as it is sung, twinkle, and blow apart after."
+}
