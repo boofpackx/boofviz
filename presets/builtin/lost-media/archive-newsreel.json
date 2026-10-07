@@ -39,6 +39,8 @@
         "kind": "archiveFootage",
         "params": {
           "collection": "newsreels",
+          "channels": "",
+          "decade": "any",
           "search": "",
           "yearFrom": 1929,
           "yearTo": 1967,
@@ -46,7 +48,8 @@
           "jumpBeats": 0,
           "skip": 0,
           "fit": "cover",
-          "punch": 0.3
+          "punch": 0.3,
+          "switchStatic": 0
         }
       },
       "fx": [],
@@ -98,6 +101,7 @@
           "kit": "archive",
           "captions": "cc",
           "lyrics": 1,
+          "safe43": false,
           "date": "JUN 14 1994",
           "station": "",
           "title": "",

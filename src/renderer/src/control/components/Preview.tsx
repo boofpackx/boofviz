@@ -36,10 +36,12 @@ export function Preview() {
       renderer.setScene(currentScene());
       renderer.setLyricsOverlay(useControl.getState().settings.lyrics.overlay);
       renderer.setLostMedia(useControl.getState().settings.lostMedia);
+      renderer.setRetroTv(useControl.getState().settings.retroTv);
       preview.renderer = renderer;
       const offOverlay = useControl.subscribe((s, prev) => {
         if (s.settings.lyrics.overlay !== prev.settings.lyrics.overlay) renderer.setLyricsOverlay(s.settings.lyrics.overlay);
         if (s.settings.lostMedia !== prev.settings.lostMedia) renderer.setLostMedia(s.settings.lostMedia);
+        if (s.settings.retroTv !== prev.settings.retroTv) renderer.setRetroTv(s.settings.retroTv);
       });
       const offShow = useShow.subscribe((s, prev) => {
         // A queued launch going live: the renderer already holds it for its beat.

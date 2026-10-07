@@ -47,6 +47,7 @@ const applyLyricsSettings = (s: Settings): void => {
   lyricsFeed.textLooks = s.lyrics.textLooks;
   renderer?.setLyricsOverlay(s.lyrics.overlay);
   renderer?.setLostMedia(s.lostMedia);
+  renderer?.setRetroTv(s.retroTv);
 };
 
 // Register before any await so the analysis port can't arrive unheard.

@@ -599,7 +599,186 @@ class DigitalRot implements Effect {
   }
 }
 
+
+// ---------------------------------------------------------------------------
+// TV set
+
+const TV = `${HEADER}
+uniform float uTime, uZoom, uCurve, uPower, uOn, uGlow, uRoom;
+uniform int uSet, uFit;   // set: 0-3 cabinets, 4 screen only · fit: 0 crop · 1 letterbox · 2 squash   // 0 60s console · 1 70s portable · 2 80s woodgrain · 3 90s black
+float PX;
+float fillD(float d) { return clamp(0.5 - d / PX, 0.0, 1.0); }
+float strokeD(float d, float w) { return clamp(0.5 - (abs(d) - w) / PX, 0.0, 1.0); }
+vec3 S(vec3 c) { return pow(max(c, 0.0), vec3(2.2)); }
+
+vec3 wood(vec2 p, vec3 a, vec3 b) {
+  float g = fbm(vec2(p.x * 3.0, p.y * 40.0)) + 0.3 * sin(p.y * 90.0 + fbm(p * 6.0) * 8.0);
+  return mix(a, b, smoothstep(0.2, 0.9, g));
+}
+float knob(vec2 p, vec2 c, float r) { return length(p - c) - r; }
+
+void main() {
+  PX = 1.5 / uRes.y;
+  float asp = uRes.x / uRes.y;
+  vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
+  // Per set: cabinet half size, corner, screen centre, screen half height, screen corner.
+  vec2 cab = uSet == 0 ? vec2(0.78, 0.4) : uSet == 1 ? vec2(0.56, 0.38) : uSet == 2 ? vec2(0.7, 0.41) : vec2(0.62, 0.43);
+  float cabR = uSet == 1 ? 0.12 : uSet == 3 ? 0.04 : 0.025;
+  vec2 sc = uSet == 0 ? vec2(-0.2, 0.0) : uSet == 1 ? vec2(-0.1, 0.0) : uSet == 2 ? vec2(-0.13, 0.0) : vec2(0.0, 0.045);
+  float sh = uSet == 3 ? 0.34 : uSet == 1 ? 0.27 : 0.31;
+  vec2 shalf = vec2(sh * 4.0 / 3.0, sh);
+  float sR = uSet == 0 ? 0.09 : uSet == 1 ? 0.07 : uSet == 2 ? 0.05 : 0.025;
+  vec2 s = mix(p, sc + p * 2.0 * shalf.y * 1.03, uZoom);
+  bool full = uSet == 4;
+  if (full) {
+    // Just the tube: the picture fills the frame behind curved glass.
+    shalf = vec2(asp * 0.5, 0.5) - 0.003;
+    sc = vec2(0.0);
+    sR = 0.03;
+    s = p;
+  }
+
+  // Room behind the set.
+  vec3 c = mix(S(vec3(0.07, 0.05, 0.04)), S(vec3(0.02, 0.015, 0.02)), smoothstep(-0.5, 0.5, s.y)) * uRoom;
+  c += S(vec3(0.5, 0.35, 0.2)) * exp(-length(s - vec2(-0.9, 0.35)) * 3.0) * 0.15 * uRoom;
+  if (s.y < -cab.y - 0.02) c = S(vec3(0.09, 0.06, 0.04)) * uRoom * (0.8 + 0.2 * fbm(s * vec2(2.0, 30.0)));
+
+  // Average picture colour: light spilling from the screen onto the set.
+  vec3 spill = (texture(uInput, vec2(0.3, 0.3)).rgb + texture(uInput, vec2(0.7, 0.3)).rgb + texture(uInput, vec2(0.5, 0.5)).rgb + texture(uInput, vec2(0.3, 0.7)).rgb + texture(uInput, vec2(0.7, 0.7)).rgb) * 0.2;
+  spill *= uOn;
+
+  if (full) c = vec3(0.0);
+  // Cabinet.
+  float body = full ? 1.0 : sdRoundBox(s, cab, cabR);
+  vec3 cabC;
+  if (uSet == 0) cabC = wood(s, S(vec3(0.25, 0.13, 0.06)), S(vec3(0.45, 0.25, 0.12)));
+  else if (uSet == 1) cabC = mix(S(vec3(0.85, 0.45, 0.12)), S(vec3(0.95, 0.6, 0.25)), smoothstep(-0.4, 0.4, s.y));
+  else if (uSet == 2) cabC = wood(s * 1.3, S(vec3(0.3, 0.17, 0.08)), S(vec3(0.5, 0.3, 0.14)));
+  else cabC = S(vec3(0.035)) + S(vec3(0.12)) * smoothstep(0.3, 0.45, s.y) * 0.5;
+  cabC *= 0.75 + 0.35 * smoothstep(-cab.y, cab.y, s.y);
+  cabC += spill * 0.25 * exp(-max(sdRoundBox(s - sc, shalf, sR), 0.0) * 14.0);
+  if (uSet == 1 && !full) {
+    // Carry handle.
+    float h = abs(length((s - vec2(0.0, cab.y - 0.05)) * vec2(1.0, 1.6)) - 0.26) - 0.012;
+    c = mix(c, S(vec3(0.6)), fillD(h) * step(cab.y, s.y));
+  }
+  c = mix(c, cabC, fillD(body));
+  if (!full) c = mix(c, cabC * 1.6 + 0.02, strokeD(body, 0.002) * 0.6);
+
+  // Controls.
+  if (uSet == 0) {
+    vec2 g = s - vec2(0.48, -0.08);
+    if (abs(g.x) < 0.2 && abs(g.y) < 0.26) c = mix(c, S(vec3(0.18, 0.15, 0.1)) * (0.6 + 0.4 * step(0.5, fract(g.x * 55.0))), 0.9);
+    for (int i = 0; i < 2; i++) {
+      vec2 kc = vec2(0.48, 0.3 - float(i) * 0.12);
+      float k = knob(s, kc, 0.04);
+      c = mix(c, S(vec3(0.8, 0.7, 0.45)) * (0.6 + 0.5 * smoothstep(0.04, -0.04, s.y - kc.y)), fillD(k));
+      c = mix(c, S(vec3(0.15)), strokeD(abs(s.x - kc.x), 0.003) * step(k, 0.0) * step(kc.y, s.y));
+    }
+    c = mix(c, S(vec3(0.85, 0.7, 0.35)), strokeD(sdRoundBox(s - sc, shalf + 0.03, sR + 0.03), 0.004));
+  } else if (uSet == 1) {
+    vec2 dc = vec2(0.37, 0.12);
+    float d = knob(s, dc, 0.075);
+    c = mix(c, S(vec3(0.92, 0.9, 0.85)), fillD(d));
+    float tick = abs(fract(atan(s.y - dc.y, s.x - dc.x) / 6.28318 * 12.0 + 0.5) - 0.5);
+    c = mix(c, S(vec3(0.2)), step(tick, 0.06) * step(0.055, length(s - dc)) * step(d, 0.0));
+    c = mix(c, S(vec3(0.3)), fillD(knob(s, dc, 0.03)));
+    vec2 gp = (s - vec2(0.37, -0.15)) * 55.0;
+    if (length(s - vec2(0.37, -0.15)) < 0.1) c = mix(c, S(vec3(0.25, 0.12, 0.04)), fillD((length(fract(gp) - 0.5) - 0.22) / 55.0));
+    c = mix(c, S(vec3(0.8)), strokeD(sdRoundBox(s - sc, shalf + 0.025, sR + 0.025), 0.006));
+  } else if (uSet == 2) {
+    vec2 pc = s - vec2(0.48, 0.0);
+    float panel = sdRoundBox(pc, vec2(0.13, 0.36), 0.01);
+    c = mix(c, S(vec3(0.62, 0.62, 0.64)) * (0.85 + 0.15 * sin(s.y * 400.0)), fillD(panel));
+    for (int i = 0; i < 6; i++) {
+      float bt = sdRoundBox(pc - vec2(-0.05 + float(i % 2) * 0.1, 0.18 - float(i / 2) * 0.09), vec2(0.035, 0.025), 0.004);
+      c = mix(c, S(vec3(0.15)), fillD(bt));
+    }
+    c = mix(c, S(vec3(1.0, 0.1, 0.05)) * (1.0 + 2.0 * uOn), fillD(length(pc - vec2(0.0, -0.25)) - 0.008));
+    c = mix(c, S(vec3(0.08)), fillD(sdRoundBox(s - sc, shalf + 0.035, sR + 0.03)) * (1.0 - fillD(sdRoundBox(s - sc, shalf, sR))));
+  } else if (uSet == 3) {
+    float strip = step(abs(s.y + cab.y - 0.06), 0.035);
+    for (int side = 0; side < 2; side++) {
+      vec2 gp = s - vec2(side == 0 ? -0.45 : 0.45, -cab.y + 0.06);
+      if (abs(gp.x) < 0.12 && abs(gp.y) < 0.025) c = mix(c, S(vec3(0.01)), step(0.5, fract(gp.x * 70.0)));
+    }
+    c = mix(c, S(vec3(0.6, 0.6, 0.62)), fillD(sdRoundBox(s - vec2(0.0, -cab.y + 0.06), vec2(0.05, 0.008), 0.003)) * strip);
+    c = mix(c, S(vec3(0.1, 1.0, 0.3)) * (0.3 + 1.5 * uOn), fillD(length(s - vec2(0.2, -cab.y + 0.06)) - 0.005));
+  }
+
+  // The screen: curved glass, the picture, scanlines, mask, reflections.
+  vec2 q = (s - sc) / shalf;
+  float scr = sdRoundBox(s - sc, shalf, sR);
+  if (scr < PX * 2.0) {
+    q *= 1.0 + uCurve * 0.09 * dot(q.yx, q.yx);
+    // Power: the picture collapses to a bright line, then a dot.
+    float pw = uPower * uOn;
+    float sy = clamp(pw / 0.6, 0.004, 1.0);
+    float sx = clamp((pw - 0.0) / 0.12, 0.01, 1.0);
+    vec2 qq = vec2(q.x / max(sx, 0.01), q.y / sy);
+    float inside = step(abs(qq.x), 1.0) * step(abs(qq.y), 1.0);
+    // Fit the picture (cover): crop the frame's sides to the 4:3 tube.
+    vec2 uv = vec2(0.5 + qq.x * 0.5 * (4.0 / 3.0) / asp, 0.5 + qq.y * 0.5);
+    if (full) uv = qq * 0.5 + 0.5;
+    else if (uFit == 1) {
+      uv = vec2(0.5 + qq.x * 0.5, 0.5 + qq.y * 0.5 * asp / (4.0 / 3.0));
+      inside *= step(abs(uv.y - 0.5), 0.5);
+    } else if (uFit == 2) uv = qq * 0.5 + 0.5;
+    vec3 pic = texture(uInput, clamp(uv, 0.0, 1.0)).rgb * inside;
+    pic *= 1.0 + (1.0 - sy) * 3.0 + (1.0 - sx) * 4.0;
+    float line = 0.55 + 0.45 * sin((q.y * 0.5 + 0.5) * 300.0 * 3.14159);
+    pic *= mix(1.0, line, 0.5);
+    int m = int(mod(gl_FragCoord.x, 3.0));
+    pic *= m == 0 ? vec3(1.08, 0.94, 0.94) : m == 1 ? vec3(0.94, 1.08, 0.94) : vec3(0.94, 0.94, 1.08);
+    vec3 glass = S(vec3(0.03, 0.035, 0.035)) + pic;
+    glass *= 1.0 - 0.35 * dot(q, q) * 0.5;
+    float refl = smoothstep(0.5, 0.0, abs(q.x * 0.6 + q.y - 0.8)) * 0.05 + smoothstep(0.15, 0.0, length((q - vec2(-0.55, 0.55)) * vec2(1.0, 2.0))) * 0.06;
+    glass += vec3(refl) * uGlow;
+    c = mix(c, glass, fillD(scr));
+  }
+  fragColor = vec4(max(c, 0.0), 1.0);
+}`;
+
+const SET_INDEX: Record<string, number> = { console60: 0, portable70: 1, woodgrain80: 2, black90: 3, screen: 4 };
+
+class TvSet implements Effect {
+  readonly kind = 'tvSet';
+  private readonly pass = new FullscreenPass(
+    mat(TV, { uTime: { value: 0 }, uZoom: { value: 0 }, uCurve: { value: 1 }, uPower: { value: 1 }, uOn: { value: 1 }, uGlow: { value: 1 }, uRoom: { value: 1 }, uSet: { value: 2 }, uFit: { value: 0 } }),
+  );
+  private started = -1;
+
+  render(renderer: THREE.WebGLRenderer, input: THREE.WebGLRenderTarget, out: THREE.WebGLRenderTarget, p: ParamBag, ctx: FxContext): THREE.WebGLRenderTarget {
+    const u = this.pass.material.uniforms;
+    if (this.started < 0 || ctx.time < this.started) this.started = ctx.time;
+    // Switching on: the line opens out over half a second when the set first appears.
+    const on = p.powerOn === false ? 1 : Math.min(1, (ctx.time - this.started) / 0.5);
+    u.uInput.value = input.texture;
+    (u.uRes.value as THREE.Vector2).set(out.width, out.height);
+    u.uTime.value = ctx.time;
+    u.uZoom.value = n(p.zoom, 0.1);
+    u.uCurve.value = n(p.curve, 1);
+    u.uPower.value = Math.min(on, ctx.power ?? 1);
+    u.uOn.value = 1;
+    u.uGlow.value = n(p.glare, 1);
+    u.uRoom.value = n(p.room, 1);
+    u.uSet.value = SET_INDEX[String(p.set ?? 'screen')] ?? 4;
+    u.uFit.value = p.fit === 'letterbox' ? 1 : p.fit === 'squash' ? 2 : 0;
+    this.pass.render(renderer, out);
+    return out;
+  }
+
+  compileTargets(): FullscreenPass[] {
+    return [this.pass];
+  }
+
+  dispose(): void {
+    this.pass.dispose();
+  }
+}
+
 export function createTapeEffect(kind: string): Effect | null {
+  if (kind === 'tvSet') return new TvSet();
   if (kind === 'tapeStack') return new TapeStack();
   if (kind === 'filmStock') return new FilmStock();
   if (kind === 'digitalRot') return new DigitalRot();

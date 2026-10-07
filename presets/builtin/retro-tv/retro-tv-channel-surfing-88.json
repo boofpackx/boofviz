@@ -1,22 +1,19 @@
 {
   "schema": 1,
-  "name": "Archive TV Commercials",
-  "category": "Lost Media",
+  "name": "Channel Surfing '88",
+  "category": "Retro TV",
   "tags": [
+    "retro tv",
+    "channel surfing",
     "archive",
-    "found footage",
-    "lost media",
     "real footage",
-    "commercials",
-    "ads",
-    "tv",
-    "80s",
-    "90s",
-    "vhs",
     "lyrics",
-    "words"
+    "words",
+    "80s",
+    "woodgrain",
+    "cable"
   ],
-  "energy": 3,
+  "energy": 4,
   "palette": "Custom",
   "paletteCycle": {
     "mode": "off",
@@ -32,24 +29,24 @@
   "layers": [
     {
       "id": "footage",
-      "name": "Archive footage",
+      "name": "Channels",
       "enabled": true,
       "source": {
         "type": "generator",
         "kind": "archiveFootage",
         "params": {
-          "collection": "commercials",
-          "channels": "",
+          "collection": "ephemeral",
+          "channels": "classictv,commercials,ephemeral,newsreels,cartoons",
           "decade": "any",
           "search": "",
-          "yearFrom": 1950,
+          "yearFrom": 1930,
           "yearTo": 2002,
-          "changeBars": 8,
+          "changeBars": 2,
           "jumpBeats": 0,
           "skip": 0,
           "fit": "cover",
-          "punch": 0.3,
-          "switchStatic": 0
+          "punch": 0.15,
+          "switchStatic": 1
         }
       },
       "fx": [],
@@ -58,8 +55,8 @@
       "modulators": []
     },
     {
-      "id": "age",
-      "name": "Age",
+      "id": "tape",
+      "name": "Signal",
       "enabled": true,
       "source": {
         "type": "generator",
@@ -71,14 +68,14 @@
           "type": "tapeStack",
           "enabled": true,
           "params": {
-            "format": "vhs",
-            "generation": 3,
-            "wear": 0.9,
-            "events": 0.3,
-            "eventList": "all",
+            "format": "cable",
+            "generation": 1,
+            "wear": 0.8,
+            "events": 0.12,
+            "eventList": "signal,eat",
             "overwrite": 0,
             "mood": 0.3,
-            "seed": 23
+            "seed": 6
           }
         }
       ],
@@ -88,13 +85,13 @@
     },
     {
       "id": "text",
-      "name": "Lyrics & labels",
+      "name": "Channel & lyrics",
       "enabled": true,
       "source": {
         "type": "generator",
         "kind": "broadcast",
         "params": {
-          "kit": "vcr",
+          "kit": "channel",
           "captions": "cc",
           "lyrics": 1,
           "safe43": false,
@@ -102,13 +99,41 @@
           "station": "CHANNEL 9",
           "title": "",
           "ticker": "",
-          "events": 0.3,
+          "events": 0,
           "eventList": "all",
-          "seed": 23,
+          "seed": 0,
           "lead": 150
         }
       },
       "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tv",
+      "name": "Old screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tvSet",
+          "enabled": true,
+          "params": {
+            "set": "screen",
+            "zoom": 0.08,
+            "fit": "crop",
+            "curve": 1,
+            "glare": 1,
+            "room": 1,
+            "powerOn": true
+          }
+        }
+      ],
       "blend": "normal",
       "opacity": 1,
       "modulators": []
@@ -129,7 +154,7 @@
       ]
     },
     {
-      "name": "Next clip",
+      "name": "Next channel",
       "value": 0,
       "targets": [
         {
@@ -142,8 +167,21 @@
       ]
     },
     {
-      "name": "Wear",
-      "value": 0.45,
+      "name": "Glass curve",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.3.fx.0.params.curve",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reception",
+      "value": 0.4,
       "targets": [
         {
           "path": "layers.1.fx.0.params.wear",
@@ -155,22 +193,17 @@
       ]
     },
     {
-      "name": "Tape events",
-      "value": 0.25,
+      "name": "Surf every",
+      "value": 0.06666666666666667,
       "targets": [
         {
-          "path": "layers.1.fx.0.params.events",
+          "path": "layers.0.source.params.changeBars",
           "range": [
-            0,
-            1
+            1,
+            16
           ]
         }
       ]
-    },
-    {
-      "name": "",
-      "value": 0.5,
-      "targets": []
     },
     {
       "name": "",
@@ -190,12 +223,12 @@
   ],
   "customPalettes": {
     "Custom": [
-      "#0b0420",
-      "#3b0a6b",
-      "#ff2fa8",
-      "#22e0d0",
-      "#fff6c8"
+      "#1a0f08",
+      "#5c2a14",
+      "#d0643a",
+      "#f2b56b",
+      "#fff1d6"
     ]
   },
-  "description": "Old TV commercials taped off cable, with the VCR display and lyric captions. Ad copyright varies, so check before showing these in public."
+  "description": "Remote in hand: real archive TV, commercials, newsreels and old films, a new channel every two bars with static and a green channel number, lyrics as captions."
 }

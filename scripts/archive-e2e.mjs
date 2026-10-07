@@ -88,6 +88,21 @@ try {
   check(!!previewSwitched, 'the preview switches to the same film');
   await output.screenshot({ path: join(outDir, 'archive-output-next.png') });
 
+  // Channel surfing on a TV set: a channel number, and the set drawn around the picture.
+  check(await control.evaluate(() => window.__BOOFVIZ_DEBUG__.load('builtin:retro-tv-channel-surfing-88')), 'retro TV preset loads');
+  const ch = await waitFor(output, () => {
+    const s = window.__BOOFVIZ_DEBUG__.archive();
+    return s.showing && s.channel ? s : null;
+  }, 30000);
+  check(!!ch, `channel surfing shows a channel (${ch ? `CH ${ch.channel}: ${ch.title}` : 'none'})`);
+  await sleep(2500);
+  await output.screenshot({ path: join(outDir, 'archive-retro-tv.png') });
+  // The global "watch on a TV" switch over an ordinary look.
+  await control.evaluate(() => window.__BOOFVIZ_DEBUG__.updateSettings({ retroTv: { enabled: true, set: 'screen' } }));
+  await control.evaluate(() => window.__BOOFVIZ_DEBUG__.load('builtin:lost-media-emergency-test'));
+  await sleep(2500);
+  await output.screenshot({ path: join(outDir, 'archive-global-tv.png') });
+
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(' | ')}` : ''}`);
 } catch (err) {
   check(false, `exception: ${err?.stack ?? err}`);

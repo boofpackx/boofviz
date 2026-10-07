@@ -1,20 +1,17 @@
 {
   "schema": 1,
-  "name": "Archive TV Commercials",
-  "category": "Lost Media",
+  "name": "Saturday Morning '79",
+  "category": "Retro TV",
   "tags": [
+    "retro tv",
+    "channel surfing",
     "archive",
-    "found footage",
-    "lost media",
     "real footage",
-    "commercials",
-    "ads",
-    "tv",
-    "80s",
-    "90s",
-    "vhs",
     "lyrics",
-    "words"
+    "words",
+    "70s",
+    "cartoons",
+    "portable"
   ],
   "energy": 3,
   "palette": "Custom",
@@ -32,24 +29,24 @@
   "layers": [
     {
       "id": "footage",
-      "name": "Archive footage",
+      "name": "Channels",
       "enabled": true,
       "source": {
         "type": "generator",
         "kind": "archiveFootage",
         "params": {
-          "collection": "commercials",
-          "channels": "",
+          "collection": "ephemeral",
+          "channels": "cartoons,commercials,cartoons,classictv",
           "decade": "any",
           "search": "",
-          "yearFrom": 1950,
+          "yearFrom": 1930,
           "yearTo": 2002,
-          "changeBars": 8,
+          "changeBars": 4,
           "jumpBeats": 0,
           "skip": 0,
           "fit": "cover",
-          "punch": 0.3,
-          "switchStatic": 0
+          "punch": 0.15,
+          "switchStatic": 1
         }
       },
       "fx": [],
@@ -58,8 +55,8 @@
       "modulators": []
     },
     {
-      "id": "age",
-      "name": "Age",
+      "id": "tape",
+      "name": "Signal",
       "enabled": true,
       "source": {
         "type": "generator",
@@ -71,14 +68,14 @@
           "type": "tapeStack",
           "enabled": true,
           "params": {
-            "format": "vhs",
-            "generation": 3,
-            "wear": 0.9,
-            "events": 0.3,
-            "eventList": "all",
+            "format": "broadcast",
+            "generation": 1,
+            "wear": 0.7,
+            "events": 0.1,
+            "eventList": "signal",
             "overwrite": 0,
-            "mood": 0.3,
-            "seed": 23
+            "mood": 0.15,
+            "seed": 4
           }
         }
       ],
@@ -88,27 +85,55 @@
     },
     {
       "id": "text",
-      "name": "Lyrics & labels",
+      "name": "Channel & lyrics",
       "enabled": true,
       "source": {
         "type": "generator",
         "kind": "broadcast",
         "params": {
-          "kit": "vcr",
-          "captions": "cc",
+          "kit": "channel",
+          "captions": "karaoke",
           "lyrics": 1,
           "safe43": false,
           "date": "JUN 14 1994",
           "station": "CHANNEL 9",
           "title": "",
           "ticker": "",
-          "events": 0.3,
+          "events": 0,
           "eventList": "all",
-          "seed": 23,
+          "seed": 0,
           "lead": 150
         }
       },
       "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tv",
+      "name": "Old screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tvSet",
+          "enabled": true,
+          "params": {
+            "set": "screen",
+            "zoom": 0.1,
+            "fit": "crop",
+            "curve": 1,
+            "glare": 1,
+            "room": 1,
+            "powerOn": true
+          }
+        }
+      ],
       "blend": "normal",
       "opacity": 1,
       "modulators": []
@@ -129,7 +154,7 @@
       ]
     },
     {
-      "name": "Next clip",
+      "name": "Next channel",
       "value": 0,
       "targets": [
         {
@@ -142,8 +167,21 @@
       ]
     },
     {
-      "name": "Wear",
-      "value": 0.45,
+      "name": "Glass curve",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.3.fx.0.params.curve",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reception",
+      "value": 0.4,
       "targets": [
         {
           "path": "layers.1.fx.0.params.wear",
@@ -155,22 +193,17 @@
       ]
     },
     {
-      "name": "Tape events",
-      "value": 0.25,
+      "name": "Surf every",
+      "value": 0.2,
       "targets": [
         {
-          "path": "layers.1.fx.0.params.events",
+          "path": "layers.0.source.params.changeBars",
           "range": [
-            0,
-            1
+            1,
+            16
           ]
         }
       ]
-    },
-    {
-      "name": "",
-      "value": 0.5,
-      "targets": []
     },
     {
       "name": "",
@@ -190,12 +223,12 @@
   ],
   "customPalettes": {
     "Custom": [
-      "#0b0420",
-      "#3b0a6b",
-      "#ff2fa8",
-      "#22e0d0",
-      "#fff6c8"
+      "#1a0f08",
+      "#5c2a14",
+      "#d0643a",
+      "#f2b56b",
+      "#fff1d6"
     ]
   },
-  "description": "Old TV commercials taped off cable, with the VCR display and lyric captions. Ad copyright varies, so check before showing these in public."
+  "description": "Saturday morning TV: real cartoons and commercials, a channel change every four bars, and the lyrics as a karaoke wipe."
 }

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import type { LostMediaSettings } from '@shared/settings';
-import { lostMediaPost } from '../lostMedia';
+import type { LostMediaSettings, RetroTvSettings } from '@shared/settings';
+import { globalPost } from '../lostMedia';
 import type { AudioFrame } from '@shared/types/audio';
 import type { ParamBag, Renderer, RendererOptions, RenderContext, RenderStats, Scene } from '@shared/types/engine';
 import type { LyricsRenderInfo } from '../generators/Lyrics';
@@ -44,6 +44,8 @@ export class ThreeRenderer implements Renderer {
   private options: RendererOptions = { renderScale: 1, isOutput: false };
   private frameIndex = 0;
   private blackout = 0;
+  private lostMedia: LostMediaSettings | undefined;
+  private retroTv: RetroTvSettings | undefined;
   private css = { w: 1, h: 1, dpr: 1 };
   /** A scene waiting for its launch beat (quantized preset change). */
   private pending: { scene: Scene; atBeat: number; transition?: SceneTransition } | null = null;
@@ -168,7 +170,18 @@ export class ThreeRenderer implements Renderer {
 
   /** "Make it lost media" over every look (settings.lostMedia). */
   setLostMedia(s: LostMediaSettings | undefined): void {
-    const spec = lostMediaPost(s);
+    this.lostMedia = s;
+    this.applyPost();
+  }
+
+  /** "Watch on a TV" over every look (settings.retroTv). */
+  setRetroTv(s: RetroTvSettings | undefined): void {
+    this.retroTv = s;
+    this.applyPost();
+  }
+
+  private applyPost(): void {
+    const spec = globalPost(this.lostMedia, this.retroTv);
     this.compositor.setPost(spec);
     this.spare.setPost(spec);
   }
@@ -200,7 +213,12 @@ export class ThreeRenderer implements Renderer {
   render(frame: AudioFrame, ctx: RenderContext): void {
     const g = ctx.globals;
     // Blackout eases over ~80 ms: instant to the eye, but never a hard flash.
-    this.blackout += ((g.blackout ? 1 : 0) - this.blackout) * (1 - Math.exp(-ctx.dt / 0.03));
+    // With the TV's power effect the tube collapses first (~0.4 s), then the output fades.
+    const crt = !!(this.retroTv?.enabled && this.retroTv.powerFx);
+    this.blackout += ((g.blackout ? 1 : 0) - this.blackout) * (1 - Math.exp(-ctx.dt / (crt ? 0.14 : 0.03)));
+    const power = crt ? 1 - Math.min(1, this.blackout / 0.8) : 1 - this.blackout;
+    this.compositor.power = power;
+    this.spare.power = power;
     if (this.pending && frame.beat >= this.pending.atBeat - 0.002) {
       const { scene, atBeat, transition } = this.pending;
       this.pending = null;
@@ -236,7 +254,8 @@ export class ThreeRenderer implements Renderer {
     u.uExposure.value = g.brightness;
     u.uSaturation.value = g.saturation;
     u.uHueShift.value = (g.hueShift * Math.PI) / 180;
-    u.uBlackout.value = this.blackout > 0.999 ? 1 : this.blackout;
+    const fade = crt ? Math.max(0, (this.blackout - 0.8) / 0.2) : this.blackout;
+    u.uBlackout.value = fade > 0.999 ? 1 : fade;
     u.uFrame.value = this.frameIndex++ % 1024;
     this.output.render(this.renderer, null);
   }

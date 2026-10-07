@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BAND_NAMES, DEFAULT_ANALYSIS_SETTINGS, type BandName } from '@shared/types/audio';
-import type { LostMediaSettings } from '@shared/settings';
+import type { LostMediaSettings, RetroTvSettings } from '@shared/settings';
 import { useControl } from '../store';
 import { Section, Segmented, Slider, Toggle } from './ui';
 
@@ -159,6 +159,7 @@ export function MasterPanel() {
         <p className="text-[11px] leading-snug text-ink-400">Double-click a slider to reset it. Speed scales every beat-synced motion (×0.25 to ×4 of the BPM).</p>
       </Section>
       <LostMediaSection />
+      <RetroTvSection />
       <Section title="Output">
         <Slider label="Render scale" value={scale} min={0.5} max={2} step={0.05} defaultValue={1} format={(v) => `${Math.round(v * 100)}%`} onChange={(v) => update({ output: { renderScale: v } })} />
       </Section>
@@ -206,6 +207,40 @@ function LostMediaSection() {
         Station / brand
         <input className="rounded border border-ink-600 bg-ink-850 px-1.5 py-0.5 text-ink-100" value={lm.station} onChange={(e) => set({ station: e.target.value })} />
       </label>
+    </Section>
+  );
+}
+
+const TV_SETS: Array<{ value: RetroTvSettings['set']; label: string; title: string }> = [
+  { value: 'screen', label: 'Screen', title: 'Just the old curved screen, filling the frame' },
+  { value: 'console60', label: '60s', title: 'Wood console with brass trim and knobs' },
+  { value: 'portable70', label: '70s', title: 'Orange portable with a carry handle and a dial' },
+  { value: 'woodgrain80', label: '80s', title: 'Woodgrain set with a silver button panel' },
+  { value: 'black90', label: '90s', title: 'Black set with a green power light' },
+];
+
+function RetroTvSection() {
+  const tv = useControl((s) => s.settings.retroTv);
+  const update = useControl((s) => s.update);
+  const set = (patch: Partial<RetroTvSettings>): void => update({ retroTv: patch });
+  return (
+    <Section title="Old TV screen (over any look)">
+      <Toggle label="Old TV screen" checked={tv.enabled} onChange={(v) => set({ enabled: v })} hint="Every look plays on old curved glass; pick a decade to show the whole set" />
+      <div className="grid grid-cols-5 gap-1">
+        {TV_SETS.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            title={o.title}
+            onClick={() => set({ set: o.value, enabled: true })}
+            className={`rounded border px-1 py-0.5 text-[10px] ${tv.set === o.value ? 'border-accent-2 bg-ink-600 text-ink-100' : 'border-ink-600 text-ink-400 hover:text-ink-200'}`}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+      {tv.set !== 'screen' && <Slider label="Zoom in" value={tv.zoom} min={0} max={1} defaultValue={0.1} onChange={(v) => set({ zoom: v })} />}
+      <Toggle label="Tube switch-off on blackout" checked={tv.powerFx} onChange={(v) => set({ powerFx: v })} hint="Blackout collapses the picture to a line and a dot before going dark" />
     </Section>
   );
 }

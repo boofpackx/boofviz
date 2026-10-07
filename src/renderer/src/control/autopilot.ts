@@ -35,8 +35,9 @@ export const PLAYLISTS: Array<{ id: string; name: string; test: (e: PresetEntry)
   { id: 'chill', name: 'Chill', test: (e) => e.preset.energy <= 2 },
   { id: 'peak', name: 'Peak time', test: (e) => e.preset.energy >= 4 },
   { id: 'space', name: '3D & trippy', test: (e) => ['3D Worlds', 'Trippy / Psychedelic'].includes(e.preset.category) || tagged(e, ['3d', 'space', 'psychedelic', 'trippy', 'tunnel']) },
+  { id: 'retrotv', name: 'Retro TV', test: (e) => e.preset.category === 'Retro TV' || e.preset.layers.some((l) => l.enabled && l.fx.some((f) => f.enabled && f.type === 'tvSet')) },
   { id: 'eq', name: 'Classic EQ', test: (e) => e.preset.category === 'Equalizers' },
-  { id: 'lostmedia', name: 'Lost media', test: (e) => e.preset.category === 'Lost Media' || tagged(e, ['lost media', 'found footage', 'archive']) },
+  { id: 'lostmedia', name: 'Lost media', test: (e) => e.preset.category === 'Lost Media' || e.preset.category === 'Retro TV' || tagged(e, ['lost media', 'found footage', 'archive']) },
 ];
 
 export interface ResolvedPool {

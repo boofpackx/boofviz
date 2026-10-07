@@ -124,6 +124,8 @@ export class Compositor {
   private overlayParams: ParamBag | null = null;
   private overlayGen: Lyrics | LyricVideo | null = null;
   private sceneHasLyrics = false;
+  /** Screen power for CRT effects (1 on, 0 off), set by the renderer from the blackout. */
+  power = 1;
   /** Global post chain ("make it lost media"): over everything, including the lyrics overlay. */
   private post: PostSpec | null = null;
   private postFx: Array<{ type: string; effect: Effect | null }> = [];
@@ -181,7 +183,7 @@ export class Compositor {
 
   setPost(spec: PostSpec | null): void {
     this.post = spec;
-    const types = spec?.fx.map((f) => f.type) ?? [];
+    const types = [...(spec?.fx.map((f) => f.type) ?? []), ...(spec?.tv ? [spec.tv.type] : [])];
     this.postFx = types.map((type, i) => {
       const prev = this.postFx[i];
       if (prev && prev.type === type) return prev;
@@ -291,7 +293,7 @@ export class Compositor {
 
     plan.resolve(frame, this.mods, globals.reactivity);
     const palette = this.palette.update(frame, dt);
-    const fxCtx: FxContext = { palette, dt, time, beat, beatsPerBar: frame.beatsPerBar, kick: this.env.kick, frameIndex: this.frameIndex };
+    const fxCtx: FxContext = { palette, dt, time, beat, beatsPerBar: frame.beatsPerBar, kick: this.env.kick, frameIndex: this.frameIndex, power: this.power };
     const maskRefs = this.maskRefs;
 
     const ctx: GenContext = { frame, env: this.env, dt, time, beat, palette, params: {}, globals, width: this.w, height: this.h, category: this.plan?.scene.category };
@@ -418,6 +420,12 @@ export class Compositor {
     if (spec.over) {
       this.postOver ??= createGenerator('broadcast');
       cur = this.stamp(cur, this.postOver, ctx, spec.over);
+    }
+    const tvFx = spec.tv ? this.postFx[spec.fx.length]?.effect : null;
+    if (spec.tv && tvFx) {
+      const spare = cur === this.accA ? this.accB : this.accA;
+      const res = tvFx.render(r, cur, spare, spec.tv.params, fxCtx);
+      if (res === spare) cur = spare;
     }
     return cur;
   }

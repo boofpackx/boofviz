@@ -38,6 +38,8 @@
         "kind": "archiveFootage",
         "params": {
           "collection": "homemovies",
+          "channels": "",
+          "decade": "any",
           "search": "",
           "yearFrom": 1930,
           "yearTo": 1985,
@@ -45,7 +47,8 @@
           "jumpBeats": 0,
           "skip": 0,
           "fit": "cover",
-          "punch": 0.3
+          "punch": 0.3,
+          "switchStatic": 0
         }
       },
       "fx": [],
@@ -97,6 +100,7 @@
           "kit": "none",
           "captions": "slate",
           "lyrics": 1,
+          "safe43": false,
           "date": "JUN 14 1994",
           "station": "CHANNEL 9",
           "title": "",

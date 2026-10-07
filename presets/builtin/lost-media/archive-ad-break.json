@@ -37,6 +37,8 @@
         "kind": "archiveFootage",
         "params": {
           "collection": "ephemeral",
+          "channels": "",
+          "decade": "any",
           "search": "",
           "yearFrom": 1940,
           "yearTo": 1975,
@@ -44,7 +46,8 @@
           "jumpBeats": 0,
           "skip": 0,
           "fit": "cover",
-          "punch": 0.3
+          "punch": 0.3,
+          "switchStatic": 0
         }
       },
       "fx": [],
@@ -92,6 +95,7 @@
           "kit": "archive",
           "captions": "cc",
           "lyrics": 1,
+          "safe43": false,
           "date": "JUN 14 1994",
           "station": "CHANNEL 9",
           "title": "",

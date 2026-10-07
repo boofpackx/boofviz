@@ -508,9 +508,10 @@ export const GENERATORS: ModuleDef[] = [
     label: 'Broadcast text',
     description: 'What an old recording printed on screen: camcorder REC and date stamp, VCR display (follows the tape events), channel bug and lower third with the playing song, CCTV labels, a weather list, corporate titles, numbers-station groups, a test-card ID, a sign-off card or a web player. Lyrics can show as closed captions, teletext, a karaoke wipe, a silent-film intertitle or a handwritten slate.',
     params: [
-      e('kit', 'Kit', 'camcorder', ['camcorder', 'vcr', 'tv', 'cctv', 'weather', 'corporate', 'shortwave', 'test', 'signoff', 'web', 'desktop', 'archive', 'none']),
+      e('kit', 'Kit', 'camcorder', ['camcorder', 'vcr', 'tv', 'cctv', 'weather', 'corporate', 'shortwave', 'test', 'signoff', 'web', 'desktop', 'archive', 'channel', 'none']),
       e('captions', 'Lyrics as', 'off', ['off', 'cc', 'teletext', 'karaoke', 'intertitle', 'slate']),
       f('lyrics', 'Lyrics on', 1, 0, 1, 1, 'turn the lyric captions off (0) or on (1)'),
+      b('safe43', '4:3 safe area', false, 'keep text inside the middle 4:3 (for looks on an old TV set)'),
       t('date', 'Date stamp', 'JUN 14 1994'),
       t('station', 'Station / bug', 'CHANNEL 9', 'your channel name or brand'),
       t('title', 'Title', '', 'title cards, slates and captions when nothing is playing'),
@@ -527,6 +528,8 @@ export const GENERATORS: ModuleDef[] = [
     description: 'Real old films and TV from the Internet Archive (before 2003): a random clip every few bars, downloaded once and cached, kept in step with the beat. Optional jump cuts to a new moment every few beats.',
     params: [
       e('collection', 'Collection', 'ephemeral', ['ephemeral', 'newsreels', 'classictv', 'cartoons', 'government', 'space', 'homemovies', 'commercials', 'custom']),
+      t('channels', 'Surf channels', '', 'channel surfing: a list of collections, e.g. cartoons, classictv, commercials (empty = just the collection above)'),
+      e('decade', 'Decade', 'any', ['any', '30s', '40s', '50s', '60s', '70s', '80s', '90s', '00s'], 'any = the years below'),
       t('search', 'Search words', '', 'narrow the collection, e.g. dance, cars, television (My search: any query)'),
       i('yearFrom', 'From year', 1930, 1880, 2002),
       i('yearTo', 'To year', 2002, 1880, 2002),
@@ -535,6 +538,7 @@ export const GENERATORS: ModuleDef[] = [
       i('skip', 'Next clip', 0, 0, 99, 'bump to change clip now'),
       e('fit', 'Fit', 'cover', ['cover', 'contain']),
       f('punch', 'Kick zoom', 0.3, 0, 1),
+      f('switchStatic', 'Channel-change static', 0, 0, 1),
     ],
   },
   {
@@ -670,6 +674,20 @@ export const EFFECTS: ModuleDef[] = [
       f('splices', 'Splices', 0.2, 0, 1),
       b('gate', 'Show film edge', false),
       i('seed', 'Reel', 0, 0, 99),
+    ],
+  },
+  {
+    kind: 'tvSet',
+    label: 'TV set',
+    description: 'An old TV screen: curved glass, scanlines, glare and the picture opening out from a line when it switches on. Optionally shows the whole set: a 60s wood console, a 70s portable, an 80s woodgrain set or a 90s black set, with curved glass, scanlines, reflections, light spilling onto the cabinet, and the picture opening out from a line when it switches on.',
+    params: [
+      e('set', 'Set', 'screen', ['screen', 'console60', 'portable70', 'woodgrain80', 'black90'], 'screen = the picture fills the frame on old curved glass'),
+      f('zoom', 'Zoom in', 0.1, 0, 1, 0.01, '0 = whole set · 1 = screen fills the frame'),
+      e('fit', 'Widescreen picture', 'crop', ['crop', 'letterbox', 'squash'], 'how a 16:9 look fits the 4:3 tube'),
+      f('curve', 'Glass curve', 1, 0, 2),
+      f('glare', 'Glare', 1, 0, 2),
+      f('room', 'Room light', 1, 0, 2),
+      b('powerOn', 'Switch-on effect', true),
     ],
   },
   {

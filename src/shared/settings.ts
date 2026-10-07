@@ -85,6 +85,16 @@ export interface LostMediaSettings {
   station: string;
 }
 
+/** "Old TV screen": every look plays on old curved glass (optionally inside a whole TV set). */
+export interface RetroTvSettings {
+  enabled: boolean;
+  set: 'screen' | 'console60' | 'portable70' | 'woodgrain80' | 'black90';
+  /** 0 = the whole set · 1 = the screen fills the frame. */
+  zoom: number;
+  /** Blackout collapses the picture to a line and a dot, like switching a tube off. */
+  powerFx: boolean;
+}
+
 export interface Settings {
   version: 1;
   input: InputSettings;
@@ -96,6 +106,7 @@ export interface Settings {
   spotify: { clientId: string };
   lyrics: LyricsSettings;
   lostMedia: LostMediaSettings;
+  retroTv: RetroTvSettings;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -124,6 +135,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // Overlay params are a partial bag: the lyrics generator's defaults fill the rest.
   lyrics: { offsetMs: 0, online: true, textLooks: false, overlay: { enabled: false, params: { kind: 'lyricVideo', style: 'auto', mode: 'karaoke', position: 'center', size: 1, backdrop: 0.45 } } },
   lostMedia: { enabled: false, style: 'vhs', wear: 1, events: 0.3, mood: 0.3, date: 'JUN 14 1994', station: 'CHANNEL 9' },
+  retroTv: { enabled: false, set: 'screen', zoom: 0.1, powerFx: true },
 };
 
 type DeepPartial<T> = T extends readonly unknown[] ? T : T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;

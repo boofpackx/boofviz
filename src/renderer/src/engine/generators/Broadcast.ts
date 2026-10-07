@@ -8,7 +8,7 @@ import type { GenContext } from './Generator';
 import { fontCss } from './KineticType';
 import { num, ShaderGenerator } from './ShaderGenerator';
 
-const W = 960;
+const CANVAS_W = 960;
 
 const FRAG = /* glsl */ `${GEN_HEADER}
 uniform sampler2D uTex;
@@ -35,10 +35,12 @@ export class Broadcast extends ShaderGenerator {
   private readonly tex: THREE.CanvasTexture;
   /** What was drawn last frame (debug hooks and tests). */
   info = { kit: '', osd: '', caption: '' };
+  /** Layout width (the canvas, or its 4:3 middle). */
+  private vw = CANVAS_W;
 
   constructor() {
     const canvas = document.createElement('canvas');
-    canvas.width = W;
+    canvas.width = CANVAS_W;
     canvas.height = 540;
     const tex = new THREE.CanvasTexture(canvas);
     tex.flipY = false;
@@ -54,11 +56,16 @@ export class Broadcast extends ShaderGenerator {
 
   update(ctx: GenContext): void {
     super.update(ctx);
-    const H = Math.max(200, Math.round((W * ctx.height) / Math.max(1, ctx.width)));
+    const H = Math.max(200, Math.round((CANVAS_W * ctx.height) / Math.max(1, ctx.width)));
     if (this.canvas.height !== H) this.canvas.height = H;
     const g = this.g;
-    g.clearRect(0, 0, W, H);
+    g.clearRect(0, 0, CANVAS_W, H);
     const p = ctx.params;
+    // 4:3 safe area: lay the text out inside the middle of the frame (for looks shown on an old TV).
+    const W = p.safe43 === true ? Math.round((H * 4) / 3) : CANVAS_W;
+    this.vw = W;
+    g.save();
+    g.translate((CANVAS_W - W) / 2, 0);
     const kit = String(p.kit ?? 'camcorder');
     const epoch = Date.now();
     const playing = lyricsFeed.now.connected && !!lyricsFeed.now.trackId;
@@ -226,6 +233,21 @@ export class Broadcast extends ShaderGenerator {
         this.info.osd = ttl;
       }
       text(station, W - 40 * s, H - 40 * s, 20, 'rgba(255,255,255,0.75)', 'right', 'heavy');
+    } else if (kit === 'channel') {
+      // Cable-box style: a big green channel number and a "now showing" banner after each change.
+      const since = ctx.beat - archiveNow.slotStart;
+      if (archiveNow.showing && since >= 0 && since < bpb * 2) {
+        g.globalAlpha = Math.min(1, (bpb * 2 - since) * 2);
+        text(`CH ${String(archiveNow.channel || 3).padStart(2, '0')}`, W - 50 * s, 82 * s, 58, '#5dff7a', 'right', 'mono');
+        if (since > 0.5 && archiveNow.title) {
+          const y = H - 96 * s;
+          box(0, y, W * 0.7, 56 * s, 'rgba(0,0,40,0.75)');
+          text(archiveNow.source.toUpperCase(), 24 * s, y + 22 * s, 16, '#9fd8ff', 'left', 'mono', false);
+          text(`${archiveNow.title.toUpperCase().slice(0, 40)}${archiveNow.year ? ` (${archiveNow.year})` : ''}`, 24 * s, y + 46 * s, 20, '#fff', 'left', 'mono', false);
+        }
+        g.globalAlpha = 1;
+        this.info.osd = `CH ${archiveNow.channel}`;
+      }
     } else if (kit === 'desktop') {
       text(title || 'DEMO.EXE', W / 2 - 0.44 * H, H / 2 - 0.283 * H, 15, '#fff', 'left', 'heavy', false);
     }
@@ -234,6 +256,7 @@ export class Broadcast extends ShaderGenerator {
     const cap = String(p.captions ?? 'off');
     if (cap !== 'off' && num(p.lyrics, 1) >= 0.5) this.drawCaption(cap, ctx, title, H, s, text, box);
 
+    g.restore();
     this.tex.needsUpdate = true;
   }
 
@@ -247,6 +270,7 @@ export class Broadcast extends ShaderGenerator {
     box: (x: number, y: number, w: number, h: number, color: string) => void,
   ): void {
     const g = this.g;
+    const W = this.vw;
     const lead = num(ctx.params.lead, 150);
     const live = liveText('lyrics', Date.now(), lead, 1, 1);
     const lyrics = live.kind === 'lyrics' || live.kind === 'title';

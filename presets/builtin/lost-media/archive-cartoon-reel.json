@@ -39,6 +39,8 @@
         "kind": "archiveFootage",
         "params": {
           "collection": "cartoons",
+          "channels": "",
+          "decade": "any",
           "search": "",
           "yearFrom": 1920,
           "yearTo": 1960,
@@ -46,7 +48,8 @@
           "jumpBeats": 2,
           "skip": 0,
           "fit": "cover",
-          "punch": 0.3
+          "punch": 0.3,
+          "switchStatic": 0
         }
       },
       "fx": [],
@@ -98,6 +101,7 @@
           "kit": "none",
           "captions": "karaoke",
           "lyrics": 1,
+          "safe43": false,
           "date": "JUN 14 1994",
           "station": "CHANNEL 9",
           "title": "",

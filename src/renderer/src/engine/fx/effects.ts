@@ -13,6 +13,8 @@ export interface FxContext {
   beatsPerBar: number;
   kick: number;
   frameIndex: number;
+  /** 0 = screen off (blackout with CRT power effects), 1 = on. */
+  power?: number;
 }
 
 /** A post-processing pass. Returns the target holding its result. */

@@ -7,11 +7,33 @@ import type { GenContext } from './Generator';
 import { num, ShaderGenerator } from './ShaderGenerator';
 
 /** What the archive layer is showing (read by the broadcast text's 'archive' kit in the same window). */
-export const archiveNow = { title: '', year: null as number | null, source: '', slotStart: 0, showing: false };
+export const archiveNow = { title: '', year: null as number | null, source: '', slotStart: 0, showing: false, channel: 0 };
+
+/** Channel numbers for surfing (the collections a set of old channels would have carried). */
+export const CHANNEL_NUMBERS: Record<string, number> = { cartoons: 3, classictv: 4, commercials: 5, ephemeral: 7, newsreels: 9, space: 11, government: 13, homemovies: 22, custom: 30 };
+
+const DECADES: Record<string, [number, number]> = { '30s': [1930, 1939], '40s': [1940, 1949], '50s': [1950, 1959], '60s': [1960, 1969], '70s': [1970, 1979], '80s': [1980, 1989], '90s': [1990, 1999], '00s': [2000, 2002] };
+
+/** The channel list for surfing ('' = no surfing). */
+export function channelList(v: unknown): string[] {
+  return String(v ?? '')
+    .split(/[\s,]+/)
+    .filter((c) => c in CHANNEL_NUMBERS);
+}
+
+/** Which collection a slot plays: one collection, or a channel picked per slot (never the same twice running). */
+export function collectionFor(p: Record<string, unknown>, slot: number): string {
+  const list = channelList(p.channels);
+  if (!list.length) return String(p.collection ?? 'ephemeral');
+  const pick = (s: number): number => Math.floor(hash2(s, 4441) * list.length);
+  let i = pick(slot);
+  if (list.length > 1 && i === pick(slot - 1)) i = (i + 1) % list.length;
+  return list[i];
+}
 
 const FRAG = /* glsl */ `${GEN_HEADER}
 uniform sampler2D uVideo;
-uniform float uHas, uVAspect, uFit, uZoom;
+uniform float uHas, uVAspect, uFit, uZoom, uChange;
 void main() {
   vec2 q = vUv - 0.5;
   float ra = uRes.x / uRes.y;
@@ -22,6 +44,9 @@ void main() {
     if (uVAspect > ra) q.y *= uVAspect / ra; else q.x *= ra / uVAspect;
   }
   vec2 t = q + 0.5;
+  // Changing channel: the picture rolls and tears for a moment.
+  t.y = fract(t.y + uChange * uChange * 0.8);
+  t.x += (hash21(vec2(floor(vUv.y * 120.0), floor(uTime * 30.0))) - 0.5) * 0.08 * uChange;
   vec3 c;
   if (uHas > 0.5) {
     float inside = step(0.0, t.x) * step(t.x, 1.0) * step(0.0, t.y) * step(t.y, 1.0);
@@ -31,6 +56,8 @@ void main() {
     float n = hash21(floor(gl_FragCoord.xy / 2.0) + floor(uTime * 30.0) * 17.0);
     c = vec3(n * 0.45) * (0.7 + 0.3 * sin(vUv.y * 8.0 - uTime * 5.0));
   }
+  float snow = hash21(floor(gl_FragCoord.xy / 2.0) + floor(uTime * 30.0) * 13.0);
+  c = mix(c, vec3(snow * 0.6), smoothstep(0.35, 0.9, uChange));
   fragColor = vec4(c, 1.0);
 }
 `;
@@ -60,16 +87,17 @@ export class ArchiveFootage extends ShaderGenerator {
   constructor() {
     const blank = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1);
     blank.needsUpdate = true;
-    super(FRAG, { uVideo: { value: blank }, uHas: { value: 0 }, uVAspect: { value: 4 / 3 }, uFit: { value: 0 }, uZoom: { value: 0 } });
+    super(FRAG, { uVideo: { value: blank }, uHas: { value: 0 }, uVAspect: { value: 4 / 3 }, uFit: { value: 0 }, uZoom: { value: 0 }, uChange: { value: 0 } });
     this.blank = blank;
   }
 
   private request(p: GenContext['params'], slot: number): ArchiveRequest {
+    const decade = DECADES[String(p.decade ?? 'any')];
     return {
-      collection: String(p.collection ?? 'ephemeral'),
+      collection: collectionFor(p, slot),
       search: String(p.search ?? ''),
-      yearFrom: num(p.yearFrom, 1930),
-      yearTo: num(p.yearTo, 2002),
+      yearFrom: decade ? decade[0] : num(p.yearFrom, 1930),
+      yearTo: decade ? decade[1] : num(p.yearTo, 2002),
       slot,
     };
   }
@@ -129,7 +157,7 @@ export class ArchiveFootage extends ShaderGenerator {
   update(ctx: GenContext): void {
     super.update(ctx);
     const p = ctx.params;
-    const key = JSON.stringify(this.request(p, 0));
+    const key = JSON.stringify({ ...this.request(p, 0), collection: channelList(p.channels).join(',') || p.collection });
     if (key !== this.queryKey) {
       this.queryKey = key;
       for (const pl of this.players.values()) this.drop(pl);
@@ -187,7 +215,9 @@ export class ArchiveFootage extends ShaderGenerator {
       u.uVAspect.value = v.videoWidth && v.videoHeight ? v.videoWidth / v.videoHeight : 4 / 3;
       archiveNow.title = show.clip.title;
       archiveNow.year = show.clip.year;
-      archiveNow.source = ARCHIVE_COLLECTIONS.find((c) => c.id === String(p.collection ?? 'ephemeral'))?.label ?? 'Archive';
+      const col = collectionFor(p, show.slot);
+      archiveNow.source = ARCHIVE_COLLECTIONS.find((c) => c.id === col)?.label ?? 'Archive';
+      archiveNow.channel = CHANNEL_NUMBERS[col] ?? 0;
       archiveNow.slotStart = show.slot === slot ? slotStart : archiveNow.slotStart;
       archiveNow.showing = true;
       this.info = { slot, title: show.clip.title, ready: true, time: v.currentTime };
@@ -199,6 +229,9 @@ export class ArchiveFootage extends ShaderGenerator {
     }
     u.uFit.value = p.fit === 'contain' ? 1 : 0;
     u.uZoom.value = num(p.punch, 0.3) * ctx.env.kick * 0.06;
+    // Channel-change static for the first half beat of a new slot (and while the next clip loads).
+    const since = ctx.beat - slotStart;
+    u.uChange.value = num(p.switchStatic, 0) * (since >= 0 && since < 0.6 ? 1 - since / 0.6 : 0);
   }
 
   dispose(): void {

@@ -1,4 +1,4 @@
-import type { LostMediaSettings } from '@shared/settings';
+import type { LostMediaSettings, RetroTvSettings } from '@shared/settings';
 import type { ParamBag } from '@shared/types/engine';
 
 /**
@@ -129,6 +129,8 @@ export interface PostSpec {
   under: ParamBag | null;
   fx: Array<{ type: string; params: ParamBag }>;
   over: ParamBag | null;
+  /** The TV set, last (so the VCR display sits on the screen, not over the cabinet). */
+  tv?: { type: string; params: ParamBag };
 }
 
 /** The global "make it lost media" chain for a style (null when off). */
@@ -162,4 +164,12 @@ export function lostMediaPost(s: LostMediaSettings | undefined): PostSpec | null
         over: stamp('vcr'),
       };
   }
+}
+
+/** The global post chain: lost media first (the picture ages), then the TV set it plays on. */
+export function globalPost(lm: LostMediaSettings | undefined, tv: RetroTvSettings | undefined): PostSpec | null {
+  const base = lostMediaPost(lm);
+  if (!tv?.enabled) return base;
+  const set = { type: 'tvSet', params: { set: tv.set, zoom: tv.zoom, curve: 1, glare: 1, room: 1, powerOn: true } };
+  return base ? { ...base, fx: [...base.fx], over: base.over, tv: set } : { under: null, fx: [], over: null, tv: set };
 }

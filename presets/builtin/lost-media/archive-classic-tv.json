@@ -37,6 +37,8 @@
         "kind": "archiveFootage",
         "params": {
           "collection": "classictv",
+          "channels": "",
+          "decade": "any",
           "search": "",
           "yearFrom": 1946,
           "yearTo": 1975,
@@ -44,7 +46,8 @@
           "jumpBeats": 0,
           "skip": 0,
           "fit": "cover",
-          "punch": 0.3
+          "punch": 0.3,
+          "switchStatic": 0
         }
       },
       "fx": [],
@@ -63,6 +66,7 @@
           "kit": "tv",
           "captions": "cc",
           "lyrics": 1,
+          "safe43": false,
           "date": "JUN 14 1994",
           "station": "CHANNEL 9",
           "title": "",
