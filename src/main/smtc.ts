@@ -33,6 +33,8 @@ export interface SmtcSample {
   updatedEpochMs: number | null;
   /** When this sample was read (epoch ms). */
   sampleEpochMs: number;
+  /** The song's cover as a data: URL, sent once per song (on the sample after it was read). */
+  art?: string;
 }
 
 /** Pluggable now-playing source: PowerShell on Windows, a URL in tests. */
@@ -69,6 +71,7 @@ export function parseSmtcSample(raw: unknown, now: number): SmtcSample | null {
     endMs: num(o.endMs),
     updatedEpochMs: num(o.updatedEpochMs),
     sampleEpochMs: at,
+    ...(typeof o.art === 'string' && /^data:image\/[a-z+.-]+;base64,[A-Za-z0-9+/=]+$/.test(o.art) && o.art.length < 3_000_000 ? { art: o.art } : {}),
   };
 }
 

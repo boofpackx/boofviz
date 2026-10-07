@@ -208,6 +208,29 @@ describe('hybrid now playing: the media session leads', () => {
     h.c.dispose();
   });
 
+  it("shows the media session's cover at once when Spotify can't answer, and Spotify's own once it does", async () => {
+    const h = await hybrid();
+    await h.play(5000);
+    h.api.status = 429;
+    h.api.retryAfter = '30';
+    const cover = 'data:image/jpeg;base64,AAAA';
+    h.show(asSmtc(INTERLUDE, { startMs: 0, endMs: 120000, positionMs: 0, updatedEpochMs: Date.now() }));
+    await vi.advanceTimersByTimeAsync(HYBRID.trackDelayMs + 1);
+    expect(h.c.state.trackId).toBe(smtcTrackId(songKey(smtc(asSmtc(INTERLUDE)))));
+    expect(h.c.state.artDataUrl).toBeUndefined();
+    // The reader sends the cover a moment later, once.
+    h.show(asSmtc(INTERLUDE, { startMs: 0, endMs: 120000, positionMs: 0, updatedEpochMs: Date.now(), art: cover }));
+    expect(h.c.state.artDataUrl).toBe(cover);
+    // Later samples (no cover) keep it.
+    h.show(asSmtc(INTERLUDE, { startMs: 0, endMs: 120000, positionMs: 0, updatedEpochMs: Date.now() }));
+    expect(h.c.state.artDataUrl).toBe(cover);
+    // Spotify answers again and confirms the song: its (bigger) cover replaces the media session's.
+    Object.assign(h.api, { status: 200, track: INTERLUDE, anchor: 9000, at: Date.now() });
+    await h.play(40000);
+    expect(h.c.state.artDataUrl).toMatch(/^data:image\/png;base64,/);
+    h.c.dispose();
+  });
+
   it('follows play, pause and seeks from the media session; only the first seek is confirmed with the Web API', async () => {
     const h = await hybrid();
     await h.play(3000);
@@ -459,6 +482,8 @@ describe('hybrid helpers', () => {
     const line = { ok: true, app: 'SpotifyAB.SpotifyMusic_zpdnekdrzrea0!Spotify', title: ' Paper Lanterns ', artist: 'The Placeholders', album: 'Invented', status: 'Paused', positionMs: 1000, startMs: 0, endMs: 180000, updatedEpochMs: T0, sampleEpochMs: T0 + 5 };
     expect(parseSmtcSample(line, 0)).toEqual({ ...line, title: 'Paper Lanterns', status: 'paused', sampleEpochMs: T0 + 5 });
     expect(parseSmtcSample({ ...line, status: 'changing' }, 0)?.status).toBe('changing');
+    expect(parseSmtcSample({ ...line, art: 'data:image/jpeg;base64,QUJD' }, 0)?.art).toBe('data:image/jpeg;base64,QUJD');
+    expect(parseSmtcSample({ ...line, art: 'javascript:alert(1)' }, 0)?.art).toBeUndefined();
     expect(parseSmtcSample({ ...line, status: 'Closed' }, 0)?.status).toBe('stopped');
     expect(parseSmtcSample({ ...line, status: '4' }, 0)?.status).toBe('playing');
     expect(parseSmtcSample({ ...line, app: 'chrome.exe' }, 0)?.app).toBeNull();

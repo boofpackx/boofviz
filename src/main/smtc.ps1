@@ -44,6 +44,30 @@ try {
   exit 2
 }
 
+# Album art: the cover the app hands Windows (the one in the volume flyout). Optional: without it, covers come from the Web API.
+$artOk = $true
+try {
+  $streamType = [Windows.Storage.Streams.IRandomAccessStreamWithContentType, Windows.Storage.Streams, ContentType = WindowsRuntime]
+  $awaitStream = $asTask.MakeGenericMethod($streamType)
+} catch { $artOk = $false }
+
+# The cover as a data: URL, or $null.
+function ReadArt($ref) {
+  $t = $awaitStream.Invoke($null, @($ref.OpenReadAsync()))
+  if (-not $t.Wait(3000)) { return $null }
+  $ras = $t.Result
+  if ($null -eq $ras -or $ras.Size -le 0 -or $ras.Size -gt 2000000) { return $null }
+  $type = "$($ras.ContentType)"
+  if ($type -notmatch '^image/[a-z+.-]+$') { $type = 'image/jpeg' }
+  $net = [System.IO.WindowsRuntimeStreamExtensions]::AsStreamForRead($ras)
+  $ms = New-Object System.IO.MemoryStream
+  $net.CopyTo($ms)
+  $net.Dispose()
+  $bytes = $ms.ToArray()
+  if ($bytes.Length -eq 0) { return $null }
+  return "data:$type;base64," + [Convert]::ToBase64String($bytes)
+}
+
 # Quit with BOOFVIZ, even if it never got to kill us.
 $parent = $null
 if ($ParentPid -gt 0) {
@@ -53,6 +77,11 @@ if ($ParentPid -gt 0) {
 $last = ''
 $lastEmit = 0
 $errors = 0
+$artKey = ''
+$artLoops = 0
+$artDone = $false
+$artNew = $false
+$art = $null
 while ($true) {
   if ($null -ne $parent) {
     $gone = $false
@@ -78,6 +107,16 @@ while ($true) {
         $o.title = "$($p.Title)"
         $o.artist = "$($p.Artist)"
         $o.album = "$($p.AlbumTitle)"
+        # Read the cover once per song, a moment after it shows (apps can update it just after the title), retrying a few times.
+        $key = "$($o.title)|$($o.artist)|$($o.album)"
+        if ($key -ne $artKey) { $artKey = $key; $artLoops = 0; $artDone = $false }
+        $artLoops++
+        if ($artOk -and -not $artDone -and $artLoops -ge 3 -and $artLoops -le 20 -and $o.status -ne 'changing' -and $null -ne $p.Thumbnail) {
+          try {
+            $a = ReadArt $p.Thumbnail
+            if ($a) { $art = $a; $artDone = $true; $artNew = $true }
+          } catch { }
+        }
       }
       # Position at LastUpdatedTime; apps update it on play, pause and seek (not continuously).
       $t = $session.GetTimelineProperties()
@@ -103,10 +142,12 @@ while ($true) {
     }
   } else {
     $json = ConvertTo-Json -InputObject $o -Compress
-    if ($json -ne $last -or $now - $lastEmit -ge 2000) {
+    if ($json -ne $last -or $now - $lastEmit -ge 2000 -or $artNew) {
       $last = $json
       $lastEmit = $now
       $o.sampleEpochMs = $now
+      # The cover rides along once, on the sample after it was read.
+      if ($artNew) { $o.art = $art; $artNew = $false }
       Emit $o
     }
   }

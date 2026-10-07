@@ -142,6 +142,8 @@ export class HybridNowPlaying {
   active = false;
   private running = false;
   private song: Song | null = null;
+  /** The latest cover from the media session, for the song it belongs to. */
+  private art: { key: string; url: string } | null = null;
   /** Id published before the current song (spots a Web API that still names the previous one). */
   private prevId: string | null = null;
   /** Last timeline stamp seen. */
@@ -219,9 +221,21 @@ export class HybridNowPlaying {
     this.goneSince = null;
     if (!this.active) this.enter();
     const key = songKey(s);
-    if (!this.song || key !== this.song.key) return this.newSong(s, key, now);
-    this.song.sample = s;
-    if (this.song.published) this.follow(s, now);
+    if (s.art) this.art = { key, url: s.art };
+    if (!this.song || key !== this.song.key) this.newSong(s, key, now);
+    else {
+      this.song.sample = s;
+      if (this.song.published) this.follow(s, now);
+    }
+    this.applyArt();
+  }
+
+  /** The media session's cover for the published song, until (or unless) Spotify's own arrives. */
+  private applyArt(): void {
+    const song = this.song;
+    const st = this.host.state();
+    if (!song?.published || !song.id || !this.art || this.art.key !== song.key || st.trackId !== song.id || st.artDataUrl) return;
+    this.host.set({ artDataUrl: this.art.url });
   }
 
   private enter(): void {
@@ -344,6 +358,7 @@ export class HybridNowPlaying {
     const t = r.track;
     this.host.set({ error: undefined, playing, trackId: t.id, title: t.title, artists: t.artists, album: t.album, artDataUrl: undefined, durationMs: t.durationMs, ...this.exact(r, t.durationMs, playing) });
     this.host.track(t);
+    this.applyArt();
     this.armDrift();
   }
 
@@ -374,6 +389,7 @@ export class HybridNowPlaying {
     this.markPublished(song, id, false);
     this.host.set({ playing, trackId: id, title: track.title, artists: track.artists, album: track.album, artDataUrl: undefined, durationMs, progressMs, sampleEpochMs: now });
     this.host.track(track);
+    this.applyArt();
     this.armDrift();
     this.request('drift', HYBRID.confirmMs);
   }
