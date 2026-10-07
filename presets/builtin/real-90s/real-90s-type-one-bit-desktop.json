@@ -32,6 +32,11 @@
         "kind": "lyricVideo",
         "params": {
           "style": "spin3d",
+          "material": "auto",
+          "hero": 0.6,
+          "camera": 0.5,
+          "drama": 0.7,
+          "exit": "auto",
           "source": "lyrics",
           "text": "HELLO / WELCOME / TO THE / FUTURE",
           "lineBeats": 8,

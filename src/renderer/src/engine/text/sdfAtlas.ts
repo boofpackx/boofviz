@@ -28,11 +28,17 @@ const SIZE = 1024;
 const CELL = 64;
 const FONT_PX = 44;
 const PAD = 10;
-const CHARS = (() => {
+/** ASCII, Western European accents, Cyrillic (Russian, Ukrainian, Belarusian, Serbian, Bulgarian) and a little punctuation. */
+export const ATLAS_CHARS = (() => {
   let s = '';
   for (let c = 32; c < 127; c++) s += String.fromCharCode(c);
-  return s + 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïñòóôõöøùúûüýÿ¿¡’‘“”–—…♪·';
+  s += 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïñòóôõöøùúûüýÿ¿¡’‘“”–—…♪·«»№';
+  for (let c = 0x410; c <= 0x44f; c++) s += String.fromCharCode(c);
+  return s + 'ЁёЄєІіЇїҐґЎўЂђЈјЉљЊњЋћЏџ';
 })();
+const CHARS = ATLAS_CHARS;
+const ROWS = Math.ceil(CHARS.length / (SIZE / CELL));
+const HEIGHT = ROWS * CELL;
 
 const cache = new Map<string, SdfAtlas>();
 
@@ -88,10 +94,11 @@ export function sdfAtlas(font: string): SdfAtlas {
   const hit = cache.get(font);
   if (hit) return hit;
   const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = SIZE;
+  canvas.width = SIZE;
+  canvas.height = HEIGHT;
   const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
   ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, SIZE, SIZE);
+  ctx.fillRect(0, 0, SIZE, HEIGHT);
   ctx.fillStyle = '#fff';
   ctx.font = fontCss(font, FONT_PX);
   ctx.textBaseline = 'alphabetic';
@@ -112,9 +119,9 @@ export function sdfAtlas(font: string): SdfAtlas {
     ctx.restore();
     glyphs.set(ch, {
       u0: cx / SIZE,
-      v0: cy / SIZE,
+      v0: cy / HEIGHT,
       u1: (cx + CELL) / SIZE,
-      v1: (cy + CELL) / SIZE,
+      v1: (cy + CELL) / HEIGHT,
       w: CELL / FONT_PX,
       h: CELL / FONT_PX,
       x: -PAD / FONT_PX,
@@ -122,23 +129,23 @@ export function sdfAtlas(font: string): SdfAtlas {
       advance: (m.width * scale) / FONT_PX,
     });
   });
-  const img = ctx.getImageData(0, 0, SIZE, SIZE).data;
-  const inside = new Float32Array(SIZE * SIZE);
-  const outside = new Float32Array(SIZE * SIZE);
-  for (let i = 0; i < SIZE * SIZE; i++) {
+  const img = ctx.getImageData(0, 0, SIZE, HEIGHT).data;
+  const inside = new Float32Array(SIZE * HEIGHT);
+  const outside = new Float32Array(SIZE * HEIGHT);
+  for (let i = 0; i < SIZE * HEIGHT; i++) {
     const on = img[i * 4] > 127;
     inside[i] = on ? 1e20 : 0;
     outside[i] = on ? 0 : 1e20;
   }
-  edt2d(inside, SIZE, SIZE);
-  edt2d(outside, SIZE, SIZE);
+  edt2d(inside, SIZE, HEIGHT);
+  edt2d(outside, SIZE, HEIGHT);
   // Encode signed distance (+inside) into 0..255 around 0.5, ±PAD pixels of range.
-  const data = new Uint8Array(SIZE * SIZE);
-  for (let i = 0; i < SIZE * SIZE; i++) {
+  const data = new Uint8Array(SIZE * HEIGHT);
+  for (let i = 0; i < SIZE * HEIGHT; i++) {
     const sd = Math.sqrt(inside[i]) - Math.sqrt(outside[i]);
     data[i] = Math.max(0, Math.min(255, Math.round(127.5 + (sd / PAD) * 127.5)));
   }
-  const texture = new THREE.DataTexture(data, SIZE, SIZE, THREE.RedFormat, THREE.UnsignedByteType);
+  const texture = new THREE.DataTexture(data, SIZE, HEIGHT, THREE.RedFormat, THREE.UnsignedByteType);
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
   texture.needsUpdate = true;

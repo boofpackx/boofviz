@@ -1,0 +1,202 @@
+{
+  "schema": 1,
+  "name": "Infomercial Super",
+  "category": "Lyrics",
+  "tags": [
+    "lyric cinema",
+    "lyrics",
+    "words",
+    "music video",
+    "90s",
+    "chrome",
+    "tv",
+    "infomercial",
+    "vhs"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "set",
+      "name": "Studio",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lostScene",
+        "params": {
+          "scene": "studio",
+          "variant": 0,
+          "react": 1,
+          "tint": 0,
+          "eerie": 0,
+          "spin": 0.8
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyric cinema",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "infomercial",
+          "material": "chrome",
+          "hero": 0.8,
+          "camera": 0.5,
+          "drama": 0.7,
+          "exit": "auto",
+          "source": "lyrics",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT / HOLD THE DOOR",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1.2,
+          "position": "center",
+          "depth": 0.85,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.6,
+          "colorMode": "palette",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tape",
+      "name": "Tape",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "vhs",
+            "generation": 2,
+            "wear": 0.6,
+            "events": 0.12,
+            "eventList": "eat,signal",
+            "overwrite": 0,
+            "mood": 0.2,
+            "seed": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hero word",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.1.source.params.hero",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Camera",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.camera",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Song shape",
+      "value": 0.7,
+      "targets": [
+        {
+          "path": "layers.1.source.params.drama",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#05060a",
+      "#1c2a44",
+      "#4f7fbf",
+      "#c9dcff",
+      "#ffffff"
+    ]
+  },
+  "description": "Late-night TV supers: every word swooshes in spinning, in bevelled chrome with a shine sweeping across, over a swirling studio backdrop on a worn tape."
+}

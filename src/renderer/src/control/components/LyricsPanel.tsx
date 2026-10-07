@@ -252,6 +252,22 @@ const VIDEO_STYLES: Array<[string, string]> = [
   ['glitch', 'Glitch: jittery arrival'],
   ['scatter', 'Scatter: words thrown around'],
   ['orbit3d', 'Orbit: words circle in 3D'],
+  ['highway', 'Highway: words on the road ahead'],
+  ['credits', 'Credits: lines roll up like end credits'],
+  ['infomercial', 'Infomercial: chrome words swoosh in'],
+  ['ransom', 'Ransom note: cut-out letters'],
+  ['teletext', 'Teletext: a page of coloured rows'],
+  ['screensaver', 'Screensaver: the line tumbles and bounces'],
+];
+
+const MATERIALS: Array<[string, string]> = [
+  ['auto', 'Auto (suits the style)'],
+  ['plain', 'Plain'],
+  ['chrome', 'Chrome'],
+  ['neon', 'Neon tube'],
+  ['paper', 'Paper'],
+  ['led', 'LED sign'],
+  ['phosphor', 'CRT phosphor'],
 ];
 
 function OverlaySection() {
@@ -299,7 +315,30 @@ function OverlaySection() {
               <option value="rainbow">Rainbow</option>
             </select>
           </label>
+          <label className="flex items-center justify-between gap-2 text-[11px] text-ink-300">
+            <span>Letters made of</span>
+            <select className="rounded border border-ink-600 bg-ink-800 px-1 py-0.5 text-[11px] text-ink-100" value={String(p.material ?? 'auto')} onChange={(e) => set({ material: e.target.value })}>
+              {MATERIALS.map(([v, l]) => (
+                <option key={v} value={v}>
+                  {l}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center justify-between gap-2 text-[11px] text-ink-300">
+            <span>Lines leave by</span>
+            <select className="rounded border border-ink-600 bg-ink-800 px-1 py-0.5 text-[11px] text-ink-100" value={String(p.exit ?? 'auto')} onChange={(e) => set({ exit: e.target.value })}>
+              <option value="auto">Auto (shatter on big choruses)</option>
+              <option value="style">The style&apos;s own exit</option>
+              <option value="fade">Fading</option>
+              <option value="shatter">Shattering</option>
+              <option value="burn">Burning away</option>
+            </select>
+          </label>
           <Slider label="3D depth" value={typeof p.depth === 'number' ? p.depth : 0.5} min={0} max={1} defaultValue={0.5} onChange={(depth) => set({ depth })} />
+          <Slider label="Hero word" value={typeof p.hero === 'number' ? p.hero : 0.6} min={0} max={1} defaultValue={0.6} onChange={(hero) => set({ hero })} />
+          <Slider label="Camera moves" value={typeof p.camera === 'number' ? p.camera : 0.5} min={0} max={1} defaultValue={0.5} onChange={(camera) => set({ camera })} />
+          <Slider label="Song shape" value={typeof p.drama === 'number' ? p.drama : 0.7} min={0} max={1} defaultValue={0.7} onChange={(drama) => set({ drama })} />
         </>
       ) : (
         <Segmented

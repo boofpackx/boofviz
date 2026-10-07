@@ -20,7 +20,7 @@ async function ensure(): Promise<void> {
 
 /** Keep file names boring and safe: the renderer slugifies, main re-checks. */
 function safeSlug(slug: string): string {
-  const s = basename(slug).replace(/[^a-z0-9-]/gi, '').slice(0, 60);
+  const s = basename(slug).replace(/[^\p{L}\p{N}-]/gu, '').slice(0, 60);
   if (!s) throw new Error('Invalid preset name');
   return s;
 }

@@ -53,6 +53,11 @@
         "kind": "lyricVideo",
         "params": {
           "style": "pop",
+          "material": "auto",
+          "hero": 0.6,
+          "camera": 0.5,
+          "drama": 0.7,
+          "exit": "auto",
           "source": "lyrics",
           "text": "BOOFVIZ / LYRIC VIDEO",
           "lineBeats": 8,

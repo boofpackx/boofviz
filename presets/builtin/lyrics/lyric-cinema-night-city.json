@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "name": "Ночной Город (Night City)",
+  "category": "Lyrics",
+  "tags": [
+    "lyric cinema",
+    "lyrics",
+    "words",
+    "music video",
+    "post-punk",
+    "cold wave",
+    "cyrillic",
+    "black and white",
+    "80s"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Night",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "noise",
+          "from": 0,
+          "to": 0.25,
+          "intensity": 0.35,
+          "motion": 0.15,
+          "pulse": 0.15
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyric cinema",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "spin3d",
+          "material": "auto",
+          "hero": 0.8,
+          "camera": 0.6,
+          "drama": 0.7,
+          "exit": "auto",
+          "source": "lyrics",
+          "text": "ТАНЦЕВАТЬ / В ТЕМНОТЕ / НОЧНОЙ ГОРОД НЕ СПИТ / ТАНЦЕВАТЬ",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1,
+          "position": "center",
+          "depth": 0.6,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.6,
+          "colorMode": "white",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "film",
+      "name": "Film",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "filmStock",
+          "enabled": true,
+          "params": {
+            "stock": "16mm",
+            "tone": "bw",
+            "fps": 0,
+            "wear": 0.7,
+            "weave": 0.6,
+            "dust": 0.6,
+            "flicker": 0.7,
+            "fade": 0,
+            "leaks": 0,
+            "splices": 0.05,
+            "gate": false,
+            "seed": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hero word",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.1.source.params.hero",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Camera",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.camera",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Song shape",
+      "value": 0.7,
+      "targets": [
+        {
+          "path": "layers.1.source.params.drama",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#020306",
+      "#141a24",
+      "#3c4a5c",
+      "#a9b8c9",
+      "#f2f5f8"
+    ]
+  },
+  "description": "Cold-wave lyrics in black and white: words turn in like cards with the hero word huge, on grainy 16 mm. Shows Cyrillic lyrics (the placeholder words are Russian) as well as Latin."
+}

@@ -1,0 +1,183 @@
+{
+  "schema": 1,
+  "name": "Chorus Explosion",
+  "category": "Lyrics",
+  "tags": [
+    "lyric cinema",
+    "lyrics",
+    "words",
+    "music video",
+    "chorus",
+    "drop",
+    "big",
+    "shatter",
+    "club"
+  ],
+  "energy": 5,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bg",
+      "name": "Chrome",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "liquidChrome",
+        "params": {
+          "formation": "cycle",
+          "count": "cycle",
+          "cycleBars": 1,
+          "droplets": 4,
+          "size": 1,
+          "goo": 0.34,
+          "punch": 1,
+          "ripple": 1,
+          "spin": 0.15,
+          "iridescence": 0.6,
+          "holo": 1,
+          "room": 1,
+          "grid": 0.7,
+          "mirror": 0.6,
+          "starburst": 0.6,
+          "quality": "high"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyric cinema",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "slam",
+          "material": "auto",
+          "hero": 1,
+          "camera": 1,
+          "drama": 1,
+          "exit": "auto",
+          "source": "lyrics",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT / HOLD THE DOOR",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1.15,
+          "position": "center",
+          "depth": 0.7,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.6,
+          "colorMode": "palette",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hero word",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.1.source.params.hero",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Camera",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.camera",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Song shape",
+      "value": 0.7,
+      "targets": [
+        {
+          "path": "layers.1.source.params.drama",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0b0420",
+      "#3b0a6b",
+      "#ff2fa8",
+      "#22e0d0",
+      "#fff6c8"
+    ]
+  },
+  "description": "Verses stay small and calm; the chorus detonates. The hero word fills the frame, the camera punches and whips, and big lines shatter into pieces as they leave."
+}

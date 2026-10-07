@@ -161,14 +161,14 @@ export function normalizeTitle(title: string): string {
   return t.replace(/\s+/g, ' ').trim() || title.trim();
 }
 
-/** Loose key for matching "Artist - Title" file names: lowercase letters and digits only. */
+/** Loose key for matching "Artist - Title" file names: lowercase letters (any script) and digits only. */
 export function matchKey(s: string): string {
   return s
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '');
+    .replace(/[^\p{L}\p{N}]+/gu, '');
 }
 
 /** File name used when attaching an .lrc to a track. */

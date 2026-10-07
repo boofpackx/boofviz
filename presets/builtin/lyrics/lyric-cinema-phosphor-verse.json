@@ -1,16 +1,21 @@
 {
   "schema": 1,
-  "name": "Glitch Verse",
+  "name": "Phosphor Verse",
   "category": "Lyrics",
   "tags": [
-    "lyric video",
-    "glitch",
+    "lyric cinema",
+    "lyrics",
+    "words",
+    "music video",
+    "crt",
     "terminal",
-    "retro",
-    "crt"
+    "phosphor",
+    "glitch",
+    "old hardware",
+    "burn"
   ],
   "energy": 3,
-  "palette": "Terminal",
+  "palette": "Custom",
   "paletteCycle": {
     "mode": "off",
     "every": 1,
@@ -24,50 +29,51 @@
   },
   "layers": [
     {
-      "id": "bg",
-      "name": "Screen",
+      "id": "rain",
+      "name": "Rain",
       "enabled": true,
       "source": {
         "type": "generator",
-        "kind": "background",
+        "kind": "codeRain",
         "params": {
-          "style": "noise",
-          "from": 0.1,
-          "to": 0,
-          "intensity": 0.4,
-          "motion": 0.3,
-          "pulse": 0.2
+          "glyphs": "katakana",
+          "columns": 90,
+          "speed": 1,
+          "trail": 1,
+          "change": 4,
+          "glow": 1,
+          "mirror": true
         }
       },
       "fx": [],
       "blend": "normal",
-      "opacity": 1,
+      "opacity": 0.35,
       "modulators": []
     },
     {
       "id": "words",
-      "name": "Lyric video",
+      "name": "Lyric cinema",
       "enabled": true,
       "source": {
         "type": "generator",
         "kind": "lyricVideo",
         "params": {
           "style": "glitch",
-          "material": "auto",
+          "material": "phosphor",
           "hero": 0.6,
           "camera": 0.5,
           "drama": 0.7,
-          "exit": "auto",
+          "exit": "burn",
           "source": "lyrics",
-          "text": "BOOFVIZ / LYRIC VIDEO",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT / HOLD THE DOOR",
           "lineBeats": 8,
-          "font": "mono",
+          "font": "heavy",
           "size": 1,
           "position": "center",
-          "depth": 0.3,
+          "depth": 0,
           "outline": 0,
-          "glow": 0.6,
-          "shadow": 0.5,
+          "glow": 0.8,
+          "shadow": 0.6,
           "colorMode": "palette",
           "dimPast": 0.25,
           "speed": 1,
@@ -76,15 +82,29 @@
           "uppercase": true
         }
       },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tube",
+      "name": "Tube",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
       "fx": [
         {
           "type": "crt",
           "enabled": true,
           "params": {
-            "curvature": 0.4,
-            "scanlines": 0.5,
+            "curvature": 0.5,
+            "scanlines": 0.7,
             "mask": 0.3,
-            "vignette": 0.5
+            "vignette": 0.6
           }
         }
       ],
@@ -96,36 +116,23 @@
   "macros": [
     {
       "name": "Size",
-      "value": 0.333,
+      "value": 0.4,
       "targets": [
         {
           "path": "layers.1.source.params.size",
           "range": [
-            0.5,
-            2
+            0.3,
+            2.5
           ]
         }
       ]
     },
     {
-      "name": "Speed",
-      "value": 0.333,
+      "name": "Hero word",
+      "value": 0.6,
       "targets": [
         {
-          "path": "layers.1.source.params.speed",
-          "range": [
-            0.5,
-            2
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Depth",
-      "value": 0.3,
-      "targets": [
-        {
-          "path": "layers.1.source.params.depth",
+          "path": "layers.1.source.params.hero",
           "range": [
             0,
             1
@@ -134,24 +141,11 @@
       ]
     },
     {
-      "name": "Glow",
-      "value": 0.4,
-      "targets": [
-        {
-          "path": "layers.1.source.params.glow",
-          "range": [
-            0,
-            1.5
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Shadow",
+      "name": "Camera",
       "value": 0.5,
       "targets": [
         {
-          "path": "layers.1.source.params.shadow",
+          "path": "layers.1.source.params.camera",
           "range": [
             0,
             1
@@ -160,24 +154,11 @@
       ]
     },
     {
-      "name": "Kick punch",
-      "value": 0.333,
+      "name": "Song shape",
+      "value": 0.7,
       "targets": [
         {
-          "path": "layers.1.source.params.punch",
-          "range": [
-            0,
-            3
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Dim sung words",
-      "value": 0.25,
-      "targets": [
-        {
-          "path": "layers.1.source.params.dimPast",
+          "path": "layers.1.source.params.drama",
           "range": [
             0,
             1
@@ -189,16 +170,31 @@
       "name": "",
       "value": 0.5,
       "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
     }
   ],
   "customPalettes": {
-    "Terminal": [
-      "#000000",
-      "#002200",
-      "#00a83c",
-      "#33ff66",
-      "#d8ffe0"
+    "Custom": [
+      "#010401",
+      "#062a0c",
+      "#1f8a32",
+      "#7dff9a",
+      "#e8ffe8"
     ]
   },
-  "description": "Words arrive jittering and flickering like a corrupted signal, then lock solid, in green monospace on a tube screen."
+  "description": "Green phosphor letters glitching onto a dark screen, each line burning away as the next one arrives."
 }

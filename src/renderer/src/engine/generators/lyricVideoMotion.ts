@@ -5,8 +5,25 @@
  * output draw the same frame (no state carried between frames).
  */
 
-export const LYRIC_STYLES = ['drop', 'slam', 'pop', 'shuffle', 'flip', 'spin3d', 'zoomthrough', 'stack', 'wave', 'glitch', 'scatter', 'orbit3d'] as const;
+export const LYRIC_STYLES = [
+  'drop', 'slam', 'pop', 'shuffle', 'flip', 'spin3d', 'zoomthrough', 'stack', 'wave', 'glitch', 'scatter', 'orbit3d',
+  // Lyric Cinema
+  'highway', 'credits', 'infomercial', 'ransom', 'teletext', 'screensaver',
+] as const;
 export type LyricStyle = (typeof LYRIC_STYLES)[number];
+
+export const LETTER_MATERIALS = ['plain', 'chrome', 'neon', 'paper', 'led', 'phosphor'] as const;
+export type LetterMaterial = (typeof LETTER_MATERIALS)[number];
+
+/** Material each style uses when the look leaves it on 'auto'. */
+export const STYLE_MATERIAL: Partial<Record<LyricStyle, LetterMaterial>> = { infomercial: 'chrome', screensaver: 'chrome', ransom: 'paper' };
+
+/** Styles that show several lines at once (a scrolling roll, a teletext page). */
+export const MULTI_LINE: ReadonlySet<LyricStyle> = new Set<LyricStyle>(['credits', 'teletext']);
+/** Styles that show words before they are sung (coming down the road, the whole line tumbling). */
+const PRESHOW: ReadonlySet<LyricStyle> = new Set<LyricStyle>(['highway', 'credits', 'teletext', 'screensaver']);
+/** Styles drawn front-on with no camera moves. */
+export const FLAT: ReadonlySet<LyricStyle> = new Set<LyricStyle>(['credits', 'teletext']);
 
 /** A line to show: its words and when each one is sung (seconds). */
 export interface TimedLine {
@@ -115,7 +132,7 @@ export function timeWords(text: string, start: number, end: number, stamps?: Arr
 export type LayoutMode = 'flow' | 'stack' | 'scatter' | 'orbit';
 
 export function layoutFor(style: LyricStyle): LayoutMode {
-  return style === 'stack' ? 'stack' : style === 'scatter' ? 'scatter' : style === 'orbit3d' ? 'orbit' : 'flow';
+  return style === 'stack' ? 'stack' : style === 'scatter' ? 'scatter' : style === 'orbit3d' || style === 'highway' ? 'orbit' : 'flow';
 }
 
 /**
@@ -124,7 +141,7 @@ export function layoutFor(style: LyricStyle): LayoutMode {
  * at a varied size; scatter throws words around the frame; orbit spaces them
  * round a ring (the style turns the ring).
  */
-export function layoutLine(words: string[], advance: (ch: string) => number, mode: LayoutMode, maxWidth: number, seed: number): LineLayout {
+export function layoutLine(words: string[], advance: (ch: string) => number, mode: LayoutMode, maxWidth: number, seed: number, hero?: { index: number; scale: number }): LineLayout {
   const space = advance(' ') || 0.28;
   const widthOf = (w: string): number => [...w].reduce((n, ch) => n + advance(ch), 0);
   const letters: LetterLayout[] = [];
@@ -166,31 +183,50 @@ export function layoutLine(words: string[], advance: (ch: string) => number, mod
     // Letters are laid out about their own word centre; the style moves words into place.
     return { letters, words: out, width: maxWidth, height: 3 };
   }
-  // Flow: greedy wrap into rows.
+  // Flow: greedy wrap into rows. A hero word gets a row of its own at its own scale
+  // (its letters keep unscaled offsets about the word centre; the renderer scales them).
+  const hi = hero && hero.index >= 0 && hero.index < words.length && hero.scale > 1.01 ? hero.index : -1;
+  const hs = hi >= 0 ? hero!.scale : 1;
   const rows: number[][] = [[]];
   let rowW = 0;
   words.forEach((w, i) => {
     const ww = widthOf(w);
-    const add = rows[rows.length - 1].length ? space + ww : ww;
-    if (rowW + add > maxWidth && rows[rows.length - 1].length) {
+    const cur = rows[rows.length - 1];
+    if (i === hi || (hi >= 0 && i === hi + 1)) {
+      if (cur.length) rows.push([]);
+      rows[rows.length - 1].push(i);
+      rowW = ww;
+      if (i === hi) {
+        rows.push([]);
+        rowW = 0;
+      }
+      return;
+    }
+    const add = cur.length ? space + ww : ww;
+    if (rowW + add > maxWidth && cur.length) {
       rows.push([i]);
       rowW = ww;
     } else {
-      rows[rows.length - 1].push(i);
+      cur.push(i);
       rowW += add;
     }
   });
+  const used = rows.filter((r) => r.length);
   const lineH = 1.18;
-  const height = rows.length * lineH;
+  const rowH = used.map((row) => (row.includes(hi) ? lineH * hs * 0.92 : lineH));
+  const height = rowH.reduce((a, b) => a + b, 0);
   let width = 0;
-  rows.forEach((row, r) => {
-    const rw = row.reduce((n, i, k) => n + widthOf(words[i]) + (k ? space : 0), 0);
+  let top = height / 2;
+  used.forEach((row, r) => {
+    const big = row.includes(hi);
+    const rw = row.reduce((n, i, k) => n + widthOf(words[i]) * (big ? hs : 1) + (k ? space : 0), 0);
     width = Math.max(width, rw);
     let pen = -rw / 2;
-    const y = height / 2 - lineH * (r + 0.5);
+    const y = top - rowH[r] / 2;
+    top -= rowH[r];
     row.forEach((i) => {
-      const ww = widthOf(words[i]);
-      out[i] = { x: pen + ww / 2, y, scale: 1, rz: 0, width: ww };
+      const ww = widthOf(words[i]) * (i === hi ? hs : 1);
+      out[i] = { x: pen + ww / 2, y, scale: i === hi ? hs : 1, rz: 0, width: ww };
       place(words[i], i, pen + ww / 2, y);
       pen += ww + space;
     });
@@ -212,6 +248,14 @@ export interface MotionInput {
   seed: number;
   /** Index of the word being sung now (−1 before the first). */
   current: number;
+  /** Lyric Cinema: line offset from the sung line (0 = this line), progress through the sung line, how big the moment is, and the view in em. */
+  rel?: number;
+  frac?: number;
+  intensity?: number;
+  viewW?: number;
+  viewH?: number;
+  /** Multi-line styles: this line's vertical place in em (the renderer stacks lines by their real heights). */
+  rowY?: number;
 }
 
 /** Pose one letter for a style; a = 0 means hidden. */
@@ -224,7 +268,7 @@ export function poseLetter(style: LyricStyle, L: LetterLayout, W: WordLayout, m:
   const h = (k: number): number => hash2(m.seed * 131 + L.index, k);
   const isCurrent = L.word === m.current;
   // Scatter and orbit lay each word out about 0,0 (the style places the word).
-  const local = style === 'scatter' || style === 'orbit3d';
+  const local = style === 'scatter' || style === 'orbit3d' || style === 'highway';
   const p: Pose = { x: L.x, y: L.y, z: 0, rx: 0, ry: 0, rz: 0, s: 1, ox: 0, oy: 0, a: 1, glow: isCurrent ? 0.35 : 0 };
   const wordPivot = (): void => {
     p.x = W.x;
@@ -232,7 +276,8 @@ export function poseLetter(style: LyricStyle, L: LetterLayout, W: WordLayout, m:
     p.ox = local ? L.x : L.x - W.x;
     p.oy = local ? L.y : L.y - W.y;
   };
-  if (tw < 0) return { ...p, a: 0 };
+  if (tw < 0 && !PRESHOW.has(style)) return { ...p, a: 0 };
+  const I = m.intensity ?? 1;
   switch (style) {
     case 'drop': {
       const a = tw / 0.55;
@@ -370,8 +415,92 @@ export function poseLetter(style: LyricStyle, L: LetterLayout, W: WordLayout, m:
       p.a = clamp01(tw / 0.2) * (0.35 + 0.65 * Math.max(0, Math.cos(ang))) * (1 - outT);
       break;
     }
+    case 'highway': {
+      // Words painted on the road come at you from the distance and pass under the camera.
+      wordPivot();
+      const z = tw * 6 * sp;
+      p.x = 0;
+      p.y = -0.9;
+      p.z = z;
+      p.rx = -Math.PI / 2 + 0.35;
+      p.a = clamp01((z + 20) / 6) * clamp01((5 - z) / 2.5);
+      p.glow += isCurrent ? 0.5 : 0;
+      p.s = 2.2;
+      break;
+    }
+    case 'credits': {
+      // End credits: every line rolls up the screen at the song's pace.
+      const rel = (m.rel ?? 0) - (m.frac ?? 0);
+      p.y = L.y + (m.rowY ?? -rel * 1.55);
+      const edge = Math.abs(p.y);
+      const half = (m.viewH ?? 9) * 0.5;
+      p.a = clamp01((half - 0.4 - edge) / 1.5);
+      p.s = (m.rel ?? 0) === 0 ? 1.08 : 0.92;
+      p.glow = (m.rel ?? 0) === 0 ? 0.25 : 0;
+      break;
+    }
+    case 'infomercial': {
+      // Chrome supers: each word swooshes in from the side, spinning, and overshoots into place.
+      wordPivot();
+      const a = outBack(tw / 0.45, 1.6);
+      const dir = L.word % 2 ? -1 : 1;
+      p.x += (1 - a) * 14 * dir;
+      p.ry = (1 - a) * Math.PI * 1.5 * dir;
+      p.a = clamp01(tw / 0.12);
+      p.s = 1 + (isCurrent ? 0.08 * Math.sin(m.beat * Math.PI * 2) * I : 0);
+      p.z = inCubic(outT) * 8;
+      p.a *= 1 - outT;
+      break;
+    }
+    case 'ransom': {
+      // Letters cut from magazines, slapped down one by one and taped crooked.
+      const a = outBack((tw - L.li * 0.05) / 0.28, 2.4);
+      if (tw - L.li * 0.05 < 0) return { ...p, a: 0 };
+      p.y += (1 - a) * 1.4;
+      p.rz = (h(12) - 0.5) * 0.35 + (1 - a) * (h(13) - 0.5) * 1.5 + m.kick * 0.05 * (h(14) - 0.5);
+      p.s = (0.85 + 0.4 * h(15)) * (1 + (1 - clamp01(a)) * 0.6);
+      p.y += (h(16) - 0.5) * 0.18;
+      p.x += inCubic(outT) * (h(17) - 0.5) * 6;
+      p.y -= inCubic(outT) * 4;
+      p.rz += outT * (h(18) - 0.5) * 4;
+      p.a = 1 - outT;
+      break;
+    }
+    case 'teletext': {
+      // A teletext page: lines appear whole on their row; a new page every four lines.
+      const rel = m.rel ?? 0;
+      const tl = (m.now - m.line.start) * sp;
+      if (rel > 0 || tl < 0) return { ...p, a: 0 };
+      p.s = rel === 0 ? 1.12 : 1;
+      p.a = 1;
+      break;
+    }
+    case 'screensaver': {
+      // The whole line as one chrome object, tumbling and bouncing round the screen.
+      const vw = m.viewW ?? 14;
+      const vh = m.viewH ?? 8;
+      const b = bounceAt(m.now, Math.max(0, vw - 6), Math.max(0, vh - 2.5));
+      p.x = b.x;
+      p.y = b.y;
+      p.ox = L.x;
+      p.oy = L.y;
+      p.ry = Math.sin(m.now * 0.9) * 0.9;
+      p.rx = Math.sin(m.now * 0.63) * 0.35;
+      const tl = (m.now - m.line.start) * sp;
+      const grow = outBack(tl / 0.5);
+      p.s = Math.max(0, grow) * (1 - outT);
+      p.ry += (1 - clamp01(tl / 0.5)) * Math.PI + outT * Math.PI;
+      p.a = clamp01(tl / 0.15) * (1 - outT);
+      break;
+    }
   }
-  // Every style breathes with the kick.
-  p.s *= 1 + 0.06 * m.kick;
+  // Every style breathes with the kick (bigger in big moments).
+  p.s *= 1 + 0.06 * m.kick * (0.6 + 0.6 * I);
   return p;
+}
+
+/** Same triangle-wave bounce as lyricCinema.bounce (kept local to avoid an import cycle). */
+function bounceAt(now: number, rangeX: number, rangeY: number): { x: number; y: number } {
+  const tri = (u: number): number => 1 - 4 * Math.abs(u - Math.floor(u + 0.5));
+  return { x: tri(now * 0.13 + 0.25) * rangeX * 0.5, y: tri(now * 0.097 + 0.1) * rangeY * 0.5 };
 }

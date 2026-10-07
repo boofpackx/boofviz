@@ -233,7 +233,10 @@ export function slugify(name: string): string {
     name
       .toLowerCase()
       .normalize('NFKD')
-      .replace(/[^\w\s-]/g, '')
+      // Drop accents from Latin letters only (keeps Cyrillic й, ё).
+      .replace(/([a-z])[\u0300-\u036f]+/g, '$1')
+      .normalize('NFC')
+      .replace(/[^\p{L}\p{N}\s_-]/gu, '')
       .trim()
       .replace(/[\s_]+/g, '-')
       .replace(/-+/g, '-')

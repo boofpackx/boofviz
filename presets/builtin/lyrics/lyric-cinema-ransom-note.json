@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "name": "Ransom Note",
+  "category": "Lyrics",
+  "tags": [
+    "lyric cinema",
+    "lyrics",
+    "words",
+    "music video",
+    "zine",
+    "cut-out",
+    "paper",
+    "punk",
+    "photocopy"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "page",
+      "name": "Page",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "noise",
+          "from": 0.6,
+          "to": 0.9,
+          "intensity": 0.7,
+          "motion": 0.05,
+          "pulse": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "halftone",
+          "enabled": true,
+          "params": {
+            "mode": "ink",
+            "cell": 6,
+            "angle": 30,
+            "mix": 0.6
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.08,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyric cinema",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "ransom",
+          "material": "paper",
+          "hero": 0.5,
+          "camera": 0.3,
+          "drama": 0.7,
+          "exit": "auto",
+          "source": "lyrics",
+          "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT / HOLD THE DOOR",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1.1,
+          "position": "center",
+          "depth": 0.15,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.6,
+          "colorMode": "palette",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Size",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hero word",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.1.source.params.hero",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Camera",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.source.params.camera",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Song shape",
+      "value": 0.7,
+      "targets": [
+        {
+          "path": "layers.1.source.params.drama",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#1a1814",
+      "#4a4438",
+      "#a89a80",
+      "#efe6d2",
+      "#ffffff"
+    ]
+  },
+  "description": "Every sung line spelled out in letters cut from magazines, slapped down one by one on coloured scraps and taped crooked, on a photocopied page."
+}

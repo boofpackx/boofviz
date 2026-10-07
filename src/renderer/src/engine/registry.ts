@@ -215,7 +215,12 @@ export const GENERATORS: ModuleDef[] = [
     label: 'Lyric video',
     description: 'Music-video lyrics: every letter is its own 3D object that drops, slams, shuffles, flips, spins, flies through the camera or orbits on the sung timing of its word, with extruded depth and crisp edges at any size.',
     params: [
-      e('style', 'Style', 'auto', ['auto', 'drop', 'slam', 'pop', 'shuffle', 'flip', 'spin3d', 'zoomthrough', 'stack', 'wave', 'glitch', 'scatter', 'orbit3d'], 'auto: picks a style that suits the look'),
+      e('style', 'Style', 'auto', ['auto', 'drop', 'slam', 'pop', 'shuffle', 'flip', 'spin3d', 'zoomthrough', 'stack', 'wave', 'glitch', 'scatter', 'orbit3d', 'highway', 'credits', 'infomercial', 'ransom', 'teletext', 'screensaver'], 'auto: picks a style that suits the look'),
+      e('material', 'Letters made of', 'auto', ['auto', 'plain', 'chrome', 'neon', 'paper', 'led', 'phosphor']),
+      f('hero', 'Hero word', 0.6, 0, 1, 0.01, 'the key word of each line takes the frame (bigger in the chorus)'),
+      f('camera', 'Camera moves', 0.5, 0, 1, 0.01, 'push-ins, whip-pans into new lines, chorus orbits, punch-ins'),
+      f('drama', 'Song shape', 0.7, 0, 1, 0.01, 'how much verses stay calm and choruses and drops go big'),
+      e('exit', 'Lines leave by', 'auto', ['auto', 'style', 'fade', 'shatter', 'burn']),
       e('source', 'Words from', 'lyrics', ['lyrics', 'title', 'text'], 'lyrics: the sung line (song title before the first line) · text: your own words below'),
       t('text', 'Text', 'BOOFVIZ / LYRIC VIDEO', 'Your own lines, separated by "/" (used when nothing is playing)'),
       i('lineBeats', 'Beats per line', 8, 1, 32, 'how long each of your own lines stays up'),
