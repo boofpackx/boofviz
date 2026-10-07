@@ -32,6 +32,7 @@
         "kind": "demoParts",
         "params": {
           "text": "BOOFVIZ",
+          "source": "text",
           "part": "sequence",
           "partPhrases": 1,
           "wipeBeats": 4,

@@ -313,6 +313,7 @@ export const GENERATORS: ModuleDef[] = [
       'A 320×256, 32-colour home-computer megademo: plasma with colour cycling, a rotozoomer, a textured tunnel and shaded vector balls in phrase-long parts joined by raster wipes, with a bitmap sine scroller and copper bars running through the borders.',
     params: [
       t('text', 'Text', 'BOOFVIZ', 'sine-scroller text; the vector balls spell its first word'),
+      e('source', 'Text from', 'text', ['text', 'lyrics', 'title'], 'lyrics: the line being sung · title: song and artist · falls back to Text'),
       e('part', 'Part', 'sequence', ['sequence', 'plasma', 'rotozoom', 'tunnel', 'balls'], 'sequence: the next part every phrase · or hold one part'),
       i('partPhrases', 'Phrases per part', 1, 1, 8),
       f('wipeBeats', 'Wipe length', 2, 0.25, 8, 0.25, 'beats; the raster wipe finishes on the phrase downbeat'),

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { FULLSCREEN_VERT, GEN_HEADER } from '../shaders/common';
 import { FullscreenPass } from '../three/fullscreen';
+import { liveText, type TextSource } from '../lyricsFeed';
 import { hash01 } from '../modulation';
 import type { CompileTarget, GenContext } from './Generator';
 import { fontCss } from './KineticType';
@@ -587,7 +588,9 @@ export class DemoParts extends ShaderGenerator {
     const p = ctx.params;
     const u = this.u;
     const { frame, env } = ctx;
-    const text = String(p.text ?? 'BOOFVIZ');
+    // The scroller can sing along: the current line and the next two, or the song title.
+    const live = liveText(String(p.source ?? 'text') as TextSource, Date.now(), 150, 0, 2);
+    const text = live.kind === 'text' ? String(p.text ?? 'BOOFVIZ') : live.kind === 'title' ? live.lines.join(' - ') : live.lines.slice(live.current).join('   ');
     if (text !== this.text) this.setText(text);
 
     const beat = ctx.beat;
