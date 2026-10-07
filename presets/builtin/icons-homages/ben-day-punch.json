@@ -64,8 +64,8 @@
         "type": "generator",
         "kind": "kineticType",
         "params": {
-          "text": "POW / BAM / ZAP / WHAM / BOOM",
-          "source": "text",
+          "text": "",
+          "source": "lyrics",
           "mode": "words",
           "font": "heavy",
           "rows": 5,

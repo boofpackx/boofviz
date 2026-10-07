@@ -85,7 +85,7 @@
           "uppercase": false,
           "nextLine": 0.5,
           "titleCard": true,
-          "idleText": "waiting for a song"
+          "idleText": ""
         }
       },
       "fx": [],

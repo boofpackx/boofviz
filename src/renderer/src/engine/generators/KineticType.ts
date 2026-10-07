@@ -225,7 +225,7 @@ export class KineticType extends ShaderGenerator {
     // Text from the preset, or live from the song: crawl shows a window of lines, the rest the current line.
     const crawl = mode === 'crawl';
     const live = liveText(String(p.source ?? 'text') as TextSource, Date.now(), 150, crawl ? 3 : 0, crawl ? 4 : 0);
-    const text = live.kind === 'text' ? String(p.text ?? 'BOOFVIZ') : crawl ? live.lines.join(' / ') : live.kind === 'title' ? live.lines.join(' / ') : live.lines[live.current];
+    const text = live.kind === 'text' ? String(p.text ?? '') : crawl ? live.lines.join(' / ') : live.kind === 'title' ? live.lines.join(' / ') : live.lines[live.current] ?? '';
     const font = String(p.font ?? 'heavy');
     const key = `${font}|${text}`;
     if (key !== this.key) {

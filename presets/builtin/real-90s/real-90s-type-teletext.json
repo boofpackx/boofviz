@@ -31,7 +31,7 @@
         "type": "generator",
         "kind": "kineticType",
         "params": {
-          "text": "PAGE 100 / NEWS / SPORT / WEATHER / TONIGHT",
+          "text": "",
           "source": "lyrics",
           "mode": "words",
           "font": "mono",

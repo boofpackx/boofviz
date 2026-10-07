@@ -61,7 +61,7 @@
           "drama": 0.7,
           "exit": "auto",
           "source": "lyrics",
-          "text": "PRESS START / PLAYER ONE / CONTINUE",
+          "text": "",
           "lineBeats": 8,
           "font": "heavy",
           "size": 1.1,

@@ -1,11 +1,10 @@
 import * as THREE from 'three';
-import { lineIndexAt } from '@shared/lyrics';
+import { lyricMoment } from '../lyricText';
 import { DISPLAY_GLSL, GEN_HEADER } from '../shaders/common';
-import { currentLines, lyricsFeed, songPositionMs } from '../lyricsFeed';
 import { hash2 } from '../lostMedia';
 import type { GenContext } from './Generator';
 import { heroWord } from './lyricCinema';
-import { timeWords, type TimedLine } from './lyricVideoMotion';
+import type { TimedLine } from './lyricVideoMotion';
 import { num, ShaderGenerator } from './ShaderGenerator';
 
 const W = 960;
@@ -70,35 +69,10 @@ export class NeoBrutal extends ShaderGenerator {
     this.tex = tex;
   }
 
-  /** The sung line with word timings (or the look's own words, a line every few beats). */
+  /** The sung line with word timings (the song's name without lyrics, nothing without a song). */
   private lines(ctx: GenContext): Lines {
-    const p = ctx.params;
-    const upper = p.uppercase !== false;
-    const fix = (s: string): string => (upper ? s.toUpperCase() : s);
-    const synced = String(p.source ?? 'lyrics') === 'lyrics' && lyricsFeed.now.connected ? currentLines() : null;
-    if (synced?.length) {
-      const posMs = songPositionMs(Date.now(), num(p.lead, 120));
-      const i = lineIndexAt(synced, posMs);
-      if (i >= 0) {
-        const at = (k: number): TimedLine => {
-          const l = synced[k];
-          const start = l.t / 1000;
-          return timeWords(fix(l.text || '♪'), start, synced[k + 1] ? synced[k + 1].t / 1000 : start + 4, l.words);
-        };
-        const previous: string[] = [];
-        for (let k = i - 1; k >= Math.max(0, i - 8); k--) previous.push(fix(synced[k].text || '♪'));
-        return { current: at(i), index: i, previous, now: posMs / 1000 };
-      }
-    }
-    const rows = String(p.text ?? 'RAW / LOUD / HONEST / NO DECORATION').split('/').map((s) => s.trim()).filter(Boolean);
-    const lineBeats = Math.max(1, num(p.lineBeats, 8));
-    const spb = 60 / Math.max(40, ctx.frame.bpm || 120);
-    const idx = Math.floor(ctx.beat / lineBeats);
-    const row = (k: number): string => fix(rows[((k % rows.length) + rows.length) % rows.length] || ' ');
-    const start = idx * lineBeats * spb;
-    const previous: string[] = [];
-    for (let k = idx - 1; k >= idx - 8; k--) previous.push(row(k));
-    return { current: timeWords(row(idx), start, start + lineBeats * spb), index: idx, previous, now: ctx.beat * spb };
+    const m = lyricMoment(ctx);
+    return { current: m.current, index: m.index, previous: m.previous, now: m.now };
   }
 
   /** A flat card: hard shadow, fill, thick border. */

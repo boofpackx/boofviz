@@ -105,7 +105,7 @@ export class SketchScreen extends ShaderGenerator {
     this.textures(H);
     const g = this.g;
     const p = ctx.params;
-    const m = lyricMoment(ctx, 'DRAW / SHAKE / DRAW AGAIN');
+    const m = lyricMoment(ctx);
     const cols = Math.max(6, Math.round(num(p.cols, 16)));
     const line = this.path(m.current.text, cols);
     const start = m.current.start;

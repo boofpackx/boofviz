@@ -31,7 +31,7 @@
         "type": "generator",
         "kind": "kineticType",
         "params": {
-          "text": "LIVE · CALL IN NOW · CHANNEL 3 · TONIGHT ONLY ·",
+          "text": "",
           "source": "lyrics",
           "mode": "marquee",
           "font": "condensed",

@@ -52,8 +52,8 @@
         "type": "generator",
         "kind": "kineticType",
         "params": {
-          "text": "FEEL / THE / BASS / DROP",
-          "source": "text",
+          "text": "",
+          "source": "lyrics",
           "mode": "words",
           "font": "condensed",
           "rows": 5,

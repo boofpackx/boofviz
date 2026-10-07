@@ -99,8 +99,8 @@
         "type": "generator",
         "kind": "kineticType",
         "params": {
-          "text": "ATDT 555 0156 / CARRIER 33600 / PROTOCOL: V.90 / COMPRESSION: V.42BIS / CONNECT 56000 / WELCOME!",
-          "source": "text",
+          "text": "",
+          "source": "lyrics",
           "mode": "words",
           "font": "mono",
           "rows": 5,

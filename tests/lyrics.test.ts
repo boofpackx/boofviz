@@ -229,6 +229,33 @@ describe('LyricsService', () => {
     expect(m.calls).toHaveLength(0);
   });
 
+  it('finds .lrc files saved by other programs: other namings, subfolders, tags inside, the track id', async () => {
+    const lyr = join(dir, 'lyrics');
+    const m = mockFetch({});
+    const svc = service(m.fn);
+    const look = (t: Partial<TrackInfo>) => svc.lookup({ ...track, ...t });
+    mkdirSync(join(lyr, 'The Placeholders'), { recursive: true });
+    writeFileSync(join(lyr, 'Paper Lanterns - The Placeholders.lrc'), '[00:01.00]title first');
+    expect((await look({ id: 'a1' })).synced?.[0].text).toBe('title first');
+    writeFileSync(join(lyr, 'The Placeholders', '03. Night Bus.lrc'), '[00:01.00]numbered in a subfolder');
+    svc.invalidateFiles();
+    expect((await look({ id: 'a2', title: 'Night Bus' })).synced?.[0].text).toBe('numbered in a subfolder');
+    writeFileSync(join(lyr, 'x9.lrc'), '[ti:Quiet Hours]\n[ar:Ann]\n[00:02.00]matched by its tags');
+    writeFileSync(join(lyr, '4uLU6hMCjMI75M1A2tKUQC.lrc'), '[00:02.00]matched by the track id');
+    svc.invalidateFiles();
+    expect((await look({ id: 'a3', title: 'Quiet Hours', artists: ['Ann, Bo'] })).synced?.[0].text).toBe('matched by its tags');
+    expect((await look({ id: '4uLU6hMCjMI75M1A2tKUQC', title: 'Anything' })).synced?.[0].text).toBe('matched by the track id');
+    // A title shared by two files is too risky to guess.
+    writeFileSync(join(lyr, 'Home.lrc'), '[00:01.00]one');
+    writeFileSync(join(lyr, 'The Placeholders', 'Home.lrc'), '[00:01.00]two');
+    svc.invalidateFiles();
+    expect((await look({ id: 'a4', title: 'Home', artists: ['Third Band'] })).source).not.toBe('file');
+    // An empty file (still being written) is not a match.
+    writeFileSync(join(lyr, 'Ann - Empty.lrc'), '');
+    svc.invalidateFiles();
+    expect(await svc.fromFiles({ ...track, id: 'a5', title: 'Empty', artists: ['Ann'] })).toBeNull();
+  });
+
   it('caches "not found" for 24 h and skips the network when offline', async () => {
     const m = mockFetch({ '/api/get': () => json({ code: 404 }, 404), '/api/search': () => json([]) });
     expect((await service(m.fn).lookup(track)).source).toBe('none');
@@ -466,20 +493,24 @@ describe('text looks', () => {
     lyricsFeed.textLooks = false;
   });
 
-  it("keeps the look's own text unless asked, and when nothing plays", () => {
+  it("keeps the look's own text only for text looks, and shows nothing when nothing plays", () => {
     play(2000);
     expect(liveText('text', 0, 0).kind).toBe('text');
     lyricsFeed.textLooks = true;
     expect(liveText('text', 0, 0).kind).toBe('lyrics');
     setNowPlaying({ ...EMPTY_NOW_PLAYING });
-    expect(liveText('lyrics', 0, 0).kind).toBe('text');
+    // No placeholder words: lyrics and title looks go blank.
+    expect(liveText('lyrics', 0, 0).lines).toEqual([]);
+    expect(liveText('title', 0, 0).lines).toEqual([]);
   });
 
-  it('shows the title before the first line and for title looks', () => {
+  it('shows just the song name before the first line or without lyrics, and song and artist for title looks', () => {
     play(500);
-    expect(liveText('lyrics', 0, 0)).toMatchObject({ kind: 'title', lines: ['A Song', 'An Artist'] });
+    expect(liveText('lyrics', 0, 0)).toMatchObject({ kind: 'title', lines: ['A Song'] });
+    setTrackLyrics({ ...EMPTY_LYRICS, trackId: 't1', source: 'none' });
+    expect(liveText('lyrics', 0, 0)).toMatchObject({ kind: 'title', lines: ['A Song'] });
     play(2000);
-    expect(liveText('title', 0, 0).kind).toBe('title');
+    expect(liveText('title', 0, 0)).toMatchObject({ kind: 'title', lines: ['A Song', 'An Artist'] });
   });
 
   it('gives the current line, its progress and a window for the crawl', () => {

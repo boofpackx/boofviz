@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { DISPLAY_GLSL, GEN_HEADER } from '../shaders/common';
-import { liveText, lyricsFeed, songPositionMs } from '../lyricsFeed';
+import { liveText, lyricsFeed, songPositionMs, songTitle } from '../lyricsFeed';
 import { hash2 } from '../lostMedia';
 import type { GenContext } from './Generator';
 import { num, ShaderGenerator } from './ShaderGenerator';
@@ -87,7 +87,8 @@ export class Desktop90 extends ShaderGenerator {
     const p = ctx.params;
     const live = liveText(String(p.source ?? 'lyrics') === 'text' ? 'text' : 'lyrics', Date.now(), num(p.lead, 150), before, 0);
     if (live.kind === 'lyrics' || live.kind === 'title') return { lines: live.lines, current: live.current, lyrics: true };
-    return { lines: [String(p.text ?? 'Thanks for visiting! Sign my guestbook!')], current: 0, lyrics: false };
+    const own = String(p.text ?? '').trim();
+    return { lines: own ? [own] : [], current: 0, lyrics: false };
   }
 
   update(ctx: GenContext): void {
@@ -125,7 +126,7 @@ export class Desktop90 extends ShaderGenerator {
     g.fillRect(0, 0, W, H);
     const cx = W / 2;
     // Rainbow title.
-    const title = String(p.title || 'Welcome to my Homepage!');
+    const title = String(p.title || songTitle());
     g.font = f(COMIC, 30);
     g.textAlign = 'center';
     const tw = g.measureText(title).width;
@@ -504,7 +505,7 @@ export class Desktop90 extends ShaderGenerator {
     g.rotate(-Math.PI / 2);
     g.font = f(COMIC, 22);
     g.fillStyle = '#1b2a8a';
-    g.fillText(String(p.title || 'MIXTAPE  ·  SIDE A'), 0, 0);
+    g.fillText(String(p.title || songTitle()), 0, 0);
     g.restore();
     // Ruled lines and a red margin.
     g.strokeStyle = 'rgba(70,110,200,0.35)';

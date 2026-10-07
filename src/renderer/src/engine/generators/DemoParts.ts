@@ -541,7 +541,7 @@ export class DemoParts extends ShaderGenerator {
     this.up = new FullscreenPass(
       new THREE.RawShaderMaterial({ glslVersion: THREE.GLSL3, vertexShader: FULLSCREEN_VERT, fragmentShader: UP_FRAG, uniforms: this.upU, depthTest: false, depthWrite: false }),
     );
-    this.setText('BOOFVIZ');
+    this.setText('');
   }
 
   private setText(text: string): void {
@@ -590,7 +590,7 @@ export class DemoParts extends ShaderGenerator {
     const { frame, env } = ctx;
     // The scroller can sing along: the current line and the next two, or the song title.
     const live = liveText(String(p.source ?? 'text') as TextSource, Date.now(), 150, 0, 2);
-    const text = live.kind === 'text' ? String(p.text ?? 'BOOFVIZ') : live.kind === 'title' ? live.lines.join(' - ') : live.lines.slice(live.current).join('   ');
+    const text = live.kind === 'text' ? String(p.text ?? '') : live.kind === 'title' ? live.lines.join(' - ') : live.lines.slice(live.current).join('   ');
     if (text !== this.text) this.setText(text);
 
     const beat = ctx.beat;

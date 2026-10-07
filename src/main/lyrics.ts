@@ -23,7 +23,7 @@ export interface TrackInfo {
 export interface LyricsDeps {
   fetch: typeof fetch;
   now: () => number;
-  /** User .lrc files named "Artist - Title.lrc". */
+  /** The user's .lrc folder ("Artist - Title.lrc" and other namings, subfolders too). */
   lyricsDir: string;
   /** JSON cache keyed by Spotify track id. */
   cacheDir: string;
@@ -60,6 +60,8 @@ export function lyricsFromText(trackId: string, source: TrackLyrics['source'], t
 }
 
 export class LyricsService {
+  private index: { at: number; map: Map<string, string[]> } | null = null;
+
   constructor(private readonly deps: LyricsDeps) {}
 
   /** `fresh`: ignore a cached miss (better metadata arrived). */
@@ -91,34 +93,111 @@ export class LyricsService {
   /** Save dropped .lrc text for a track (it then wins over the cache and LRCLIB). */
   async saveLrc(track: TrackInfo, text: string): Promise<TrackLyrics> {
     await fsp.mkdir(this.deps.lyricsDir, { recursive: true });
+    this.index = null;
     const name = lrcFileName(track.artists[0] ?? '', track.title);
     await fsp.writeFile(join(this.deps.lyricsDir, name), text, 'utf8');
     return lyricsFromText(track.id, 'file', text);
   }
 
-  private async fromFiles(track: TrackInfo): Promise<TrackLyrics | null> {
-    let names: string[];
+  /** Forget the folder index (files were added, changed or removed). */
+  invalidateFiles(): void {
+    this.index = null;
+  }
+
+  /**
+   * The track's lyrics from the user's folder (subfolders too), matched by
+   * file name ("Artist - Title", "Title - Artist", "01. Title", the Spotify
+   * track id, or the title alone when only one file has it) or by the
+   * [ar:] / [ti:] tags inside the file. Null when no file matches or it holds no lyrics.
+   */
+  async fromFiles(track: TrackInfo): Promise<TrackLyrics | null> {
+    const index = await this.fileIndex();
+    if (!index.size) return null;
+    const full = track.artists[0] ?? '';
+    const artists = [...new Set([full, track.artists.join(', '), track.artists.join(' & '), track.artists.join('; '), primaryArtist(full)].filter(Boolean))];
+    const titles = [...new Set([track.title, normalizeTitle(track.title)].filter(Boolean))];
+    const keys: string[] = [];
+    if (/^[0-9A-Za-z]{22}$/.test(track.id)) keys.push(`id:${track.id}`);
+    for (const t of titles) for (const a of artists) keys.push(matchKey(`${a} - ${t}`), matchKey(`${t} - ${a}`));
+    for (const key of keys) {
+      const hit = index.get(key);
+      if (hit?.length) return this.readLrc(track.id, hit[0]);
+    }
+    // The title alone, only when a single file has it (common titles would match the wrong song).
+    for (const t of titles) {
+      const hit = index.get(matchKey(t));
+      if (hit?.length === 1) return this.readLrc(track.id, hit[0]);
+    }
+    return null;
+  }
+
+  private async readLrc(trackId: string, path: string): Promise<TrackLyrics | null> {
     try {
-      names = (await fsp.readdir(this.deps.lyricsDir)).filter((n) => /\.lrc$/i.test(n));
+      const l = lyricsFromText(trackId, 'file', decodeText(await fsp.readFile(path)));
+      // A file still being written (or empty) is not a match yet.
+      return l.synced || l.plain ? l : null;
     } catch {
       return null;
     }
-    if (!names.length) return null;
-    const byKey = new Map(names.map((n) => [matchKey(n.replace(/\.lrc$/i, '')), n]));
-    const artists = [track.artists[0] ?? '', track.artists.join(', '), track.artists.join(' & ')];
-    const titles = [track.title, normalizeTitle(track.title)];
-    for (const title of titles) {
-      for (const artist of artists) {
-        const name = byKey.get(matchKey(`${artist} - ${title}`));
-        if (!name) continue;
+  }
+
+  /** key → .lrc paths, rebuilt after a change (or a minute, without a folder watcher). */
+  private async fileIndex(): Promise<Map<string, string[]>> {
+    if (this.index && this.deps.now() - this.index.at < 60000) return this.index.map;
+    const map = new Map<string, string[]>();
+    const add = (key: string, path: string): void => {
+      if (!key || key === 'id:') return;
+      const list = map.get(key) ?? [];
+      if (!list.includes(path)) list.push(path);
+      map.set(key, list);
+    };
+    let count = 0;
+    const walk = async (dir: string, depth: number): Promise<void> => {
+      let entries: import('node:fs').Dirent[];
+      try {
+        entries = await fsp.readdir(dir, { withFileTypes: true });
+      } catch {
+        return;
+      }
+      for (const e of entries) {
+        const path = join(dir, e.name);
+        if (e.isDirectory()) {
+          if (depth < 3) await walk(path, depth + 1);
+          continue;
+        }
+        if (!/\.lrc$/i.test(e.name) || ++count > 20000) continue;
+        const base = e.name.replace(/\.lrc$/i, '');
+        add(matchKey(base), path);
+        add(matchKey(base.replace(/^\d{1,3}\s*[.\-_)]\s*/, '')), path);
+        const id = /(?:^|[^0-9A-Za-z])([0-9A-Za-z]{22})(?:$|[^0-9A-Za-z])/.exec(base);
+        if (id && /\d/.test(id[1]) && /[A-Za-z]/.test(id[1])) add(`id:${id[1]}`, path);
+        // [ti:] and [ar:] tags at the top of the file.
         try {
-          return lyricsFromText(track.id, 'file', await fsp.readFile(join(this.deps.lyricsDir, name), 'utf8'));
+          const fh = await fsp.open(path, 'r');
+          const buf = Buffer.alloc(2048);
+          const { bytesRead } = await fh.read(buf, 0, 2048, 0);
+          await fh.close();
+          const head = decodeText(buf.subarray(0, bytesRead));
+          const ti = /\[ti:([^\]]*)\]/i.exec(head)?.[1]?.trim();
+          const ar = /\[ar:([^\]]*)\]/i.exec(head)?.[1]?.trim();
+          if (ti) {
+            add(matchKey(ti), path);
+            add(matchKey(normalizeTitle(ti)), path);
+            if (ar) {
+              for (const a of new Set([ar, primaryArtist(ar)])) {
+                add(matchKey(`${a} - ${ti}`), path);
+                add(matchKey(`${a} - ${normalizeTitle(ti)}`), path);
+              }
+            }
+          }
         } catch {
-          return null;
+          // Unreadable: matched by name only.
         }
       }
-    }
-    return null;
+    };
+    await walk(this.deps.lyricsDir, 0);
+    this.index = { at: this.deps.now(), map };
+    return map;
   }
 
   private async lrclib(path: string, params: Record<string, string>): Promise<unknown> {
@@ -185,6 +264,13 @@ export class LyricsService {
 /** The first of several artists named in one string ("A, B", "A feat. B", "A & B"). */
 export function primaryArtist(name: string): string {
   return name.split(/\s*,\s*|\s+(?:feat\.?|ft\.?|featuring|x|&|and)\s+/i)[0]?.trim() ?? name;
+}
+
+/** File text as UTF-8, or UTF-16 when it starts with a byte-order mark. */
+function decodeText(buf: Buffer): string {
+  if (buf[0] === 0xff && buf[1] === 0xfe) return buf.subarray(2).toString('utf16le');
+  if (buf[0] === 0xfe && buf[1] === 0xff) return Buffer.from(buf.subarray(2, 2 + ((buf.length - 2) & ~1))).swap16().toString('utf16le');
+  return buf.toString('utf8');
 }
 
 function none(trackId: string): TrackLyrics {

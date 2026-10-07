@@ -88,7 +88,7 @@
           "uppercase": false,
           "nextLine": 0.35,
           "titleCard": true,
-          "idleText": "tonight"
+          "idleText": ""
         }
       },
       "fx": [

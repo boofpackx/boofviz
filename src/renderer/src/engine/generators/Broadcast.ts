@@ -195,7 +195,7 @@ export class Broadcast extends ShaderGenerator {
       const y = H * 0.5 - 30 * s;
       box(W / 2 - 230 * s, y, 460 * s, 66 * s, '#000');
       text(station, W / 2, y + 30 * s, 26, '#fff', 'center', 'heavy', false);
-      text(title || 'PLEASE STAND BY', W / 2, y + 56 * s, 18, '#fff', 'center', 'mono', false);
+      text(playing ? lyricsFeed.now.title : title, W / 2, y + 56 * s, 18, '#fff', 'center', 'mono', false);
     } else if (kit === 'signoff') {
       const ph = (ctx.beat / bpb) % 16;
       const a = Math.min(1, Math.max(0, Math.min((ph - 2) / 2, (14 - ph) / 2)));
@@ -206,7 +206,7 @@ export class Broadcast extends ShaderGenerator {
     } else if (kit === 'web') {
       const stall = tapeEventAt(ctx.beat, bpb, num(p.events, 0), seed + 101, ['pause']);
       const np = lyricsFeed.now;
-      text((playing ? `${np.title} - ${np.artists.join(', ')}` : title || 'video.rm').slice(0, 48), W / 2 - 0.4 * H, H / 2 - 0.29 * H, 20, '#123', 'left', 'serif', false);
+      text((playing ? `${np.title} - ${np.artists.join(', ')}` : title).slice(0, 48), W / 2 - 0.4 * H, H / 2 - 0.29 * H, 20, '#123', 'left', 'serif', false);
       const tot = playing && np.durationMs ? np.durationMs / 1000 : 240;
       const fmt = (v: number): string => `${Math.floor(v / 60)}:${String(Math.floor(v % 60)).padStart(2, '0')}`;
       text(`${fmt(secs % tot)} / ${fmt(tot)}`, W / 2 + 0.4 * H, H / 2 + 0.31 * H, 16, '#222', 'right', 'mono', false);

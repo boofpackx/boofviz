@@ -76,7 +76,7 @@
           "uppercase": true,
           "nextLine": 0.3,
           "titleCard": true,
-          "idleText": "> awaiting signal"
+          "idleText": ""
         }
       },
       "fx": [

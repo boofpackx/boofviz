@@ -31,7 +31,7 @@
         "type": "generator",
         "kind": "kineticType",
         "params": {
-          "text": "INCOMING TRANSMISSION · PAGE 1 OF 1 · DO NOT REPLY ·",
+          "text": "",
           "source": "lyrics",
           "mode": "stack",
           "font": "mono",

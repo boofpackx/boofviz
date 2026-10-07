@@ -415,11 +415,13 @@ export class LyricVideo implements Generator {
     // No sung line: the song title while a track plays, else the look's own words, a line every few beats.
     const np = lyricsFeed.now;
     const titled = source !== 'text' && np.connected && np.trackId;
-    const text = titled ? `${np.title} / ${np.artists.join(', ')}` : String(p.text ?? 'BOOFVIZ / LYRIC VIDEO');
+    const text = source === 'title' && titled ? `${np.title} / ${np.artists.join(', ')}` : source === 'text' ? String(p.text ?? '') : titled ? np.title : '';
     const rows = text.split('/').map((s) => s.trim()).filter(Boolean);
     const lineBeats = Math.max(1, num(p.lineBeats, 8));
     const spb = 60 / Math.max(40, ctx.frame.bpm || 120);
     const now = ctx.beat * spb;
+    // Nothing to say: no placeholder words.
+    if (!rows.length) return { list: [], now, frac: 0, card: false, index: -1 };
     const idx = Math.floor(ctx.beat / lineBeats);
     const make = (k: number): ShownLine => {
       const start = k * lineBeats * spb;

@@ -30,8 +30,8 @@
         "type": "generator",
         "kind": "kineticType",
         "params": {
-          "text": "BOOFVIZ",
-          "source": "text",
+          "text": "",
+          "source": "lyrics",
           "mode": "punch",
           "font": "heavy",
           "rows": 5,

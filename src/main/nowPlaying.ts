@@ -1,5 +1,5 @@
 import { safeStorage, shell } from 'electron';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, watch, writeFileSync, type FSWatcher } from 'node:fs';
 import { join } from 'node:path';
 import { IPC } from '@shared/ipc';
 import { EMPTY_LYRICS, type NowPlaying, type SpotifyCommand, type TrackLyrics } from '@shared/lyrics';
@@ -56,6 +56,8 @@ export class NowPlayingService {
   private track: TrackInfo | null = null;
   private current: TrackLyrics = { ...EMPTY_LYRICS };
   private sentArt: string | undefined;
+  private watcher: FSWatcher | null = null;
+  private filesTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly store: SettingsStore,
@@ -104,6 +106,34 @@ export class NowPlayingService {
 
   start(): void {
     this.spotify.start();
+    this.watchLyricsFolder();
+  }
+
+  /**
+   * .lrc files saved into the lyrics folder (by hand or by another program)
+   * apply to the playing song at once, without reloading anything.
+   */
+  private watchLyricsFolder(): void {
+    try {
+      mkdirSync(this.lyricsDir, { recursive: true });
+      this.watcher = watch(this.lyricsDir, { recursive: true }, (_event, name) => {
+        if (name && !/\.lrc$/i.test(String(name))) return;
+        // Wait for the writer to finish; several events per save collapse into one.
+        if (this.filesTimer) clearTimeout(this.filesTimer);
+        this.filesTimer = setTimeout(() => void this.lyricsFilesChanged(), 700);
+      });
+      this.watcher.on('error', () => this.watcher?.close());
+    } catch {
+      // No watcher: the folder is still searched for every new song.
+    }
+  }
+
+  private async lyricsFilesChanged(): Promise<void> {
+    this.lyrics.invalidateFiles();
+    const track = this.track;
+    if (!track) return;
+    const l = await this.lyrics.fromFiles(track).catch(() => null);
+    if (l && this.track?.id === track.id) this.setLyrics(l);
   }
 
   private publish(s: NowPlaying): void {
@@ -160,5 +190,7 @@ export class NowPlayingService {
 
   dispose(): void {
     this.spotify.dispose();
+    this.watcher?.close();
+    if (this.filesTimer) clearTimeout(this.filesTimer);
   }
 }

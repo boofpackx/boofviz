@@ -156,7 +156,7 @@ export class TapeDeck extends ShaderGenerator {
     const dub = String(p.deckB ?? 'dub') === 'dub' ? 1 : 0;
     const radii = [supply, take, rMax * 0.98, rMin * 1.02];
     for (let k = 0; k < 4; k++) this.hubs[k] -= dt * speed * 0.5 * (k < 2 ? 1 : dub) / radii[k];
-    const title = String(p.label ?? '') || lyricsFeed.now.title || 'MIX TAPE';
+    const title = String(p.label ?? '') || lyricsFeed.now.title || '';
     this.well(g, 24, wy, W / 2 - 40, wh, 'A', title, [supply, take], [this.hubs[0], this.hubs[1]], black, ctx);
     this.well(g, W / 2 + 16, wy, W / 2 - 40, wh, 'B', String(p.labelB ?? 'BLANK C90'), [radii[2], radii[3]], [this.hubs[2], this.hubs[3]], black, ctx);
 
@@ -270,7 +270,7 @@ export class TapeDeck extends ShaderGenerator {
     g.fillRect(x - 4, y - 4, w + 8, h + 8);
     g.fillStyle = '#04100f';
     g.fillRect(x, y, w, h);
-    const m = lyricMoment(ctx, 'SIDE A / TRACK ONE / PRESS PLAY');
+    const m = lyricMoment(ctx);
     const dot = Math.min((w - 20) / (COLS * 6), (h * 0.5) / 17);
     // Wrap the line into rows; show the pair with the current sung word.
     const rows: Array<{ text: string; from: number }> = [];

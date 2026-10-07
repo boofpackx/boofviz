@@ -96,8 +96,8 @@ export class MusicChannel extends ShaderGenerator {
     const playing = np.connected && !!np.trackId;
     this.loadArt(playing ? np.artDataUrl : undefined);
     const layout = String(p.layout ?? 'cable');
-    const title = playing ? np.title : String(p.title ?? 'Your Song Here');
-    const artist = playing ? np.artists.join(', ') : String(p.artist ?? 'Now Playing');
+    const title = playing ? np.title : String(p.title ?? '');
+    const artist = playing ? np.artists.join(', ') : String(p.artist ?? '');
     const album = playing ? np.album : '';
     const pos = playing ? songPositionMs(Date.now()) / 1000 : ctx.time % 210;
     const dur = playing && np.durationMs ? np.durationMs / 1000 : 210;

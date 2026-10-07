@@ -31,7 +31,7 @@
         "type": "generator",
         "kind": "kineticType",
         "params": {
-          "text": "SYSTEM ONLINE · ALL CIRCUITS NOMINAL · AWAITING INPUT ·",
+          "text": "",
           "source": "lyrics",
           "mode": "stack",
           "font": "mono",

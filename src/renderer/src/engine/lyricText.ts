@@ -4,7 +4,7 @@ import type { GenContext } from './generators/Generator';
 import { fontCss } from './generators/KineticType';
 import { heroWord } from './generators/lyricCinema';
 import { timeWords, type TimedLine } from './generators/lyricVideoMotion';
-import { currentLines, lyricsFeed, songPositionMs } from './lyricsFeed';
+import { currentLines, lyricsFeed, songPositionMs, songTitle } from './lyricsFeed';
 
 export interface LyricMoment {
   /** The sung line with word timings. */
@@ -23,10 +23,11 @@ export interface LyricMoment {
 
 /**
  * What a lyric look shows right now: the sung line from Spotify's synced
- * lyrics, or the look's own text ("a / b / c") with a line every few beats.
- * Pure of the clock and the lyrics feed, so preview and output agree.
+ * lyrics; with no line, the song's name; with no song, nothing. With
+ * "Words from: text" it is the look's own text ("a / b / c"), a line every
+ * few beats. Pure of the clock and the lyrics feed, so preview and output agree.
  */
-export function lyricMoment(ctx: GenContext, fallback = 'LYRICS / GO / HERE'): LyricMoment {
+export function lyricMoment(ctx: GenContext): LyricMoment {
   const p = ctx.params;
   const upper = p.uppercase !== false;
   const fix = (s: string): string => (upper ? s.toUpperCase() : s);
@@ -43,10 +44,20 @@ export function lyricMoment(ctx: GenContext, fallback = 'LYRICS / GO / HERE'): L
       return { current, index: i, previous, next: fix(synced[i + 1]?.text ?? ''), now: posMs / 1000, hero: heroWord(current.text) };
     }
   }
-  const rows = String(p.text ?? fallback)
+  if (String(p.source ?? 'lyrics') !== 'text') {
+    // A still line that has been there a while: looks show it whole, no line change.
+    const now = ctx.time;
+    const current = { ...timeWords(fix(songTitle()), now - 60, now - 59), end: now + 3600 };
+    return { current, index: 0, previous: [], next: '', now, hero: current.text ? heroWord(current.text) : -1 };
+  }
+  const rows = String(p.text ?? '')
     .split('/')
     .map((s) => s.trim())
     .filter(Boolean);
+  if (!rows.length) {
+    const current = { ...timeWords('', ctx.time - 60, ctx.time - 59), end: ctx.time + 3600 };
+    return { current, index: 0, previous: [], next: '', now: ctx.time, hero: -1 };
+  }
   const lineBeats = Math.max(1, typeof p.lineBeats === 'number' ? p.lineBeats : 8);
   const spb = 60 / Math.max(40, ctx.frame.bpm || 120);
   const idx = Math.floor(ctx.beat / lineBeats);

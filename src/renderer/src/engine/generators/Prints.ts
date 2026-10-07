@@ -231,7 +231,7 @@ export class Prints extends ShaderGenerator {
     const every = Math.max(1, num(p.every, 2)) * bpb;
     const shot = Math.floor(ctx.beat / every);
     const into = ctx.beat - shot * every;
-    const m = lyricMoment(ctx, 'SUMMER 98 / BEST NIGHT EVER / DONT FORGET THIS');
+    const m = lyricMoment(ctx);
     const captions = p.captions !== false;
     const pw = W * 0.34;
     const ph = pw / 1.5;
@@ -290,7 +290,7 @@ export class Prints extends ShaderGenerator {
     const bpb = Math.max(1, ctx.frame.beatsPerBar);
     const strip = Math.floor(ctx.beat / (bpb * 2));
     const into = ctx.beat - strip * bpb * 2;
-    const m = lyricMoment(ctx, 'SMILE / SAY CHEESE / ONE MORE / PULL A FACE');
+    const m = lyricMoment(ctx);
     const words = m.current.words.map((w) => w.text);
     const sw = H * 0.3;
     const fh = (H - 70) / 4;
@@ -339,7 +339,7 @@ export class Prints extends ShaderGenerator {
   private instant(ctx: GenContext, H: number): void {
     const g = this.g;
     this.table(H, false);
-    const m = lyricMoment(ctx, 'POLAROID NIGHTS / SHAKE IT / WATCH IT COME BACK');
+    const m = lyricMoment(ctx);
     const since = m.now - m.current.start;
     const develop = Math.min(1, Math.max(0, since / 3.5));
     const shake = ctx.env.kick * num(ctx.params.react, 1);

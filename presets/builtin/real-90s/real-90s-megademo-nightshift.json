@@ -31,8 +31,8 @@
         "type": "generator",
         "kind": "demoParts",
         "params": {
-          "text": "BOOFVIZ",
-          "source": "text",
+          "text": "",
+          "source": "lyrics",
           "part": "sequence",
           "partPhrases": 1,
           "wipeBeats": 4,

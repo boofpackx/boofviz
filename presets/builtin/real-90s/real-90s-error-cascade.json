@@ -36,8 +36,8 @@
         "params": {
           "mode": "popups",
           "source": "lyrics",
-          "text": "Thanks for visiting! Sign my guestbook!",
-          "title": "Welcome to my Homepage!",
+          "text": "",
+          "title": "",
           "every": 2,
           "speed": 1,
           "react": 1,

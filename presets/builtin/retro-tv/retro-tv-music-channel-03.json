@@ -43,8 +43,8 @@
           "fit": "cover",
           "pan": 1,
           "punch": 1,
-          "title": "Your Song Here",
-          "artist": "Now Playing"
+          "title": "",
+          "artist": ""
         }
       },
       "fx": [],

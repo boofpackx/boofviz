@@ -32,8 +32,8 @@
         "type": "generator",
         "kind": "kineticType",
         "params": {
-          "text": "BEAT DETECTED · SYSTEM ONLINE ·",
-          "source": "text",
+          "text": "",
+          "source": "lyrics",
           "mode": "marquee",
           "font": "heavy",
           "rows": 5,

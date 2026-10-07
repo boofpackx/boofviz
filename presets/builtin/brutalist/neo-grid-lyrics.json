@@ -36,7 +36,7 @@
         "params": {
           "mode": "grid",
           "source": "lyrics",
-          "text": "RAW / LOUD / HONEST / NO DECORATION",
+          "text": "",
           "lineBeats": 8,
           "uppercase": true,
           "speed": 1,

@@ -63,18 +63,27 @@ export interface LiveText {
 
 const OWN_TEXT: LiveText = { kind: 'text', lines: [], current: 0, progress: 0 };
 
+/** The song's name while a track is known (no lyrics yet, or none at all), else nothing. */
+export function songTitle(): string {
+  const { now } = lyricsFeed;
+  return now.connected && now.trackId ? now.title : '';
+}
+
 /**
  * Resolve a text look's source. Lyrics fall back to the song title (before
- * the first line, or when the track has no synced lyrics), and both fall
- * back to the look's own text when nothing is playing. `before`/`after` size
- * the window of lines around the current one.
+ * the first line, or when the track has no lyrics), and to nothing at all
+ * when no song is known: never placeholder words. Only "Text from: text"
+ * uses the look's own text. `before`/`after` size the window of lines around
+ * the current one.
  */
 export function liveText(source: TextSource, epochMs: number, leadMs = 150, before = 0, after = 0): LiveText {
   const kind = source === 'text' && lyricsFeed.textLooks ? 'lyrics' : source;
   const { now } = lyricsFeed;
-  if (kind === 'text' || !now.connected || !now.trackId) return OWN_TEXT;
-  const title: LiveText = { kind: 'title', lines: [now.title, now.artists.join(', ')].filter(Boolean), current: 0, progress: 0 };
-  if (kind === 'title') return title;
+  if (kind === 'text') return OWN_TEXT;
+  const name = songTitle();
+  const title: LiveText = { kind: 'title', lines: name ? [name] : [], current: 0, progress: 0 };
+  if (!name) return title;
+  if (kind === 'title') return { ...title, lines: [now.title, now.artists.join(', ')].filter(Boolean) };
   const lines = currentLines();
   if (!lines?.length) return title;
   const pos = songPositionMs(epochMs, leadMs);

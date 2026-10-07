@@ -57,8 +57,8 @@
         "type": "generator",
         "kind": "kineticType",
         "params": {
-          "text": "HUMAN / MACHINE",
-          "source": "text",
+          "text": "",
+          "source": "lyrics",
           "mode": "words",
           "font": "condensed",
           "rows": 5,

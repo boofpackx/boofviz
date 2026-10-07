@@ -84,7 +84,7 @@
           "uppercase": true,
           "nextLine": 0.3,
           "titleCard": true,
-          "idleText": "LOUDER"
+          "idleText": ""
         }
       },
       "fx": [],
