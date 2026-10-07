@@ -75,3 +75,18 @@ describe('auto-play timing', () => {
     expect(nextAutoBeat(63.9, 15.9 / 16, 16, 16)).toBe(80);
   });
 });
+
+describe('premade playlists', () => {
+  it('splits looks with and without words, and by energy', async () => {
+    const { PLAYLISTS } = await import('@/control/autopilot');
+    const withText = { ...entry('t', 'Lyrics', 3), preset: { ...entry('t', 'Lyrics', 3).preset, layers: [{ enabled: true, source: { kind: 'lyricVideo' } }] } } as unknown as PresetEntry;
+    const plain = { ...entry('p', 'Equalizers', 5), preset: { ...entry('p', 'Equalizers', 5).preset, layers: [{ enabled: true, source: { kind: 'spectrumBars' } }] } } as unknown as PresetEntry;
+    const pl = (id: string) => PLAYLISTS.find((x) => x.id === id)!;
+    expect(pl('lyrics').test(withText)).toBe(true);
+    expect(pl('nowords').test(withText)).toBe(false);
+    expect(pl('nowords').test(plain)).toBe(true);
+    expect(pl('peak').test(plain)).toBe(true);
+    const r = resolvePool(lib({ shufflePool: 'playlist:lyrics' }), ctx({ all: [withText, plain, ...ALL] }));
+    expect(r.label).toContain('With lyrics');
+  });
+});

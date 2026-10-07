@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import type { PresetEntry } from '@/engine/library';
 import { libraryEntries, useShow } from '../show';
 import { useControl } from '../store';
+import { PLAYLISTS } from '../autopilot';
 import { createPool, deletePool, launchQuantized, renamePool, toggleFavorite, togglePoolMember } from '../launcher';
 import { contextMenu } from './ContextMenu';
 import { Swatch } from './Inspector';
@@ -19,7 +20,8 @@ export function filteredEntries(tab: Tab, query: string, category: string, tag: 
     const p = e.preset;
     if (category === '★ Favorites' && !favs.includes(e.id)) return false;
     if (category.startsWith('pool:') && !pool?.ids.includes(e.id)) return false;
-    if (category !== 'All' && category !== '★ Favorites' && !category.startsWith('pool:') && p.category !== category) return false;
+    if (category.startsWith('playlist:') && !PLAYLISTS.find((x) => `playlist:${x.id}` === category)?.test(e)) return false;
+    if (category !== 'All' && category !== '★ Favorites' && !category.startsWith('pool:') && !category.startsWith('playlist:') && p.category !== category) return false;
     if (tag && !p.tags.includes(tag)) return false;
     if (!q) return true;
     return p.name.toLowerCase().includes(q) || p.tags.some((t) => t.includes(q)) || p.category.toLowerCase().includes(q);
@@ -86,6 +88,19 @@ export function Library() {
               {c}
             </button>
           ))}
+          {tab === 'presets' &&
+            PLAYLISTS.map((pl) => (
+              <button
+                key={pl.id}
+                type="button"
+                title="Premade playlist (right-click to shuffle and auto-play from it)"
+                onClick={() => setCategory(`playlist:${pl.id}`)}
+                onContextMenu={contextMenu(() => [{ label: 'Shuffle and auto-play from this playlist', onSelect: () => update({ library: { shufflePool: `playlist:${pl.id}` } }) }])}
+                className={`rounded-full border px-2 py-0.5 text-[10px] ${category === `playlist:${pl.id}` ? 'border-accent-2 bg-accent-2/15 text-ink-100' : 'border-ink-600 text-ink-400 hover:text-ink-200'}`}
+              >
+                ▶ {pl.name}
+              </button>
+            ))}
           {tab === 'presets' &&
             pools.map((p) =>
               renaming === p.id ? (

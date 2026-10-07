@@ -7,6 +7,7 @@ import { useControl } from '../store';
 import { engine } from '../runtime';
 import { useTicker } from '../hooks';
 import { poolLabel, shuffleNow, toggleAuto } from '../launcher';
+import { PLAYLISTS } from '../autopilot';
 import type { LaunchQuantize, ShufflePool, TransitionType } from '@shared/settings';
 import { contextMenu } from './ContextMenu';
 import { Button, Segmented, Toggle } from './ui';
@@ -276,6 +277,13 @@ function AutoPanel({ onClose }: { onClose: () => void }) {
           <option value="all">All presets</option>
           <option value="category">Same category as now</option>
           <option value="view">What the Library shows</option>
+          <optgroup label="Playlists">
+            {PLAYLISTS.map((pl) => (
+              <option key={pl.id} value={`playlist:${pl.id}`}>
+                ▶ {pl.name}
+              </option>
+            ))}
+          </optgroup>
           {lib.pools.map((p) => (
             <option key={p.id} value={`pool:${p.id}`}>
               ● {p.name} ({p.ids.length})

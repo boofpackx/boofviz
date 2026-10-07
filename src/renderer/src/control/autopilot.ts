@@ -20,6 +20,23 @@ export interface PickContext {
   rand: number;
 }
 
+const WORD_KINDS = new Set(['lyrics', 'lyricVideo', 'kineticType', 'platinumType']);
+const hasWords = (e: PresetEntry): boolean => e.preset.layers.some((l) => l.enabled && WORD_KINDS.has(l.source.kind));
+const tagged = (e: PresetEntry, tags: string[]): boolean => e.preset.tags.some((t) => tags.includes(t));
+
+/** Premade playlists: rules, not fixed lists, so new presets join automatically. */
+export const PLAYLISTS: Array<{ id: string; name: string; test: (e: PresetEntry) => boolean }> = [
+  { id: 'lyrics', name: 'With lyrics', test: hasWords },
+  { id: 'nowords', name: 'No words', test: (e) => !hasWords(e) && e.preset.layers.every((l) => l.source.kind !== 'demoParts') },
+  { id: 'nineties', name: '90s night', test: (e) => ['Real 90s', 'Retro Type', 'Retro / Glitch'].includes(e.preset.category) || tagged(e, ['90s', 'arcade', 'crt', 'vhs', 'lcd', 'terminal', 'old hardware', '8-bit', 'screensaver', 'dial-up']) },
+  { id: 'vintage', name: 'Vintage & analog', test: (e) => e.preset.category === 'Retro Type' || tagged(e, ['vintage', 'film', 'sepia', 'tape', 'vhs', 'photocopy', 'neon', 'silent film', 'home video']) },
+  { id: 'y2k', name: 'Y2K & glossy', test: (e) => e.preset.category === 'Y2K & Aero' || tagged(e, ['y2k', 'chrome', 'glossy', 'candy', 'vaporwave', 'synthwave']) },
+  { id: 'chill', name: 'Chill', test: (e) => e.preset.energy <= 2 },
+  { id: 'peak', name: 'Peak time', test: (e) => e.preset.energy >= 4 },
+  { id: 'space', name: '3D & trippy', test: (e) => ['3D Worlds', 'Trippy / Psychedelic'].includes(e.preset.category) || tagged(e, ['3d', 'space', 'psychedelic', 'trippy', 'tunnel']) },
+  { id: 'eq', name: 'Classic EQ', test: (e) => e.preset.category === 'Equalizers' },
+];
+
 export interface ResolvedPool {
   entries: PresetEntry[];
   label: string;
@@ -44,6 +61,10 @@ export function resolvePool(lib: Pick<LibrarySettings, 'shufflePool' | 'favorite
   } else if (pool === 'view') {
     entries = ctx.view;
     label = 'Library view';
+  } else if (pool.startsWith('playlist:')) {
+    const pl = PLAYLISTS.find((x) => `playlist:${x.id}` === pool);
+    entries = pl ? ctx.all.filter(pl.test) : [];
+    label = pl ? `▶ ${pl.name}` : 'missing playlist';
   } else if (pool.startsWith('pool:')) {
     const p = lib.pools.find((x) => `pool:${x.id}` === pool);
     entries = p ? pick(p.ids) : [];

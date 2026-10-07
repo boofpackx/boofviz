@@ -29,7 +29,7 @@ export interface PresetPool {
 }
 
 /** Where shuffle picks from: favorites, everything, the current look's category, what the Library shows, or a named pool. */
-export type ShufflePool = 'favorites' | 'all' | 'category' | 'view' | `pool:${string}`;
+export type ShufflePool = 'favorites' | 'all' | 'category' | 'view' | `pool:${string}` | `playlist:${string}`;
 
 export type TransitionType = 'cut' | 'crossfade' | 'flashBlack' | 'flashWhite' | 'lumaWipe' | 'zoomThrough' | 'glitchCut' | 'blurDissolve' | 'feedbackSmear';
 
