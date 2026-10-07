@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { app, net, protocol, shell } from 'electron';
-import { archiveQuery, cacheName, parseLength, pickArchiveFile, VIDEO_EXT, type ArchiveClip, type ArchiveFile, type ArchiveRequest } from '@shared/archive';
+import { archiveQuery, cacheName, cleanVideoName, matchMusicVideo, parseLength, pickArchiveFile, VIDEO_EXT, type ArchiveClip, type ArchiveFile, type ArchiveRequest, type SongRef } from '@shared/archive';
 import { hashSlot } from './archiveHash';
 
 /**
@@ -90,6 +90,14 @@ export class ArchiveService {
     if (names.length > 1 && i === pick(slot - 1)) i = (i + 1) % names.length;
     const name = names[i];
     return { id: `local:${name}`, title: name.replace(VIDEO_EXT, '').replace(/[_]+/g, ' '), year: null, url: `${ARCHIVE_SCHEME}://local/${encodeURIComponent(name)}`, duration: 0, seed: hashSlot(slot + 7777) };
+  }
+
+  /** The user's music video for the playing song: a file in the videos folder named after it. */
+  async musicVideo(song: SongRef): Promise<ArchiveClip | null> {
+    const names = (await fs.readdir(this.videosDir).catch(() => [] as string[])).filter((n) => !n.startsWith('.'));
+    const name = matchMusicVideo(names, song);
+    if (!name) return null;
+    return { id: `local:${name}`, title: cleanVideoName(name), year: null, url: `${ARCHIVE_SCHEME}://local/${encodeURIComponent(name)}`, duration: 0, seed: 0 };
   }
 
   async openVideosFolder(): Promise<void> {

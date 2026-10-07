@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "name": "Channel Chaos",
+  "category": "Random Clips to BPM",
+  "tags": [
+    "clips",
+    "footage",
+    "beat cuts",
+    "commercials",
+    "tv",
+    "chaos",
+    "fast"
+  ],
+  "energy": 5,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "clips",
+      "name": "Clips",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "clipEngine",
+        "params": {
+          "footage": "clips",
+          "collection": "commercials",
+          "decade": "any",
+          "search": "",
+          "cut": 0.5,
+          "pool": 3,
+          "reelBars": 16,
+          "dropCuts": true,
+          "fx": "mix",
+          "fxAmount": 0.8,
+          "gate": 0.4,
+          "flash": 0.4,
+          "punch": 0.3,
+          "rate": 1,
+          "fit": "cover",
+          "offset": 0,
+          "fallback": "clips",
+          "skip": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "rgbSplit",
+          "enabled": true,
+          "params": {
+            "amount": 0.002,
+            "angle": 0,
+            "radial": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Cut speed",
+      "value": 0.1,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cut",
+          "range": [
+            0.25,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trick bars",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.fxAmount",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick punch",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.punch",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#333333",
+      "#888888",
+      "#cccccc",
+      "#ffffff"
+    ]
+  },
+  "description": "Old TV commercials chopped twice a beat with tricks on most bars and a colour split, the whole set changing every 16 bars."
+}

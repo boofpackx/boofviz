@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "name": "Music Video on TV",
+  "category": "Random Clips to BPM",
+  "tags": [
+    "clips",
+    "footage",
+    "beat cuts",
+    "music video",
+    "my videos",
+    "old tv",
+    "sync"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "clips",
+      "name": "Clips",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "clipEngine",
+        "params": {
+          "footage": "musicvideo",
+          "collection": "classictv",
+          "decade": "any",
+          "search": "",
+          "cut": 1,
+          "pool": 3,
+          "reelBars": 32,
+          "dropCuts": true,
+          "fx": "off",
+          "fxAmount": 0,
+          "gate": 0.4,
+          "flash": 0,
+          "punch": 0.3,
+          "rate": 1,
+          "fit": "cover",
+          "offset": 0,
+          "fallback": "clips",
+          "skip": 0
+        }
+      },
+      "fx": [
+        {
+          "type": "tvSet",
+          "enabled": true,
+          "params": {
+            "set": "screen",
+            "zoom": 0.08,
+            "fit": "crop",
+            "curve": 1,
+            "glare": 1,
+            "room": 1,
+            "powerOn": true
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Video offset",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.offset",
+          "range": [
+            -15,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#333333",
+      "#888888",
+      "#cccccc",
+      "#ffffff"
+    ]
+  },
+  "description": "Your own music video for the song that's on, playing on an old TV screen in time with the song (file named \"Artist - Title\" in the videos folder)."
+}

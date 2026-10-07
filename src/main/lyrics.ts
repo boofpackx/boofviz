@@ -1,6 +1,8 @@
 import { promises as fsp } from 'node:fs';
 import { join } from 'node:path';
-import { lrcFileName, matchKey, normalizeTitle, parseLrc, type TrackLyrics } from '@shared/lyrics';
+import { lrcFileName, matchKey, normalizeTitle, parseLrc, primaryArtist, type TrackLyrics } from '@shared/lyrics';
+
+export { primaryArtist };
 
 /**
  * Lyrics lookup for a Spotify track: the user's .lrc folder first, then the
@@ -259,11 +261,6 @@ export class LyricsService {
       // A read-only profile just means no cache.
     }
   }
-}
-
-/** The first of several artists named in one string ("A, B", "A feat. B", "A & B"). */
-export function primaryArtist(name: string): string {
-  return name.split(/\s*,\s*|\s+(?:feat\.?|ft\.?|featuring|x|&|and)\s+/i)[0]?.trim() ?? name;
 }
 
 /** File text as UTF-8, or UTF-16 when it starts with a byte-order mark. */

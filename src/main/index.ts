@@ -60,6 +60,12 @@ function registerIpc(): void {
   ipcMain.handle(IPC.saveLyrics, (_e, text: string) => nowPlaying.saveLrc(String(text)));
   ipcMain.handle(IPC.archiveClip, (_e, req: ArchiveRequest) => archive.clip(req));
   ipcMain.handle(IPC.openVideosFolder, () => archive.openVideosFolder());
+  ipcMain.handle(IPC.musicVideo, (_e, song: unknown) => {
+    const s = song as { title?: unknown; artists?: unknown } | null;
+    const title = typeof s?.title === 'string' ? s.title.slice(0, 300) : '';
+    const artists = Array.isArray(s?.artists) ? s.artists.filter((a): a is string => typeof a === 'string').slice(0, 10).map((a) => a.slice(0, 200)) : [];
+    return archive.musicVideo({ title, artists });
+  });
 
   store.onChange((s) => {
     for (const w of BrowserWindow.getAllWindows()) w.webContents.send(IPC.settingsChanged, s);

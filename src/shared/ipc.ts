@@ -1,4 +1,4 @@
-import type { ArchiveClip, ArchiveRequest } from './archive';
+import type { ArchiveClip, ArchiveRequest, SongRef } from './archive';
 import type { NowPlaying, SpotifyCommand, TrackLyrics } from './lyrics';
 import type { Settings, SettingsPatch } from './settings';
 import type { GlobalControls, Scene } from './types/engine';
@@ -97,6 +97,8 @@ export interface BoofvizApi {
   archiveClip(req: ArchiveRequest): Promise<ArchiveClip | null>;
   /** Open the folder of the user's own clips (created if missing). */
   openVideosFolder(): Promise<void>;
+  /** The user's own music video for a song (videos folder), or null. */
+  musicVideo(song: SongRef): Promise<ArchiveClip | null>;
 }
 
 export const IPC = {
@@ -132,6 +134,7 @@ export const IPC = {
   saveLyrics: 'lyrics:save',
   archiveClip: 'archive:clip',
   openVideosFolder: 'archive:openVideos',
+  musicVideo: 'archive:musicVideo',
 } as const;
 
 /** window.postMessage tag the preload uses to hand a MessagePort to the page. */

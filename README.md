@@ -2,7 +2,7 @@
 
 Real-time audio visualizer and auto-VJ for Windows (macOS second). It listens to anything playing on the computer (Serato, Rekordbox, Traktor, Spotify, YouTube, DAWs) and renders beat-locked visuals to a clean output window for a projector, LED wall or second screen.
 
-> **Status: Phase 2 (Engine core) complete.** Layer compositor with blend modes, masks and effects, the modulation system, macros, palette cycling, JSON presets with save/import/export and undo, and **21 built-in presets** across Equalizers and 2D Graphic, plus 3 templates. Phase 1 delivered the shell, System Audio capture, the analysis engine and the debug HUD. See [Roadmap](#roadmap).
+> **Status: Phase 5 (Clip engine) complete.** Over 200 built-in looks, synced lyrics from Spotify, archive footage, and clips cut to the beat. See [Roadmap](#roadmap).
 
 ## Run it (Windows)
 
@@ -161,10 +161,10 @@ Both windows receive identical packets. Each one rebuilds the same `AudioFrame` 
 ## Roadmap
 
 1. **Foundation**: done ✅
-2. **Engine core**: done ✅. Compositor, modulation, macros, palettes, preset save/load, Equalizers (10) + 2D Graphic (11) + 3 templates
-3. Beat engine: a stronger beat tracker, Ableton Link, MIDI Clock in, beat-quantized events
-4. 3D and techniques: terrain, camera, particles, raymarching, post-FX, and the 3D / Trippy / Mellow categories
-5. Clip engine
-6. Performance layer: autopilot, transitions, cue, MIDI learn, sets
+2. **Engine core**: done ✅. Compositor, modulation, macros, palettes, preset save/load
+3. **Beat engine**: done ✅. Stronger beat tracker, Ableton Link, MIDI Clock in, beat-quantized changes
+4. **3D, techniques and looks**: done ✅. 3D scenes, raymarching, SDF text, particles, post-FX, and the era looks (Real 90s, Y2K, Lost Media, Retro TV, Brutalist, Neo 90s, Vintage, Lyrics)
+5. **Clip engine**: done ✅. Clips cut to the beat from the archive or your own videos folder (the next clip cued before its cut), beat-synced stutter, reverse, scratch and freeze, and music-video mode: your own video for the playing song (named "Artist - Title" in the videos folder), in time with the song
+6. Performance layer: transitions, cue, MIDI learn, sets
 7. Output pro: Spout, recording, keystone, auto-quality, photosensitivity limiter
-8. Polish: 100+ presets, onboarding, packs
+8. Polish: onboarding, packs, more Trippy, Mellow and 3D Worlds looks

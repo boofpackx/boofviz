@@ -199,6 +199,11 @@ export function matchKey(s: string): string {
 }
 
 /** File name used when attaching an .lrc to a track. */
+/** The first of several artists named in one string ("A, B", "A feat. B", "A & B"). */
+export function primaryArtist(name: string): string {
+  return name.split(/\s*,\s*|\s+(?:feat\.?|ft\.?|featuring|x|&|and)\s+/i)[0]?.trim() ?? name;
+}
+
 export function lrcFileName(artist: string, title: string): string {
   const clean = (s: string): string => s.replace(/[<>:"/\\|?*\u0000-\u001f]+/g, ' ').replace(/\s+/g, ' ').trim();
   return `${clean(artist) || 'Unknown'} - ${clean(normalizeTitle(title)) || 'Untitled'}.lrc`;

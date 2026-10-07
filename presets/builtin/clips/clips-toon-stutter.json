@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "name": "Toon Stutter",
+  "category": "Cartoon to BPM",
+  "tags": [
+    "clips",
+    "footage",
+    "beat cuts",
+    "cartoons",
+    "animation",
+    "stutter",
+    "fast"
+  ],
+  "energy": 5,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "clips",
+      "name": "Clips",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "clipEngine",
+        "params": {
+          "footage": "clips",
+          "collection": "cartoons",
+          "decade": "any",
+          "search": "",
+          "cut": 0.5,
+          "pool": 3,
+          "reelBars": 32,
+          "dropCuts": true,
+          "fx": "stutter",
+          "fxAmount": 0.75,
+          "gate": 0.6,
+          "flash": 0.3,
+          "punch": 0.5,
+          "rate": 1,
+          "fit": "cover",
+          "offset": 0,
+          "fallback": "clips",
+          "skip": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Cut speed",
+      "value": 0.1,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cut",
+          "range": [
+            0.25,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trick bars",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.fxAmount",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick punch",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.punch",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#333333",
+      "#888888",
+      "#cccccc",
+      "#ffffff"
+    ]
+  },
+  "description": "Cartoons cut twice a beat and stuttering hard on most bars, gated like a chopped sample."
+}

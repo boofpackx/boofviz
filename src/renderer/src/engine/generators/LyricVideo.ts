@@ -232,6 +232,9 @@ const AUTO_STYLE: Record<string, LyricStyle> = {
   'Lost Media': 'credits',
   'Retro TV': 'teletext',
   'Neo 90s': 'glitter',
+  'Live Action to BPM': 'slam',
+  'Cartoon to BPM': 'pop',
+  'Random Clips to BPM': 'glitch',
   Vintage: 'jcard',
   Lyrics: 'drop',
 };

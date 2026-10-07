@@ -26,6 +26,8 @@ export const ARCHIVE_COLLECTIONS: ArchiveCollection[] = [
   { id: 'myvideos', label: 'My videos folder', query: '', rights: 'check rights' },
 ];
 
+import { matchKey, normalizeTitle, primaryArtist } from './lyrics';
+
 /** Video files the players can open from the user's videos folder. */
 export const VIDEO_EXT = /\.(mp4|m4v|webm|ogv|mov|mkv)$/i;
 
@@ -97,4 +99,45 @@ export function pickArchiveFile(files: ArchiveFile[]): ArchiveFile | null {
 /** Cache file name for an item's file (no path separators, bounded length). */
 export function cacheName(id: string, file: string): string {
   return `${id}__${file}`.replace(/[^a-zA-Z0-9._-]+/g, '_').slice(-180);
+}
+
+/** "Song (Official Music Video) [HD]" → "Song": the extras video file names carry. */
+export function cleanVideoName(name: string): string {
+  return name
+    .replace(VIDEO_EXT, '')
+    .replace(/_+/g, ' ')
+    .replace(/\s*[([]([^)\]]*)[)\]]/g, (whole, inner: string) => (/official|video|audio|lyric|visuali[sz]er|\bhd\b|4k|1080p|720p|remaster|explicit|clean|uncensored|feat|\bft\b/i.test(inner) ? '' : whole))
+    .replace(/\s+-\s+(official\s+)?(music\s+)?video$/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export interface SongRef {
+  title: string;
+  artists: string[];
+}
+
+/**
+ * The user's music video for a song among file names: "Artist - Title",
+ * "Title - Artist", or a title that only one file has ("(Official Video)" and
+ * similar extras ignored). Null when nothing matches.
+ */
+export function matchMusicVideo(names: readonly string[], song: SongRef): string | null {
+  if (!song.title) return null;
+  const keyed = names.filter((n) => VIDEO_EXT.test(n)).map((n) => ({ n, k: matchKey(cleanVideoName(n)) }));
+  const full = song.artists[0] ?? '';
+  const artists = [...new Set([full, song.artists.join(', '), song.artists.join(' & '), primaryArtist(full)].filter(Boolean))];
+  const titles = [...new Set([song.title, normalizeTitle(song.title)].filter(Boolean))];
+  for (const t of titles) {
+    for (const a of artists) {
+      const keys = [matchKey(`${a} - ${t}`), matchKey(`${t} - ${a}`)];
+      const hit = keyed.find((f) => keys.includes(f.k));
+      if (hit) return hit.n;
+    }
+  }
+  for (const t of titles) {
+    const hits = keyed.filter((f) => f.k === matchKey(t));
+    if (hits.length === 1) return hits[0].n;
+  }
+  return null;
 }

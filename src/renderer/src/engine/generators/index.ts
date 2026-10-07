@@ -22,6 +22,7 @@ import { Memphis } from './Memphis';
 import { MusicChannel } from './MusicChannel';
 import { OpArt } from './OpArt';
 import { NeoBrutal } from './NeoBrutal';
+import { ClipEngine } from './ClipEngine';
 import { Neo90 } from './Neo90';
 import { Prints } from './Prints';
 import { SketchScreen } from './SketchScreen';
@@ -91,6 +92,7 @@ const FACTORIES: Record<string, () => Generator> = {
   prints: () => new Prints(),
   tapeDeck: () => new TapeDeck(),
   sketchScreen: () => new SketchScreen(),
+  clipEngine: () => new ClipEngine(),
 };
 
 export function createGenerator(kind: string): Generator {

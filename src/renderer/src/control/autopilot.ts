@@ -40,6 +40,7 @@ export const PLAYLISTS: Array<{ id: string; name: string; test: (e: PresetEntry)
   { id: 'peak', name: 'Peak time', test: (e) => e.preset.energy >= 4 },
   { id: 'space', name: '3D & trippy', test: (e) => ['3D Worlds', 'Trippy / Psychedelic'].includes(e.preset.category) || tagged(e, ['3d', 'space', 'psychedelic', 'trippy', 'tunnel']) },
   { id: 'retrotv', name: 'Retro TV', test: (e) => e.preset.category === 'Retro TV' || e.preset.layers.some((l) => l.enabled && l.fx.some((f) => f.enabled && f.type === 'tvSet')) },
+  { id: 'clips', name: 'Clips to the beat', test: (e) => ['Live Action to BPM', 'Cartoon to BPM', 'Random Clips to BPM'].includes(e.preset.category) || e.preset.layers.some((l) => l.enabled && l.source.kind === 'clipEngine') },
   { id: 'neo90s', name: 'Neo 90s', test: (e) => e.preset.category === 'Neo 90s' || tagged(e, ['holographic', 'lava lamp', 'stereogram', 'lenticular', 'jelly', 'glitter']) },
   { id: 'brutalist', name: 'Brutalist', test: (e) => e.preset.category === 'Brutalist' || tagged(e, ['brutalist', 'concrete', 'neo-brutal']) },
   { id: 'eq', name: 'Classic EQ', test: (e) => e.preset.category === 'Equalizers' },
