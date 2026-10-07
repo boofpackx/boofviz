@@ -1,0 +1,196 @@
+{
+  "schema": 1,
+  "name": "Two-Step Platinum",
+  "category": "Club / Strobe",
+  "tags": [
+    "uk garage",
+    "two-step",
+    "chrome",
+    "platinum",
+    "velvet",
+    "2000s",
+    "words",
+    "lyrics"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "stage",
+      "name": "Stage",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "platinumStage",
+        "params": {
+          "swing": 0.6,
+          "glints": 1,
+          "beams": 1,
+          "rings": 1,
+          "velvet": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "name",
+      "name": "Name",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "infomercial",
+          "material": "chrome",
+          "hero": 0.5,
+          "camera": 0.4,
+          "drama": 0.7,
+          "exit": "auto",
+          "source": "text",
+          "text": "YOUR NAME / PLATINUM",
+          "lineBeats": 16,
+          "font": "heavy",
+          "size": 1.4,
+          "position": "center",
+          "depth": 0.9,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.6,
+          "colorMode": "palette",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "shine",
+      "name": "Shine",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.9,
+            "threshold": 0.7,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Swing",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.swing",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glints",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.glints",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Beams",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.beams",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Name size",
+      "value": 0.48,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0a0012",
+      "#3a0a5a",
+      "#a24bd6",
+      "#e7c8ff",
+      "#ffffff"
+    ]
+  },
+  "description": "Heavy bevelled platinum chrome on purple velvet, spinning chrome rings, club beams and diamond glints that fire on the swung two-step accents. Shows your own words (Text) or the lyrics."
+}

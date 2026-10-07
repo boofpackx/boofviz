@@ -604,6 +604,18 @@ export const GENERATORS: ModuleDef[] = [
     ],
   },
   {
+    kind: 'vitalSigns',
+    label: 'Vital signs monitor',
+    description: 'A bedside patient monitor: ECG, pleth and respiration traces sweeping across with phosphor persistence, one heartbeat per beat, the heart rate reading the live BPM, and a flatline alarm on the drop before it restarts.',
+    params: [f('glow', 'Phosphor glow', 1, 0, 2), b('flatline', 'Flatline on the drop', true), t('patient', 'Label', 'BED 04')],
+  },
+  {
+    kind: 'platinumStage',
+    label: 'Platinum stage',
+    description: 'A two-step garage club stage: folded velvet, sweeping beams, spinning chrome rings and diamond glints that fire on the swung two-step accents (not on every kick). Put a chrome name or lyric layer on top.',
+    params: [f('swing', 'Swing', 0.6, 0, 1), f('glints', 'Glint size', 1, 0, 2), f('beams', 'Beams', 1, 0, 2), f('rings', 'Rings', 1, 0, 1), f('velvet', 'Velvet', 1, 0, 1.5)],
+  },
+  {
     kind: 'adjust',
     label: 'Everything below',
     description: 'An adjustment layer: its effects treat every layer underneath (put a tape deck or old film here to age the whole picture).',

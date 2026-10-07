@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "name": "Vital Signs Monitor",
+  "category": "2D Graphic",
+  "tags": [
+    "medical",
+    "ecg",
+    "heartbeat",
+    "monitor",
+    "phosphor",
+    "old hardware"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "monitor",
+      "name": "Monitor",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "vitalSigns",
+        "params": {
+          "glow": 1,
+          "flatline": true,
+          "patient": "BED 04"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "glass",
+      "name": "Glass",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.5,
+            "radius": 0.5,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.25,
+            "scanlines": 0.35,
+            "mask": 0.2,
+            "vignette": 0.4
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Glow",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.glow",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bloom",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.strength",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#06301a",
+      "#30ff70",
+      "#40d8ff",
+      "#ffffff"
+    ]
+  },
+  "description": "A real bedside monitor: the ECG beats once per beat with a sweep bar and phosphor persistence, pleth and respiration below, the heart rate reading the live BPM, and a flatline alarm on the drop before it restarts."
+}

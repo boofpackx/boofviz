@@ -22,6 +22,7 @@ import { MusicChannel } from './MusicChannel';
 import { OpArt } from './OpArt';
 import { Orb } from './Orb';
 import { Pipes } from './Pipes';
+import { PlatinumStage } from './PlatinumStage';
 import { PixelArcade } from './PixelArcade';
 import { Polygon } from './Polygon';
 import { Prism } from './Prism';
@@ -35,6 +36,7 @@ import { SwissGrid } from './SwissGrid';
 import { SynthSunset } from './SynthSunset';
 import { Tiles } from './Tiles';
 import { TwistCube } from './TwistCube';
+import { VitalSigns } from './VitalSigns';
 import { Warp } from './Warp';
 
 const FACTORIES: Record<string, () => Generator> = {
@@ -75,6 +77,8 @@ const FACTORIES: Record<string, () => Generator> = {
   lowPoly: () => new LowPoly(),
   desktop90: () => new Desktop90(),
   musicChannel: () => new MusicChannel(),
+  vitalSigns: () => new VitalSigns(),
+  platinumStage: () => new PlatinumStage(),
 };
 
 export function createGenerator(kind: string): Generator {
