@@ -208,7 +208,7 @@ export class Compositor {
     this.plan = new ScenePlan(scene);
     // A look that already shows lyrics doesn't get a second copy from the overlay.
     this.sceneHasLyrics = scene.layers.some(
-      (l) => l.enabled && (l.source.kind === 'lyrics' || l.source.kind === 'lyricVideo' || (l.source.kind === 'broadcast' && !!l.source.params.captions && l.source.params.captions !== 'off')),
+      (l) => l.enabled && (l.source.kind === 'lyrics' || l.source.kind === 'lyricVideo' || (l.source.kind === 'broadcast' && !!l.source.params.captions && l.source.params.captions !== 'off' && Number(l.source.params.lyrics ?? 1) >= 0.5)),
     );
     this.palette.setScene(this.plan.scene);
     this.maskRefs = new Set(this.plan.scene.layers.filter((l) => l.enabled && l.mask?.type === 'luma' && l.mask.layer !== undefined).map((l) => l.mask!.layer!));

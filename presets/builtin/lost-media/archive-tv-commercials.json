@@ -1,18 +1,22 @@
 {
   "schema": 1,
-  "name": "Buffering…",
+  "name": "Archive TV Commercials",
   "category": "Lost Media",
   "tags": [
-    "lost media",
+    "archive",
     "found footage",
-    "web",
-    "early internet",
-    "2000s",
-    "y2k",
-    "datamosh",
-    "compression"
+    "lost media",
+    "real footage",
+    "commercials",
+    "ads",
+    "tv",
+    "80s",
+    "90s",
+    "vhs",
+    "lyrics",
+    "words"
   ],
-  "energy": 2,
+  "energy": 3,
   "palette": "Custom",
   "paletteCycle": {
     "mode": "off",
@@ -27,19 +31,22 @@
   },
   "layers": [
     {
-      "id": "set",
-      "name": "Set",
+      "id": "footage",
+      "name": "Archive footage",
       "enabled": true,
       "source": {
         "type": "generator",
-        "kind": "lostScene",
+        "kind": "archiveFootage",
         "params": {
-          "scene": "player",
-          "variant": 0,
-          "react": 1,
-          "tint": 0,
-          "eerie": 0,
-          "spin": 0
+          "collection": "commercials",
+          "search": "",
+          "yearFrom": 1950,
+          "yearTo": 2002,
+          "changeBars": 8,
+          "jumpBeats": 0,
+          "skip": 0,
+          "fit": "cover",
+          "punch": 0.3
         }
       },
       "fx": [],
@@ -48,8 +55,8 @@
       "modulators": []
     },
     {
-      "id": "tape",
-      "name": "Tape",
+      "id": "age",
+      "name": "Age",
       "enabled": true,
       "source": {
         "type": "generator",
@@ -58,15 +65,17 @@
       },
       "fx": [
         {
-          "type": "digitalRot",
+          "type": "tapeStack",
           "enabled": true,
           "params": {
-            "lowres": 0.3,
-            "blocks": 0.6,
-            "bitrate": 0.45,
-            "mosh": 0.5,
-            "buffering": 0.35,
-            "seed": 0
+            "format": "vhs",
+            "generation": 3,
+            "wear": 0.9,
+            "events": 0.3,
+            "eventList": "all",
+            "overwrite": 0,
+            "mood": 0.3,
+            "seed": 23
           }
         }
       ],
@@ -76,22 +85,22 @@
     },
     {
       "id": "text",
-      "name": "On screen",
+      "name": "Lyrics & labels",
       "enabled": true,
       "source": {
         "type": "generator",
         "kind": "broadcast",
         "params": {
-          "kit": "web",
-          "captions": "off",
+          "kit": "vcr",
+          "captions": "cc",
           "lyrics": 1,
           "date": "JUN 14 1994",
           "station": "CHANNEL 9",
           "title": "",
           "ticker": "",
-          "events": 0.35,
+          "events": 0.3,
           "eventList": "all",
-          "seed": 0,
+          "seed": 23,
           "lead": 150
         }
       },
@@ -103,11 +112,11 @@
   ],
   "macros": [
     {
-      "name": "Compression",
-      "value": 0.6,
+      "name": "Lyrics on",
+      "value": 1,
       "targets": [
         {
-          "path": "layers.1.fx.0.params.blocks",
+          "path": "layers.2.source.params.lyrics",
           "range": [
             0,
             1
@@ -116,42 +125,43 @@
       ]
     },
     {
-      "name": "Datamosh",
-      "value": 0.5,
+      "name": "Next clip",
+      "value": 0,
       "targets": [
         {
-          "path": "layers.1.fx.0.params.mosh",
+          "path": "layers.0.source.params.skip",
+          "range": [
+            0,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wear",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape events",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.events",
           "range": [
             0,
             1
           ]
         }
       ]
-    },
-    {
-      "name": "Stalls",
-      "value": 0.35,
-      "targets": [
-        {
-          "path": "layers.1.fx.0.params.buffering",
-          "range": [
-            0,
-            1
-          ]
-        },
-        {
-          "path": "layers.2.source.params.events",
-          "range": [
-            0,
-            1
-          ]
-        }
-      ]
-    },
-    {
-      "name": "",
-      "value": 0.5,
-      "targets": []
     },
     {
       "name": "",
@@ -176,12 +186,12 @@
   ],
   "customPalettes": {
     "Custom": [
-      "#020812",
-      "#0b2a4a",
-      "#2f7fbf",
-      "#9fd8ff",
-      "#f2fbff"
+      "#0b0420",
+      "#3b0a6b",
+      "#ff2fa8",
+      "#22e0d0",
+      "#fff6c8"
     ]
   },
-  "description": "A video on an early web page: a small blocky picture, a progress bar creeping along, datamosh smears every few bars, and stalls where it freezes and shows Buffering… with a percentage."
+  "description": "Old TV commercials taped off cable, with the VCR display and lyric captions. Ad copyright varies, so check before showing these in public."
 }

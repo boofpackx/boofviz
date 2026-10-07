@@ -1,16 +1,19 @@
 {
   "schema": 1,
-  "name": "Buffering…",
+  "name": "Home Movie Archive",
   "category": "Lost Media",
   "tags": [
-    "lost media",
+    "archive",
     "found footage",
-    "web",
-    "early internet",
-    "2000s",
-    "y2k",
-    "datamosh",
-    "compression"
+    "lost media",
+    "real footage",
+    "home movies",
+    "super 8",
+    "family",
+    "vintage",
+    "lyrics",
+    "words",
+    "handwritten"
   ],
   "energy": 2,
   "palette": "Custom",
@@ -27,19 +30,22 @@
   },
   "layers": [
     {
-      "id": "set",
-      "name": "Set",
+      "id": "footage",
+      "name": "Archive footage",
       "enabled": true,
       "source": {
         "type": "generator",
-        "kind": "lostScene",
+        "kind": "archiveFootage",
         "params": {
-          "scene": "player",
-          "variant": 0,
-          "react": 1,
-          "tint": 0,
-          "eerie": 0,
-          "spin": 0
+          "collection": "homemovies",
+          "search": "",
+          "yearFrom": 1930,
+          "yearTo": 1985,
+          "changeBars": 16,
+          "jumpBeats": 0,
+          "skip": 0,
+          "fit": "cover",
+          "punch": 0.3
         }
       },
       "fx": [],
@@ -48,8 +54,8 @@
       "modulators": []
     },
     {
-      "id": "tape",
-      "name": "Tape",
+      "id": "age",
+      "name": "Age",
       "enabled": true,
       "source": {
         "type": "generator",
@@ -58,15 +64,21 @@
       },
       "fx": [
         {
-          "type": "digitalRot",
+          "type": "filmStock",
           "enabled": true,
           "params": {
-            "lowres": 0.3,
-            "blocks": 0.6,
-            "bitrate": 0.45,
-            "mosh": 0.5,
-            "buffering": 0.35,
-            "seed": 0
+            "stock": "super8",
+            "tone": "color",
+            "fps": 18,
+            "wear": 1,
+            "weave": 1.3,
+            "dust": 1,
+            "flicker": 1,
+            "fade": 0.45,
+            "leaks": 0.7,
+            "splices": 0.25,
+            "gate": true,
+            "seed": 17
           }
         }
       ],
@@ -76,20 +88,20 @@
     },
     {
       "id": "text",
-      "name": "On screen",
+      "name": "Lyrics & labels",
       "enabled": true,
       "source": {
         "type": "generator",
         "kind": "broadcast",
         "params": {
-          "kit": "web",
-          "captions": "off",
+          "kit": "none",
+          "captions": "slate",
           "lyrics": 1,
           "date": "JUN 14 1994",
           "station": "CHANNEL 9",
           "title": "",
           "ticker": "",
-          "events": 0.35,
+          "events": 0,
           "eventList": "all",
           "seed": 0,
           "lead": 150
@@ -103,11 +115,11 @@
   ],
   "macros": [
     {
-      "name": "Compression",
-      "value": 0.6,
+      "name": "Lyrics on",
+      "value": 1,
       "targets": [
         {
-          "path": "layers.1.fx.0.params.blocks",
+          "path": "layers.2.source.params.lyrics",
           "range": [
             0,
             1
@@ -116,42 +128,43 @@
       ]
     },
     {
-      "name": "Datamosh",
+      "name": "Next clip",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.skip",
+          "range": [
+            0,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wear",
       "value": 0.5,
       "targets": [
         {
-          "path": "layers.1.fx.0.params.mosh",
+          "path": "layers.1.fx.0.params.wear",
           "range": [
             0,
-            1
+            2
           ]
         }
       ]
     },
     {
-      "name": "Stalls",
-      "value": 0.35,
+      "name": "Dust",
+      "value": 0.5,
       "targets": [
         {
-          "path": "layers.1.fx.0.params.buffering",
+          "path": "layers.1.fx.0.params.dust",
           "range": [
             0,
-            1
-          ]
-        },
-        {
-          "path": "layers.2.source.params.events",
-          "range": [
-            0,
-            1
+            2
           ]
         }
       ]
-    },
-    {
-      "name": "",
-      "value": 0.5,
-      "targets": []
     },
     {
       "name": "",
@@ -176,12 +189,12 @@
   ],
   "customPalettes": {
     "Custom": [
-      "#020812",
-      "#0b2a4a",
-      "#2f7fbf",
-      "#9fd8ff",
-      "#f2fbff"
+      "#1a0f08",
+      "#5c2a14",
+      "#d0643a",
+      "#f2b56b",
+      "#fff1d6"
     ]
   },
-  "description": "A video on an early web page: a small blocky picture, a progress bar creeping along, datamosh smears every few bars, and stalls where it freezes and shows Buffering… with a percentage."
+  "description": "Strangers' home movies at 18 fps with light leaks and a sprocket-hole edge, the lyrics written on a slate."
 }

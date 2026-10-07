@@ -7,10 +7,16 @@
 //   BOOFVIZ_SPOTIFY_ACCOUNTS_URL=http://127.0.0.1:<port>/accounts
 //   BOOFVIZ_SPOTIFY_API_URL=http://127.0.0.1:<port>/v1
 //   BOOFVIZ_LRCLIB_URL=http://127.0.0.1:<port>/lrclib
+//   BOOFVIZ_ARCHIVE_URL=http://127.0.0.1:<port>/archive   (Internet Archive search,
+//     metadata and downloads; clips are ffmpeg test patterns)
 //
 // All lyric lines are invented placeholder text.
 import { createHash, randomBytes } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const INVENTED = [
@@ -47,6 +53,21 @@ export function syncedLyrics(durationMs) {
 
 const key = (s) => String(s ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '');
 const b64url = (buf) => buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+/** Invented archive items: each is an ffmpeg test pattern, made on first download. */
+export const ARCHIVE_ITEMS = [
+  { identifier: 'MockFilm1957', title: 'Your Friend The Kitchen (invented)', year: 1957, source: 'smptebars' },
+  { identifier: 'MockFilm1964', title: 'Highways Of Tomorrow (invented)', year: 1964, source: 'testsrc' },
+  { identifier: 'MockFilm1972', title: 'A Day At The Plant (invented)', year: 1972, source: 'testsrc2' },
+];
+
+function archiveClip(item) {
+  const file = join(tmpdir(), `boofviz-mock-${item.identifier}.mp4`);
+  if (!existsSync(file)) {
+    execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', `${item.source}=size=320x240:rate=25`, '-t', '24', '-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-g', '25', '-movflags', '+faststart', file]);
+  }
+  return readFileSync(file);
+}
 
 export function startMockServices({ port = 43890, host = '127.0.0.1' } = {}) {
   const counts = {};
@@ -92,6 +113,31 @@ export function startMockServices({ port = 43890, host = '127.0.0.1' } = {}) {
     const path = url.pathname;
     counts[path] = (counts[path] ?? 0) + 1;
     const q = url.searchParams;
+
+    // ---- Internet Archive ------------------------------------------------------
+    if (path === '/archive/advancedsearch.php') {
+      const rows = Number(q.get('rows') ?? 50);
+      return send(res, 200, { response: { numFound: ARCHIVE_ITEMS.length, docs: rows ? ARCHIVE_ITEMS.map(({ identifier, title, year }) => ({ identifier, title, year })) : [] } });
+    }
+    if (path.startsWith('/archive/metadata/')) {
+      const item = ARCHIVE_ITEMS.find((i) => i.identifier === decodeURIComponent(path.split('/')[3]));
+      if (!item) return send(res, 200, {});
+      return send(res, 200, {
+        metadata: { title: item.title, year: String(item.year) },
+        files: [
+          { name: `${item.identifier}.ogv`, format: 'Ogg Video', size: '900000' },
+          { name: `${item.identifier}_512kb.mp4`, format: '512Kb MPEG4', size: '400000', length: '24.0' },
+          { name: `${item.identifier}.mp4`, format: 'h.264', size: '2000000', length: '24.0' },
+        ],
+      });
+    }
+    if (path.startsWith('/archive/download/')) {
+      const item = ARCHIVE_ITEMS.find((i) => i.identifier === decodeURIComponent(path.split('/')[3]));
+      if (!item) return send(res, 404, 'no such item');
+      const buf = archiveClip(item);
+      res.writeHead(200, { 'Content-Type': 'video/mp4', 'Content-Length': buf.length });
+      return res.end(buf);
+    }
 
     // ---- Accounts -----------------------------------------------------------
     if (path === '/accounts/authorize' && req.method === 'GET') {

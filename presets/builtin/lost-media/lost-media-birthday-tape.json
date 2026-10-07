@@ -57,6 +57,7 @@
         "params": {
           "kit": "camcorder",
           "captions": "off",
+          "lyrics": 1,
           "date": "JUN 14 1994",
           "station": "CHANNEL 9",
           "title": "",

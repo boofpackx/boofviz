@@ -1,4 +1,5 @@
 import { PORT_MESSAGE_TAG } from '@shared/ipc';
+import { archiveNow } from '@/engine/generators/ArchiveFootage';
 import { AudioEngine } from '@/audio/AudioEngine';
 import type { ThreeRenderer } from '@/engine/three/ThreeRenderer';
 import { connectLyricsFeed, lyricAt, lyricsFeed } from '@/engine/lyricsFeed';
@@ -37,6 +38,7 @@ export function liveValue(layerId: string, path: string): number | undefined {
   previewLastSwitch: () => preview.renderer?.lastSwitch ?? null,
   /** Current lyric line at an epoch time (with the overlay's lead), and what the preview's overlay drew last frame. */
   lyricsAt: (ms: number) => lyricAt(ms, overlayLead()),
+  archive: () => ({ ...archiveNow }),
   lyricsOverlay: () => preview.renderer?.lyricsInfo ?? null,
   nowPlaying: () => ({ ...lyricsFeed.now, artDataUrl: lyricsFeed.now.artDataUrl ? '(data url)' : undefined }),
   trackLyrics: () => lyricsFeed.lyrics,

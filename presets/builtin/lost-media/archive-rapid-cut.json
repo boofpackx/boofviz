@@ -1,18 +1,21 @@
 {
   "schema": 1,
-  "name": "Buffering…",
+  "name": "Rapid Cut Archive",
   "category": "Lost Media",
   "tags": [
-    "lost media",
+    "archive",
     "found footage",
-    "web",
-    "early internet",
-    "2000s",
-    "y2k",
-    "datamosh",
-    "compression"
+    "lost media",
+    "real footage",
+    "montage",
+    "fast",
+    "vhs",
+    "music video",
+    "lyrics",
+    "words",
+    "karaoke"
   ],
-  "energy": 2,
+  "energy": 5,
   "palette": "Custom",
   "paletteCycle": {
     "mode": "off",
@@ -27,19 +30,22 @@
   },
   "layers": [
     {
-      "id": "set",
-      "name": "Set",
+      "id": "footage",
+      "name": "Archive footage",
       "enabled": true,
       "source": {
         "type": "generator",
-        "kind": "lostScene",
+        "kind": "archiveFootage",
         "params": {
-          "scene": "player",
-          "variant": 0,
-          "react": 1,
-          "tint": 0,
-          "eerie": 0,
-          "spin": 0
+          "collection": "ephemeral",
+          "search": "",
+          "yearFrom": 1930,
+          "yearTo": 2002,
+          "changeBars": 8,
+          "jumpBeats": 1,
+          "skip": 0,
+          "fit": "cover",
+          "punch": 0.6
         }
       },
       "fx": [],
@@ -48,8 +54,8 @@
       "modulators": []
     },
     {
-      "id": "tape",
-      "name": "Tape",
+      "id": "age",
+      "name": "Age",
       "enabled": true,
       "source": {
         "type": "generator",
@@ -58,15 +64,17 @@
       },
       "fx": [
         {
-          "type": "digitalRot",
+          "type": "tapeStack",
           "enabled": true,
           "params": {
-            "lowres": 0.3,
-            "blocks": 0.6,
-            "bitrate": 0.45,
-            "mosh": 0.5,
-            "buffering": 0.35,
-            "seed": 0
+            "format": "vhs",
+            "generation": 2,
+            "wear": 0.7,
+            "events": 0.3,
+            "eventList": "eat,rewind,ffwd,signal",
+            "overwrite": 0,
+            "mood": 0.2,
+            "seed": 19
           }
         }
       ],
@@ -76,20 +84,20 @@
     },
     {
       "id": "text",
-      "name": "On screen",
+      "name": "Lyrics & labels",
       "enabled": true,
       "source": {
         "type": "generator",
         "kind": "broadcast",
         "params": {
-          "kit": "web",
-          "captions": "off",
+          "kit": "none",
+          "captions": "karaoke",
           "lyrics": 1,
           "date": "JUN 14 1994",
           "station": "CHANNEL 9",
           "title": "",
           "ticker": "",
-          "events": 0.35,
+          "events": 0,
           "eventList": "all",
           "seed": 0,
           "lead": 150
@@ -103,11 +111,11 @@
   ],
   "macros": [
     {
-      "name": "Compression",
-      "value": 0.6,
+      "name": "Lyrics on",
+      "value": 1,
       "targets": [
         {
-          "path": "layers.1.fx.0.params.blocks",
+          "path": "layers.2.source.params.lyrics",
           "range": [
             0,
             1
@@ -116,11 +124,37 @@
       ]
     },
     {
-      "name": "Datamosh",
-      "value": 0.5,
+      "name": "Next clip",
+      "value": 0,
       "targets": [
         {
-          "path": "layers.1.fx.0.params.mosh",
+          "path": "layers.0.source.params.skip",
+          "range": [
+            0,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wear",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape events",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.events",
           "range": [
             0,
             1
@@ -129,34 +163,17 @@
       ]
     },
     {
-      "name": "Stalls",
-      "value": 0.35,
+      "name": "Cut every",
+      "value": 0.0625,
       "targets": [
         {
-          "path": "layers.1.fx.0.params.buffering",
+          "path": "layers.0.source.params.jumpBeats",
           "range": [
             0,
-            1
-          ]
-        },
-        {
-          "path": "layers.2.source.params.events",
-          "range": [
-            0,
-            1
+            16
           ]
         }
       ]
-    },
-    {
-      "name": "",
-      "value": 0.5,
-      "targets": []
-    },
-    {
-      "name": "",
-      "value": 0.5,
-      "targets": []
     },
     {
       "name": "",
@@ -176,12 +193,12 @@
   ],
   "customPalettes": {
     "Custom": [
-      "#020812",
-      "#0b2a4a",
-      "#2f7fbf",
-      "#9fd8ff",
-      "#f2fbff"
+      "#0b0420",
+      "#3b0a6b",
+      "#ff2fa8",
+      "#22e0d0",
+      "#fff6c8"
     ]
   },
-  "description": "A video on an early web page: a small blocky picture, a progress bar creeping along, datamosh smears every few bars, and stalls where it freezes and shows Buffering… with a percentage."
+  "description": "A music-video montage of real archive footage: a new moment on every beat, a new film every 8 bars, dubbed to tape, with karaoke lyrics."
 }

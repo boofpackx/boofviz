@@ -140,6 +140,17 @@ Each has a frequency slider and an on/off switch, so it can range from rare and 
 
 A **Lost media** playlist and a `lost media` tag hook all of these into shuffle and auto-play.
 
+### C5. Real archive footage (built)
+
+The `archiveFootage` layer pulls random **real** films and TV from before 2003
+from the Internet Archive:
+- **Collections:** ads, educational and industrial films; newsreels; classic TV; cartoons; government films; space age; home movies; TV commercials; or your own search.
+- **Main process:** searches, downloads each clip once into a 3 GB disk cache, and streams it to both windows over `boofviz-archive://`.
+- **Sync:** the same slot gives the same clip and a beat-derived position, so preview and output match.
+- **Timing:** a new film every N bars, optional jump cuts every N beats, and a "Next clip" macro.
+- **Looks:** 8 archive looks, each with a tape or film treatment, a catalogue card, lyrics as captions, teletext, karaoke or slate, and a **Lyrics on** macro to switch them off.
+- **Rights:** collections default to public-domain sources; the TV commercials collection is marked "check rights".
+
 ---
 
 ## Build order

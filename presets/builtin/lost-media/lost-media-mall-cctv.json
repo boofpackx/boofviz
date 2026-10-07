@@ -57,6 +57,7 @@
         "params": {
           "kit": "cctv",
           "captions": "off",
+          "lyrics": 1,
           "date": "11-03-1996",
           "station": "CHANNEL 9",
           "title": "",

@@ -1,3 +1,4 @@
+import type { ArchiveClip, ArchiveRequest } from './archive';
 import type { NowPlaying, SpotifyCommand, TrackLyrics } from './lyrics';
 import type { Settings, SettingsPatch } from './settings';
 import type { GlobalControls, Scene } from './types/engine';
@@ -92,6 +93,8 @@ export interface BoofvizApi {
   openLyricsFolder(): Promise<void>;
   /** Attach .lrc text to the track playing now. Resolves to an error message, or null. */
   saveLyricsForCurrentTrack(lrcText: string): Promise<string | null>;
+  /** Archive footage: the clip for a slot (downloaded and cached by main), or null. */
+  archiveClip(req: ArchiveRequest): Promise<ArchiveClip | null>;
 }
 
 export const IPC = {
@@ -125,6 +128,7 @@ export const IPC = {
   lyrics: 'lyrics:track',
   openLyricsFolder: 'lyrics:openFolder',
   saveLyrics: 'lyrics:save',
+  archiveClip: 'archive:clip',
 } as const;
 
 /** window.postMessage tag the preload uses to hand a MessagePort to the page. */

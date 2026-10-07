@@ -57,6 +57,7 @@
         "params": {
           "kit": "weather",
           "captions": "off",
+          "lyrics": 1,
           "date": "JUN 14 1994",
           "station": "WEATHER 24",
           "title": "",

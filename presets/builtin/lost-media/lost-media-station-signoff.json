@@ -57,6 +57,7 @@
         "params": {
           "kit": "signoff",
           "captions": "off",
+          "lyrics": 1,
           "date": "JUN 14 1994",
           "station": "KXBV 9",
           "title": "THIS CONCLUDES OUR BROADCAST DAY",

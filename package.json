@@ -24,6 +24,7 @@
     "presets:format": "esbuild scripts/format-presets.ts --tsconfig=tsconfig.node.json --bundle --platform=node --format=esm --log-level=warning --outfile=out/tools/format-presets.mjs && node out/tools/format-presets.mjs",
     "presets:check": "esbuild scripts/format-presets.ts --tsconfig=tsconfig.node.json --bundle --platform=node --format=esm --log-level=warning --outfile=out/tools/format-presets.mjs && node out/tools/format-presets.mjs --check",
     "tour": "node scripts/preset-tour.mjs",
+    "archive:e2e": "node scripts/archive-e2e.mjs",
     "link:build": "node scripts/build-link.mjs"
   },
   "dependencies": {

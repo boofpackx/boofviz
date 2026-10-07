@@ -3,6 +3,7 @@ import { GEN_HEADER } from '../shaders/common';
 import { liveText, lyricsFeed, songPositionMs } from '../lyricsFeed';
 import { camClock, hash2, osdText, tapeEventAt, timecode } from '../lostMedia';
 import { eventKinds } from '../fx/tapeFx';
+import { archiveNow } from './ArchiveFootage';
 import type { GenContext } from './Generator';
 import { fontCss } from './KineticType';
 import { num, ShaderGenerator } from './ShaderGenerator';
@@ -207,13 +208,31 @@ export class Broadcast extends ShaderGenerator {
         text(`Buffering… ${pct}%`, W / 2, H / 2 + 0.04 * H, 26, '#fff', 'center');
         this.info.osd = 'Buffering';
       }
+    } else if (kit === 'archive') {
+      // A catalogue card for each new clip: source, year and title, for the first two bars.
+      const since = ctx.beat - archiveNow.slotStart;
+      if (archiveNow.showing && since >= 0 && since < bpb * 2 && archiveNow.title) {
+        const a = Math.min(1, since * 2, (bpb * 2 - since) * 2);
+        g.globalAlpha = a;
+        const y = 44 * s;
+        g.font = fontCss('mono', Math.round(20 * s));
+        const head = `${archiveNow.source.toUpperCase()}${archiveNow.year ? ` · ${archiveNow.year}` : ''}`;
+        const ttl = archiveNow.title.toUpperCase().slice(0, 44);
+        const w = Math.max(g.measureText(head).width, g.measureText(ttl).width) + 32 * s;
+        box(30 * s, y, w, 66 * s, 'rgba(0,0,0,0.72)');
+        text(head, 46 * s, y + 26 * s, 18, '#ffd76a', 'left', 'mono', false);
+        text(ttl, 46 * s, y + 52 * s, 20, '#fff', 'left', 'mono', false);
+        g.globalAlpha = 1;
+        this.info.osd = ttl;
+      }
+      text(station, W - 40 * s, H - 40 * s, 20, 'rgba(255,255,255,0.75)', 'right', 'heavy');
     } else if (kit === 'desktop') {
       text(title || 'DEMO.EXE', W / 2 - 0.44 * H, H / 2 - 0.283 * H, 15, '#fff', 'left', 'heavy', false);
     }
 
     // ---- captions (the sung line)
     const cap = String(p.captions ?? 'off');
-    if (cap !== 'off') this.drawCaption(cap, ctx, title, H, s, text, box);
+    if (cap !== 'off' && num(p.lyrics, 1) >= 0.5) this.drawCaption(cap, ctx, title, H, s, text, box);
 
     this.tex.needsUpdate = true;
   }

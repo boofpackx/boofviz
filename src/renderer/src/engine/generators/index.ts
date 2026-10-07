@@ -1,4 +1,5 @@
 import { Adjust } from './Adjust';
+import { ArchiveFootage } from './ArchiveFootage';
 import { Background } from './Background';
 import { Broadcast } from './Broadcast';
 import { BarCity } from './BarCity';
@@ -63,6 +64,7 @@ const FACTORIES: Record<string, () => Generator> = {
   lostScene: () => new LostScene(),
   broadcast: () => new Broadcast(),
   adjust: () => new Adjust(),
+  archiveFootage: () => new ArchiveFootage(),
 };
 
 export function createGenerator(kind: string): Generator {

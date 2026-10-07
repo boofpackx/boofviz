@@ -2,6 +2,8 @@ import { app, ipcMain, BrowserWindow } from 'electron';
 import { IPC, type OutputCommand } from '@shared/ipc';
 import type { SpotifyCommand } from '@shared/lyrics';
 import type { SettingsPatch } from '@shared/settings';
+import type { ArchiveRequest } from '@shared/archive';
+import { ArchiveService, registerArchiveScheme } from './archive';
 import { installCaptureHandlers } from './audioCapture';
 import { LinkService } from './link';
 import { NowPlayingService } from './nowPlaying';
@@ -20,11 +22,13 @@ app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
 
 if (!app.requestSingleInstanceLock()) app.quit();
+registerArchiveScheme();
 
 let store: SettingsStore;
 let windows: WindowManager;
 let link: LinkService;
 let nowPlaying: NowPlayingService;
+let archive: ArchiveService;
 
 function registerIpc(): void {
   ipcMain.handle(IPC.getSettings, () => store.get());
@@ -54,6 +58,7 @@ function registerIpc(): void {
   ipcMain.handle(IPC.getNowPlaying, () => nowPlaying.snapshot());
   ipcMain.handle(IPC.openLyricsFolder, () => nowPlaying.openLyricsFolder());
   ipcMain.handle(IPC.saveLyrics, (_e, text: string) => nowPlaying.saveLrc(String(text)));
+  ipcMain.handle(IPC.archiveClip, (_e, req: ArchiveRequest) => archive.clip(req));
 
   store.onChange((s) => {
     for (const w of BrowserWindow.getAllWindows()) w.webContents.send(IPC.settingsChanged, s);
@@ -66,6 +71,8 @@ app.whenReady().then(() => {
   installCaptureHandlers();
   link = new LinkService((s) => windows.control?.webContents.send(IPC.linkState, s));
   nowPlaying = new NowPlayingService(store, (channel, value, replay) => windows.broadcast(channel, value, replay));
+  archive = new ArchiveService();
+  archive.start();
   registerIpc();
   windows.createControl();
   if (store.get().output.openOnLaunch) windows.openOutput();

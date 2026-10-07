@@ -508,8 +508,9 @@ export const GENERATORS: ModuleDef[] = [
     label: 'Broadcast text',
     description: 'What an old recording printed on screen: camcorder REC and date stamp, VCR display (follows the tape events), channel bug and lower third with the playing song, CCTV labels, a weather list, corporate titles, numbers-station groups, a test-card ID, a sign-off card or a web player. Lyrics can show as closed captions, teletext, a karaoke wipe, a silent-film intertitle or a handwritten slate.',
     params: [
-      e('kit', 'Kit', 'camcorder', ['camcorder', 'vcr', 'tv', 'cctv', 'weather', 'corporate', 'shortwave', 'test', 'signoff', 'web', 'desktop', 'none']),
+      e('kit', 'Kit', 'camcorder', ['camcorder', 'vcr', 'tv', 'cctv', 'weather', 'corporate', 'shortwave', 'test', 'signoff', 'web', 'desktop', 'archive', 'none']),
       e('captions', 'Lyrics as', 'off', ['off', 'cc', 'teletext', 'karaoke', 'intertitle', 'slate']),
+      f('lyrics', 'Lyrics on', 1, 0, 1, 1, 'turn the lyric captions off (0) or on (1)'),
       t('date', 'Date stamp', 'JUN 14 1994'),
       t('station', 'Station / bug', 'CHANNEL 9', 'your channel name or brand'),
       t('title', 'Title', '', 'title cards, slates and captions when nothing is playing'),
@@ -518,6 +519,22 @@ export const GENERATORS: ModuleDef[] = [
       t('eventList', 'Events', 'all'),
       i('seed', 'Tape', 0, 0, 99),
       i('lead', 'Lyrics lead (ms)', 150, -500, 1000),
+    ],
+  },
+  {
+    kind: 'archiveFootage',
+    label: 'Archive footage',
+    description: 'Real old films and TV from the Internet Archive (before 2003): a random clip every few bars, downloaded once and cached, kept in step with the beat. Optional jump cuts to a new moment every few beats.',
+    params: [
+      e('collection', 'Collection', 'ephemeral', ['ephemeral', 'newsreels', 'classictv', 'cartoons', 'government', 'space', 'homemovies', 'commercials', 'custom']),
+      t('search', 'Search words', '', 'narrow the collection, e.g. dance, cars, television (My search: any query)'),
+      i('yearFrom', 'From year', 1930, 1880, 2002),
+      i('yearTo', 'To year', 2002, 1880, 2002),
+      i('changeBars', 'New clip every (bars)', 16, 1, 64),
+      i('jumpBeats', 'Jump cut every (beats)', 0, 0, 16, '0 = play straight through'),
+      i('skip', 'Next clip', 0, 0, 99, 'bump to change clip now'),
+      e('fit', 'Fit', 'cover', ['cover', 'contain']),
+      f('punch', 'Kick zoom', 0.3, 0, 1),
     ],
   },
   {

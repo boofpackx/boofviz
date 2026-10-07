@@ -1,5 +1,6 @@
 /// Clean output window: no UI, no cursor, no overlays. Only the rendered frame.
 import './output.css';
+import { archiveNow } from '@/engine/generators/ArchiveFootage';
 import { PORT_MESSAGE_TAG } from '@shared/ipc';
 import { DEFAULT_GLOBALS, type GlobalControls } from '@shared/types/engine';
 import { AudioFrameBuilder } from '@/audio/frameBuilder';
@@ -28,6 +29,7 @@ let renderer: ThreeRenderer | null = null;
   beatAtEpoch: (ms: number) => builder.beatAtEpoch(ms),
   /** Current lyric line at an epoch time (with the overlay's lead), and what the overlay drew last frame. */
   lyricsAt: (ms: number) => lyricAt(ms, overlayLead()),
+  archive: () => ({ ...archiveNow }),
   lyricsOverlay: () => renderer?.lyricsInfo ?? null,
   liveText: (source: TextSource) => liveText(source, Date.now(), 150, 3, 4),
   nowPlaying: () => ({ ...lyricsFeed.now, artDataUrl: lyricsFeed.now.artDataUrl ? '(data url)' : undefined }),

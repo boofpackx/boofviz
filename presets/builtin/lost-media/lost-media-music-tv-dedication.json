@@ -57,6 +57,7 @@
         "params": {
           "kit": "tv",
           "captions": "off",
+          "lyrics": 1,
           "date": "JUN 14 1994",
           "station": "VIDEO NITE",
           "title": "",
