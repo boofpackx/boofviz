@@ -80,7 +80,7 @@ try {
     setInterval(() => {
       const s = window.__BOOFVIZ_DEBUG__.scene();
       const k = s ? s.layers.map((l) => `${l.id}:${l.source.kind}`).join(',') : '';
-      if (window.__seq[window.__seq.length - 1] !== k) window.__seq.push(k);
+      if (window.__seq[window.__seq.length - 1]?.k !== k) window.__seq.push({ k, ms: Date.now() });
       if (window.__BOOFVIZ_DEBUG__.transition()) window.__trans++;
     }, 5);
   });
@@ -103,7 +103,7 @@ try {
   const late = (s) => (s && q ? (((s.beat - q.atBeat) * 60000) / f.bpm).toFixed(1) : '?');
   check(onTime(pSw) && onTime(oSw), `preview and output both switch on the first frame of the bar (preview +${late(pSw)} ms, output +${late(oSw)} ms after the downbeat)`);
   await sleep(1500);
-  const seq = await output.evaluate(() => window.__seq);
+  const seq = (await output.evaluate(() => window.__seq)).map((x) => x.k);
   check(seq.length >= 2 && seq.indexOf(seq[seq.length - 1]) === seq.length - 1, `no flash of the old look around the switch (${seq.length} scene changes seen by the output)`);
   check((await output.evaluate(() => window.__trans)) > 0, 'the new look blends in with the default crossfade');
 
@@ -125,10 +125,17 @@ try {
 
   // Auto-play every 4 bars from everything; then back to Shape Morph for the checks below.
   const lookBefore = await dbg(() => window.__BOOFVIZ_DEBUG__.show().sourceId);
+  const autoOn = Date.now();
   await dbg(() => window.__BOOFVIZ_DEBUG__.updateSettings({ library: { autoShuffle: true, autoMode: 'bars', shuffleBars: 4, shufflePool: 'all' } }));
   let autoChanged = false;
   for (const end = Date.now() + 15000; Date.now() < end && !autoChanged; await sleep(200)) autoChanged = (await control.evaluate((id) => window.__BOOFVIZ_DEBUG__.show().sourceId !== id, lookBefore)) === true;
   check(autoChanged, 'auto-play changes the look by itself (every 4 bars)');
+  // Let it change again, then make sure no change was followed by another a split second later.
+  await sleep(9000);
+  const changes = (await output.evaluate(() => window.__seq)).filter((x) => x.ms >= autoOn);
+  let minGap = Infinity;
+  for (let i = 1; i < changes.length; i++) minGap = Math.min(minGap, changes[i].ms - changes[i - 1].ms);
+  check(changes.length >= 2 && minGap > 2000, `auto-play changes cleanly, one look per interval (${changes.length} changes, closest ${(minGap / 1000).toFixed(1)} s apart)`);
   await dbg(() => window.__BOOFVIZ_DEBUG__.updateSettings({ library: { autoShuffle: false } }));
   await sleep(300);
   await dbg(() => window.__BOOFVIZ_DEBUG__.load('builtin:shape-morph'));

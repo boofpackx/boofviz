@@ -144,40 +144,49 @@ let lastChangeBeat = Number.NEGATIVE_INFINITY;
 export function startLauncher(): () => void {
   const id = window.setInterval(() => {
     const f = engine.builder.frame;
+    // The live beat, not the last rendered frame's: a busy window (loading a look) can lag frames by a beat or more.
+    const live = engine.builder.beatAtEpoch(performance.timeOrigin + performance.now());
+    const beat = Number.isFinite(live) ? live : f.beat;
     const show = useShow.getState();
     const q = show.queued;
-    if (q && f.beat >= q.atBeat - 0.002) {
+    if (q && beat >= q.atBeat - 0.002) {
       show.launch(q.entry);
       lastChangeBeat = q.atBeat;
+      return;
     }
 
     const lib = useControl.getState().settings.library;
     const drops = engine.builder.dropCount;
     const dropped = seenDrops >= 0 && drops > seenDrops;
     seenDrops = drops;
-    if (!lib.autoShuffle || !engine.builder.connected) {
+    if (!lib.autoShuffle) {
       nextAuto = null;
       return;
     }
+    // A momentary stall isn't silence: keep the schedule and just wait.
+    if (!engine.builder.connected) return;
     const queueAt = (atBeat: number): void => {
       const pick = pickShuffle();
       if (pick) show.launch(pick, atBeat);
     };
     // A drop is the moment: change on the very next beat (drops mode, or "also on drops").
     if (dropped && (lib.autoMode === 'drops' || lib.alsoOnDrop) && !show.queued) {
-      queueAt(Math.ceil(f.beat + 0.05));
+      queueAt(Math.max(Math.ceil(beat + 0.05), lastChangeBeat + 1));
       nextAuto = null;
       return;
     }
     if (lib.autoMode === 'drops') {
       // No drop for a long stretch (64 bars): move on at the next phrase anyway.
-      if (f.beat - lastChangeBeat > 64 * f.beatsPerBar && !show.queued) queueAt(nextBoundary(f, 'phrase') ?? Math.ceil(f.beat + 0.05));
+      if (beat - lastChangeBeat > 64 * f.beatsPerBar && !show.queued) queueAt(nextBoundary({ ...f, beat, phrasePhase: f.phrasePhase + (beat - f.beat) / f.beatsPerPhrase }, 'phrase') ?? Math.ceil(beat + 0.05));
       return;
     }
     const every = autoInterval(lib, f.beatsPerBar, f.beatsPerPhrase);
-    if (nextAuto === null || nextAuto - f.beat > every + 1) nextAuto = nextAutoBeat(f.beat, f.phrasePhase, f.beatsPerPhrase, every);
+    if (nextAuto === null || nextAuto - beat > every + 1) nextAuto = nextAutoBeat(beat, f.phrasePhase + (beat - f.beat) / f.beatsPerPhrase, f.beatsPerPhrase, every);
+    // Never in the past, and never sooner than half an interval after the last change
+    // (the phrase grid can shift when the tracker re-aligns, e.g. a track looping).
+    while (nextAuto <= beat + 0.05 || nextAuto < lastChangeBeat + Math.max(0.5, every / 2)) nextAuto += every;
     // Queue a bar ahead so both windows have the scene before the boundary.
-    if (!show.queued && nextAuto - f.beat <= f.beatsPerBar) {
+    if (!show.queued && nextAuto - beat <= f.beatsPerBar) {
       queueAt(nextAuto);
       nextAuto += every;
     }
