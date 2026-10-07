@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "name": "Rave Flyer",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "old hardware",
+    "rave",
+    "fractal",
+    "acid",
+    "smiley",
+    "flyer",
+    "lyrics",
+    "words"
+  ],
+  "energy": 5,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "fractal",
+      "name": "Fractal",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "screensaver90",
+        "params": {
+          "scene": "fractal",
+          "speed": 1,
+          "count": 12,
+          "smiley": 1,
+          "zoom": 1,
+          "react": 1,
+          "seed": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Flyer type",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "kineticType",
+        "params": {
+          "text": "ALL NIGHT LONG LASER SHOW SPECIAL GUESTS",
+          "source": "lyrics",
+          "mode": "words",
+          "font": "condensed",
+          "rows": 5,
+          "speed": 1,
+          "size": 0.9,
+          "stretch": 0.3,
+          "outline": 1,
+          "wordBeats": 1,
+          "skew": 0,
+          "punch": 0.3
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "print",
+      "name": "Print",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "halftone",
+          "enabled": true,
+          "params": {
+            "mode": "color",
+            "cell": 5,
+            "angle": 20,
+            "mix": 0.35
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.06,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Smiley",
+      "value": 0.67,
+      "targets": [
+        {
+          "path": "layers.0.source.params.smiley",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Zoom",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.zoom",
+          "range": [
+            0.3,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Type size",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#05000a",
+      "#3a00a8",
+      "#ff0090",
+      "#00f0ff",
+      "#fff200"
+    ]
+  },
+  "description": "A photocopied rave flyer come to life: a swirling fractal, an acid smiley bouncing on the beat, and the lyrics slammed across in chunky type."
+}

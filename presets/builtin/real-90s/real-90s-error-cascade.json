@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "name": "Error Cascade",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "old hardware",
+    "desktop",
+    "error",
+    "windows",
+    "pop-ups",
+    "lyrics",
+    "words"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "desk",
+      "name": "Desktop",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "desktop90",
+        "params": {
+          "mode": "popups",
+          "source": "lyrics",
+          "text": "Thanks for visiting! Sign my guestbook!",
+          "title": "Welcome to my Homepage!",
+          "every": 2,
+          "speed": 1,
+          "react": 1,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tube",
+      "name": "Monitor",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.3,
+            "scanlines": 0.5,
+            "mask": 0.35,
+            "vignette": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Box every",
+      "value": 0.07,
+      "targets": [
+        {
+          "path": "layers.0.source.params.every",
+          "range": [
+            1,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#008080",
+      "#000080",
+      "#c0c0c0",
+      "#ffffff"
+    ]
+  },
+  "description": "The desktop fills up with error boxes, a new one every two beats, each holding a line of the lyrics, until the phrase ends and it all clears."
+}

@@ -1,0 +1,145 @@
+{
+  "schema": 1,
+  "name": "Bouncing Lines",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "old hardware",
+    "screensaver",
+    "desktop",
+    "lines",
+    "trails"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "lines",
+      "name": "Lines",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "screensaver90",
+        "params": {
+          "scene": "polylines",
+          "speed": 1,
+          "count": 12,
+          "smiley": 0,
+          "zoom": 1,
+          "react": 1,
+          "seed": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "glow",
+      "name": "Glow",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.8,
+            "threshold": 0.3,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.3,
+            "scanlines": 0.5,
+            "mask": 0.35,
+            "vignette": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed-up",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0b0420",
+      "#3b0a6b",
+      "#ff2fa8",
+      "#22e0d0",
+      "#fff6c8"
+    ]
+  },
+  "description": "Two polygons of glowing lines bouncing around the screen with trailing echoes, speeding up with the music."
+}

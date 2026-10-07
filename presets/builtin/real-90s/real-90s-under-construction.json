@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "name": "Under Construction",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "old hardware",
+    "web",
+    "homepage",
+    "dial-up",
+    "marquee",
+    "lyrics",
+    "words"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "page",
+      "name": "Homepage",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "desktop90",
+        "params": {
+          "mode": "web",
+          "source": "lyrics",
+          "text": "Thanks for visiting! Sign my guestbook!",
+          "title": "Welcome to my Homepage!",
+          "every": 2,
+          "speed": 1,
+          "react": 1,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tube",
+      "name": "Monitor",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.35,
+            "scanlines": 0.5,
+            "mask": 0.35,
+            "vignette": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Marquee speed",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#008080",
+      "#000080",
+      "#c0c0c0",
+      "#ffffff"
+    ]
+  },
+  "description": "A homemade web page from 1998: tiled stars, a rainbow title, an under-construction banner, a hit counter counting the beats, and the lyrics scrolling in the marquee."
+}

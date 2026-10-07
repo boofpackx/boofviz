@@ -1,0 +1,154 @@
+{
+  "schema": 1,
+  "name": "Console Title Screen",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "old hardware",
+    "console",
+    "3d",
+    "low poly",
+    "chrome",
+    "lyrics",
+    "words"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "game",
+      "name": "Game",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lowPoly",
+        "params": {
+          "lines": 240,
+          "speed": 0.6,
+          "wobble": 0.6,
+          "punch": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Title",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "infomercial",
+          "material": "chrome",
+          "hero": 0.6,
+          "camera": 0.5,
+          "drama": 0.7,
+          "exit": "auto",
+          "source": "lyrics",
+          "text": "PRESS START / PLAYER ONE / CONTINUE",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1.1,
+          "position": "center",
+          "depth": 0.8,
+          "outline": 0,
+          "glow": 0.2,
+          "shadow": 0.6,
+          "colorMode": "palette",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.15,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Title size",
+      "value": 0.36,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#05030a",
+      "#2a1a5a",
+      "#3a7a3a",
+      "#c0782a",
+      "#ffe9a0"
+    ]
+  },
+  "description": "A game's title screen: the low-poly canyon behind, and the lyrics swooshing in as bevelled chrome titles."
+}

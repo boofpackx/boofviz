@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "name": "Virtual Pet",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "old hardware",
+    "lcd",
+    "pet",
+    "handheld",
+    "cute",
+    "toy"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "pet",
+      "name": "Pet",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "desktop90",
+        "params": {
+          "mode": "pet",
+          "source": "lyrics",
+          "text": "Thanks for visiting! Sign my guestbook!",
+          "title": "Welcome to my Homepage!",
+          "every": 2,
+          "speed": 1,
+          "react": 1,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Hop",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#2b3320",
+      "#ff7eb6",
+      "#ff9ec9",
+      "#ffd1e6",
+      "#ffffff"
+    ]
+  },
+  "description": "A pocket virtual pet in an egg-shaped shell, hopping on the beat on its little LCD, with hearts on the kick."
+}

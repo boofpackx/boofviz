@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "name": "3D Maze Walk",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "old hardware",
+    "screensaver",
+    "3d",
+    "maze",
+    "desktop"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "maze",
+      "name": "Maze",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "screensaver90",
+        "params": {
+          "scene": "maze",
+          "speed": 1,
+          "count": 12,
+          "smiley": 0,
+          "zoom": 1,
+          "react": 1,
+          "seed": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tube",
+      "name": "Monitor",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.45,
+            "scanlines": 0.5,
+            "mask": 0.35,
+            "vignette": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Walk speed",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Maze",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.seed",
+          "range": [
+            0,
+            99
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#1b3a8a",
+      "#d0302f",
+      "#2fae4a",
+      "#f2c12e"
+    ]
+  },
+  "description": "Walking a brick 3D maze like the old screensaver: a step per beat, stopping to turn at every corner and turning round at dead ends."
+}

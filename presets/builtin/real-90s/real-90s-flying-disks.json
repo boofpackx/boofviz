@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "name": "Flying Disks",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "old hardware",
+    "screensaver",
+    "desktop",
+    "floppy",
+    "cute"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "disks",
+      "name": "Disks",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "screensaver90",
+        "params": {
+          "scene": "flyers",
+          "speed": 1,
+          "count": 14,
+          "smiley": 0,
+          "zoom": 1,
+          "react": 1,
+          "seed": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tube",
+      "name": "Monitor",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.3,
+            "scanlines": 0.5,
+            "mask": 0.35,
+            "vignette": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Flock",
+      "value": 0.72,
+      "targets": [
+        {
+          "path": "layers.0.source.params.count",
+          "range": [
+            1,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Flap",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#008080",
+      "#000080",
+      "#c0c0c0",
+      "#ffffff"
+    ]
+  },
+  "description": "Winged floppy disks flapping across a black screen, a wing beat on every beat and a bigger flap on the kick."
+}

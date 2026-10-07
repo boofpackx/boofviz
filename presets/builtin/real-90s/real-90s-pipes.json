@@ -1,0 +1,150 @@
+{
+  "schema": 1,
+  "name": "Pipes Screensaver",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "old hardware",
+    "screensaver",
+    "3d",
+    "desktop",
+    "pipes"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "pipes",
+      "name": "Pipes",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "pipes",
+        "params": {
+          "pipes": 7,
+          "rate": 4,
+          "clearBars": 32,
+          "drift": 0.3,
+          "punch": 1,
+          "seed": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tube",
+      "name": "Monitor",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.35,
+            "scanlines": 0.5,
+            "mask": 0.35,
+            "vignette": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Growth",
+      "value": 0.24,
+      "targets": [
+        {
+          "path": "layers.0.source.params.rate",
+          "range": [
+            0.25,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pipes",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.pipes",
+          "range": [
+            1,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drift",
+      "value": 0.15,
+      "targets": [
+        {
+          "path": "layers.0.source.params.drift",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#000000",
+      "#1b3a8a",
+      "#d0302f",
+      "#2fae4a",
+      "#f2c12e"
+    ]
+  },
+  "description": "The 3D pipes screensaver: shiny pipes growing through space a segment at a time on the beat, ball joints at every turn, clearing and starting over every 32 bars."
+}

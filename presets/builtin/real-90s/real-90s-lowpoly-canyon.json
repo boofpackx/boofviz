@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "name": "Low-Poly Canyon",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "old hardware",
+    "console",
+    "3d",
+    "low poly",
+    "racing",
+    "32-bit"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "game",
+      "name": "Game",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lowPoly",
+        "params": {
+          "lines": 240,
+          "speed": 1,
+          "wobble": 0.6,
+          "punch": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wobble",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.wobble",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Resolution",
+      "value": 0.33,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lines",
+          "range": [
+            120,
+            480
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#05030a",
+      "#2a1a5a",
+      "#3a7a3a",
+      "#c0782a",
+      "#ffe9a0"
+    ]
+  },
+  "description": "A 32-bit console flythrough: a low-poly canyon road with rings to fly through, 240 lines of chunky pixels, wobbling vertices, dithered 15-bit colour and fog."
+}

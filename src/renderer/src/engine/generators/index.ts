@@ -2,6 +2,7 @@ import { Adjust } from './Adjust';
 import { ArchiveFootage } from './ArchiveFootage';
 import { Background } from './Background';
 import { Broadcast } from './Broadcast';
+import { Desktop90 } from './Desktop90';
 import { BarCity } from './BarCity';
 import { CodeRain } from './CodeRain';
 import { DemoParts } from './DemoParts';
@@ -12,18 +13,21 @@ import { GlassMeadow } from './GlassMeadow';
 import { KineticType } from './KineticType';
 import { Lines } from './Lines';
 import { LostScene } from './LostScene';
+import { LowPoly } from './LowPoly';
 import { LiquidChrome } from './LiquidChrome';
 import { Lyrics } from './Lyrics';
 import { LyricVideo } from './LyricVideo';
 import { Memphis } from './Memphis';
 import { OpArt } from './OpArt';
 import { Orb } from './Orb';
+import { Pipes } from './Pipes';
 import { PixelArcade } from './PixelArcade';
 import { Polygon } from './Polygon';
 import { Prism } from './Prism';
 import { RadialSpectrum } from './RadialSpectrum';
 import { Ricochet } from './Ricochet';
 import { Scope } from './Scope';
+import { Screensaver90 } from './Screensaver90';
 import { Spectrogram } from './Spectrogram';
 import { SpectrumBars } from './SpectrumBars';
 import { SwissGrid } from './SwissGrid';
@@ -65,6 +69,10 @@ const FACTORIES: Record<string, () => Generator> = {
   broadcast: () => new Broadcast(),
   adjust: () => new Adjust(),
   archiveFootage: () => new ArchiveFootage(),
+  screensaver90: () => new Screensaver90(),
+  pipes: () => new Pipes(),
+  lowPoly: () => new LowPoly(),
+  desktop90: () => new Desktop90(),
 };
 
 export function createGenerator(kind: string): Generator {
