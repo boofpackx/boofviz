@@ -1,5 +1,5 @@
 import type { BoofvizApi } from '@shared/ipc';
-import { EMPTY_LYRICS, EMPTY_NOW_PLAYING, lineIndexAt, positionAt, type LyricLine, type NowPlaying, type TrackLyrics } from '@shared/lyrics';
+import { EMPTY_LYRICS, EMPTY_NOW_PLAYING, estimateLines, lineIndexAt, positionAt, type LyricLine, type NowPlaying, type TrackLyrics } from '@shared/lyrics';
 
 /**
  * Per-window singleton holding the latest now-playing sample and lyrics from
@@ -18,10 +18,20 @@ export const lyricsFeed = {
   version: 0,
 };
 
-/** Synced lines for the track playing now (never a previous track's). */
+let estimated: { key: string; lines: LyricLine[] | null } = { key: '', lines: null };
+
+/**
+ * Timed lines for the track playing now (never a previous track's). Lyrics
+ * found without timestamps are spread across the song so they still show.
+ */
 export function currentLines(): LyricLine[] | null {
   const { now, lyrics } = lyricsFeed;
-  return now.trackId && lyrics.trackId === now.trackId ? lyrics.synced : null;
+  if (!now.trackId || lyrics.trackId !== now.trackId) return null;
+  if (lyrics.synced) return lyrics.synced;
+  if (!lyrics.plain || lyrics.instrumental) return null;
+  const key = `${now.trackId}|${now.durationMs}`;
+  if (estimated.key !== key) estimated = { key, lines: estimateLines(lyrics.plain, now.durationMs) };
+  return estimated.lines;
 }
 
 /** Song position (ms) at `epochMs`, including the settings offset and `leadMs`. */

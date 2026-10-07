@@ -157,7 +157,7 @@ function LyricsSection() {
         : lyrics.instrumental
           ? 'Instrumental'
           : lyrics.plain
-            ? `Unsynced only · ${SOURCE_LABEL[lyrics.source]}`
+            ? `No timestamps, timing estimated · ${SOURCE_LABEL[lyrics.source]}`
             : 'No lyrics found';
 
   const attach = (file: File | undefined): void => {
@@ -177,7 +177,7 @@ function LyricsSection() {
     <Section title="Lyrics" right={<span className="text-[10px] text-ink-400">{status}</span>}>
       <div className="rounded border border-ink-700 bg-ink-850 px-2 py-1.5">
         <div className="min-h-[16px] truncate text-ink-100" data-testid="lyrics-current">
-          {cur.text || (forTrack && lyrics.synced ? '♪' : '—')}
+          {cur.text || (forTrack && (lyrics.synced || lyrics.plain) ? '♪' : '—')}
         </div>
         <div className="min-h-[14px] truncate text-[11px] text-ink-400">{cur.next}</div>
       </div>

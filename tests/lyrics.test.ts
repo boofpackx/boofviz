@@ -2,9 +2,9 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync, existsSync
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { EMPTY_LYRICS, EMPTY_NOW_PLAYING, lineIndexAt, lrcFileName, normalizeTitle, parseLrc, positionAt } from '@shared/lyrics';
-import { liveText, lyricsFeed, setNowPlaying, setTrackLyrics } from '@/engine/lyricsFeed';
-import { LRCLIB_USER_AGENT, LyricsService, type TrackInfo } from '../src/main/lyrics';
+import { EMPTY_LYRICS, EMPTY_NOW_PLAYING, estimateLines, lineIndexAt, lrcFileName, normalizeTitle, parseLrc, positionAt } from '@shared/lyrics';
+import { currentLines, liveText, lyricsFeed, setNowPlaying, setTrackLyrics } from '@/engine/lyricsFeed';
+import { LRCLIB_USER_AGENT, LyricsService, primaryArtist, type TrackInfo } from '../src/main/lyrics';
 import { authorizeUrl, createPkce, pickArt, pkceChallenge, SpotifyClient, type SpotifyDeps, type TokenStore } from '../src/main/spotify';
 
 // All lyric text below is invented placeholder text.
@@ -100,6 +100,27 @@ describe('lyric timing', () => {
   });
 });
 
+describe('lyrics without timestamps', () => {
+  it('spreads the lines across the song by length, with stanza gaps', () => {
+    const lines = estimateLines('one two three\nfour five\n\n\nsix seven eight nine', 200000)!;
+    expect(lines.map((l) => l.text)).toEqual(['one two three', 'four five', '', 'six seven eight nine', '']);
+    expect(lines[0].t).toBe(15000);
+    for (let k = 1; k < lines.length; k++) expect(lines[k].t).toBeGreaterThan(lines[k - 1].t);
+    expect(lines[lines.length - 1].t).toBe(180000);
+    expect(estimateLines('short', 5000)).toBeNull();
+  });
+
+  it('the screen gets estimated lines when only plain lyrics were found', () => {
+    setNowPlaying({ ...EMPTY_NOW_PLAYING, connected: true, playing: true, trackId: 'plain1', title: 'x', durationMs: 180000, progressMs: 0, sampleEpochMs: Date.now() });
+    setTrackLyrics({ ...EMPTY_LYRICS, trackId: 'plain1', source: 'lrclib', plain: 'first line\nsecond line' });
+    expect(currentLines()?.map((l) => l.text)).toEqual(['first line', 'second line', '']);
+    setTrackLyrics({ ...EMPTY_LYRICS, trackId: 'plain1', source: 'lrclib', plain: 'x', instrumental: true });
+    expect(currentLines()).toBeNull();
+    setNowPlaying({ ...EMPTY_NOW_PLAYING });
+    setTrackLyrics({ ...EMPTY_LYRICS });
+  });
+});
+
 describe('normalizeTitle', () => {
   it('strips remaster / single-version / featuring suffixes', () => {
     expect(normalizeTitle('A Forest - 2006 Remaster')).toBe('A Forest');
@@ -173,6 +194,29 @@ describe('LyricsService', () => {
     expect(l.synced?.[0].text).toBe('the right one');
     const search = m.calls.find((c) => c.url.pathname === '/api/search')!;
     expect(search.url.searchParams.get('track_name')).toBe('Paper Lanterns');
+  });
+
+  it('splits a several-artist name, and searches by any length when the length is unknown', async () => {
+    expect(primaryArtist('The Placeholders, Somebody Else')).toBe('The Placeholders');
+    expect(primaryArtist('Ann feat. Bo')).toBe('Ann');
+    expect(primaryArtist('Ann & Bo')).toBe('Ann');
+    expect(primaryArtist('Charli Example')).toBe('Charli Example');
+    const m = mockFetch({
+      '/api/get': (url) => (url.searchParams.get('artist_name') === 'The Placeholders' ? json({ id: 1, duration: 201, syncedLyrics: SYNCED }) : json({ code: 404 }, 404)),
+      '/api/search': () => json([{ id: 9, duration: 95, syncedLyrics: '[00:01.00]found by search' }]),
+    });
+    const both = await service(m.fn).lookup({ ...track, id: 'multi', artists: ['The Placeholders, Somebody Else'] });
+    expect(both.synced).not.toBeNull();
+    const unknown = await service(m.fn).lookup({ ...track, id: 'nolen', durationMs: 0 });
+    expect(unknown.synced?.[0].text).toBe('found by search');
+  });
+
+  it('a cached miss is searched again when better details arrive', async () => {
+    const m = mockFetch({ '/api/get': () => json({ code: 404 }, 404), '/api/search': () => json([]) });
+    await service(m.fn).lookup(track);
+    const n = m.calls.length;
+    await service(m.fn).lookup(track, true);
+    expect(m.calls.length).toBeGreaterThan(n);
   });
 
   it('prefers a user .lrc file, matched loosely by "Artist - Title"', async () => {

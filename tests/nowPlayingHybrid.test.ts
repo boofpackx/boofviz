@@ -176,9 +176,9 @@ describe('hybrid now playing: the media session leads', () => {
     expect(h.c.state).toMatchObject({ trackId: id, title: 'Quiet Interlude', artists: ['Nobody In Particular'], album: 'Blank Tapes', durationMs: 120000, playing: true });
     expect(positionAt(h.c.state, Date.now())).toBeGreaterThan(3000);
     expect(positionAt(h.c.state, Date.now())).toBeLessThan(4200);
-    // Spotify catches up; the drift check confirms the song: exact position and art, same id.
+    // Spotify catches up; a check soon after confirms the song: exact position and art, same id.
     Object.assign(h.api, { track: INTERLUDE, anchor: 9000, at: Date.now() });
-    await h.play(HYBRID.driftMs);
+    await h.play(HYBRID.confirmMs);
     expect(h.cp()).toBe(5);
     expect(h.c.state.trackId).toBe(id);
     expect(h.c.state.artDataUrl).toMatch(/^data:image\/png;base64,/);

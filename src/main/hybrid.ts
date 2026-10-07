@@ -22,6 +22,8 @@ export const HYBRID = {
   idRetries: 2,
   /** Publish a new song under a media-session id if Spotify hasn't named it by then. */
   idWaitMs: 3500,
+  /** A song published from the media session is checked with Spotify this soon after (album art, exact length, better lyrics). */
+  confirmMs: 8000,
   /** Exact-position check while playing... */
   driftMs: 45000,
   /** ...or this long after the song should have ended without the media session showing the next (repeat, a missed change)... */
@@ -104,6 +106,8 @@ export interface HybridHost {
   track(t: SpotifyTrack | null): void;
   /** Album art for a song that Spotify confirmed after it was published. */
   art(trackId: string, images: SpotifyTrack['images']): void;
+  /** Spotify's own metadata for a song published from the media session (a lyrics search that found nothing can retry). */
+  refine?(t: SpotifyTrack): void;
   /** One Web API currently-playing request. */
   current(): Promise<CurrentlyPlaying>;
   /** No Web API requests before this (Retry-After). */
@@ -371,6 +375,7 @@ export class HybridNowPlaying {
     this.host.set({ playing, trackId: id, title: track.title, artists: track.artists, album: track.album, artDataUrl: undefined, durationMs, progressMs, sampleEpochMs: now });
     this.host.track(track);
     this.armDrift();
+    this.request('drift', HYBRID.confirmMs);
   }
 
   /** Spotify's sample as is, or re-anchored to now when it disagrees with the media session about playing. */
@@ -410,6 +415,7 @@ export class HybridNowPlaying {
       if (!song.confirmed) {
         song.confirmed = true;
         this.host.art(song.id, r.track.images);
+        if (song.id.startsWith(SMTC_ID_PREFIX)) this.host.refine?.({ ...r.track, id: song.id });
       }
     } else if (st.error) this.host.set({ error: undefined });
     this.armDrift();

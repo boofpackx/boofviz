@@ -62,13 +62,14 @@ export function lyricsFromText(trackId: string, source: TrackLyrics['source'], t
 export class LyricsService {
   constructor(private readonly deps: LyricsDeps) {}
 
-  async lookup(track: TrackInfo): Promise<TrackLyrics> {
+  /** `fresh`: ignore a cached miss (better metadata arrived). */
+  async lookup(track: TrackInfo, fresh = false): Promise<TrackLyrics> {
     const file = await this.fromFiles(track);
     if (file) return file;
     const cached = await this.readCache(track.id);
     if (cached) {
       if (cached.found) return lyricsFromText(track.id, 'cache', cached.synced, cached.plain, cached.instrumental);
-      if (this.deps.now() - cached.fetchedAt < NOT_FOUND_TTL_MS) return none(track.id);
+      if (!fresh && this.deps.now() - cached.fetchedAt < NOT_FOUND_TTL_MS) return none(track.id);
     }
     if (!this.deps.online()) return none(track.id);
     let rec: LrclibRecord | null;
@@ -127,21 +128,31 @@ export class LyricsService {
     return res.json();
   }
 
-  /** /get with the exact title, then the normalized one; then /search for synced lyrics within ±2 s. */
+  /**
+   * /get with the exact title, then the normalized one (and the first artist
+   * when one name holds several); then /search for synced lyrics within ±2 s
+   * (any length when it isn't known).
+   */
   private async fromLrclib(track: TrackInfo): Promise<LrclibRecord | null> {
-    const artist = track.artists[0] ?? '';
+    const full = track.artists[0] ?? '';
+    const first = primaryArtist(full);
+    const artists = first && first !== full ? [full, first] : [full];
     const durationS = Math.round(track.durationMs / 1000);
     const norm = normalizeTitle(track.title);
     const titles = norm !== track.title ? [track.title, norm] : [track.title];
     let fallback: LrclibRecord | null = null;
-    for (const title of titles) {
-      const rec = (await this.lrclib('/get', { track_name: title, artist_name: artist, album_name: track.album, duration: String(durationS) })) as LrclibRecord | null;
-      if (rec?.syncedLyrics) return rec;
-      if (rec && !fallback && (rec.plainLyrics || rec.instrumental)) fallback = rec;
+    if (durationS > 0) {
+      for (const artist of artists) {
+        for (const title of titles) {
+          const rec = (await this.lrclib('/get', { track_name: title, artist_name: artist, album_name: track.album, duration: String(durationS) })) as LrclibRecord | null;
+          if (rec?.syncedLyrics) return rec;
+          if (rec && !fallback && (rec.plainLyrics || rec.instrumental)) fallback = rec;
+        }
+      }
     }
-    const results = await this.lrclib('/search', { track_name: norm, artist_name: artist });
+    const results = await this.lrclib('/search', { track_name: norm, artist_name: first || full });
     if (Array.isArray(results)) {
-      const close = (r: LrclibRecord): boolean => typeof r.duration === 'number' && Math.abs(r.duration - track.durationMs / 1000) <= DURATION_TOLERANCE_S;
+      const close = (r: LrclibRecord): boolean => durationS <= 0 || (typeof r.duration === 'number' && Math.abs(r.duration - track.durationMs / 1000) <= DURATION_TOLERANCE_S);
       const hit = (results as LrclibRecord[]).find((r) => r.syncedLyrics && close(r));
       if (hit) return hit;
       fallback ??= (results as LrclibRecord[]).find((r) => (r.plainLyrics || r.instrumental) && close(r)) ?? null;
@@ -169,6 +180,11 @@ export class LyricsService {
       // A read-only profile just means no cache.
     }
   }
+}
+
+/** The first of several artists named in one string ("A, B", "A feat. B", "A & B"). */
+export function primaryArtist(name: string): string {
+  return name.split(/\s*,\s*|\s+(?:feat\.?|ft\.?|featuring|x|&|and)\s+/i)[0]?.trim() ?? name;
 }
 
 function none(trackId: string): TrackLyrics {

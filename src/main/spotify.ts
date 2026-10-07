@@ -53,6 +53,8 @@ export interface SpotifyDeps {
   publish: (s: NowPlaying) => void;
   /** The track changed (null: nothing / not a track). */
   onTrack?: (t: SpotifyTrack | null) => void;
+  /** Spotify named a song first published from the media session (same id, better metadata). */
+  onRefine?: (t: SpotifyTrack) => void;
   redirectPort?: number;
   /** Windows media session: while it shows Spotify it leads, and polling stops. */
   media?: MediaSessionSource | null;
@@ -224,6 +226,8 @@ export class SpotifyClient {
   private lastSendMs = 0;
   private generation = 0;
   private lastTrackId: string | null = null;
+  /** Track whose album art was last requested. */
+  private artFor: string | null = null;
   /** Retry-After of the last 429: no Web API requests before this (hybrid checks, polling after a fallback). */
   private limitedUntil = 0;
   private readonly hybrid: HybridNowPlaying | null;
@@ -235,6 +239,7 @@ export class SpotifyClient {
       set: (patch) => this.set(patch),
       track: (t) => this.applyTrack(t),
       art: (id, images) => this.fetchArt(id, images),
+      refine: (t) => this.deps.onRefine?.(t),
       current: () => this.current(),
       limitedUntil: () => this.limitedUntil,
       polling: (on) => (on ? this.beginPolling(Math.max(0, this.limitedUntil - this.deps.now())) : this.stopPolling()),
@@ -507,6 +512,8 @@ export class SpotifyClient {
       sampleEpochMs,
     });
     if (changed) this.applyTrack(track);
+    // Same song but no art yet (published from the media session, or the image failed): fetch it now.
+    else if (!this.state.artDataUrl && this.artFor !== track.id) this.fetchArt(track.id, track.images);
     return playing ? this.steady('playing', progressMs, track.durationMs) : this.steady('paused');
   }
 
@@ -524,11 +531,15 @@ export class SpotifyClient {
     if (track) this.fetchArt(track.id, track.images);
   }
 
-  private fetchArt(trackId: string, images: SpotifyTrack['images']): void {
+  private fetchArt(trackId: string, images: SpotifyTrack['images'], retry = true): void {
     const art = pickArt(images);
     if (!art) return;
+    this.artFor = trackId;
     void fetchDataUrl(this.deps.fetch, art).then((dataUrl) => {
-      if (dataUrl && this.state.trackId === trackId) this.set({ artDataUrl: dataUrl });
+      if (this.state.trackId !== trackId) return;
+      if (dataUrl) this.set({ artDataUrl: dataUrl });
+      // One more try for a dropped image download.
+      else if (retry) setTimeout(() => this.state.trackId === trackId && !this.state.artDataUrl && this.fetchArt(trackId, images, false), 3000);
     });
   }
 

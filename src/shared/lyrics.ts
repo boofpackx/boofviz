@@ -127,6 +127,33 @@ export function parseLrc(text: string): ParsedLrc {
 }
 
 /** Index of the line playing at `ms` (the last line with t ≤ ms), or −1 before the first. */
+/**
+ * Lines for lyrics that came without timestamps: spread across the song by
+ * length (stanza breaks become short gaps), skipping a typical intro and
+ * outro. Only a guess, but it keeps the words moving with the song.
+ */
+export function estimateLines(plain: string, durationMs: number): LyricLine[] | null {
+  if (!plain.trim() || durationMs < 20000) return null;
+  const rows = plain.split(/\r?\n/).map((r) => r.trim());
+  while (rows.length && !rows[0]) rows.shift();
+  const weights = rows.map((r) => (r ? 6 + r.length : 4));
+  const total = weights.reduce((a, b) => a + b, 0);
+  if (!total) return null;
+  const start = Math.min(15000, durationMs * 0.08);
+  const span = durationMs * 0.9 - start;
+  const out: LyricLine[] = [];
+  let acc = 0;
+  rows.forEach((text, i) => {
+    const t = Math.round(start + (acc / total) * span);
+    acc += weights[i];
+    // Consecutive breaks collapse into one gap.
+    if (!text && (!out.length || !out[out.length - 1].text)) return;
+    out.push({ t, text });
+  });
+  out.push({ t: Math.round(start + span), text: '' });
+  return out;
+}
+
 export function lineIndexAt(lines: readonly LyricLine[], ms: number): number {
   let lo = 0;
   let hi = lines.length - 1;

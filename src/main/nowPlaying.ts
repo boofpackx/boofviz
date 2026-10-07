@@ -87,6 +87,12 @@ export class NowPlayingService {
         this.track = t && { id: t.id, title: t.title, artists: t.artists, album: t.album, durationMs: t.durationMs };
         void this.loadLyrics();
       },
+      onRefine: (t) => {
+        // Found nothing under the media session's names: search again with Spotify's (exact length, split artists).
+        if (this.track?.id !== t.id || this.current.trackId !== t.id || this.current.source !== 'none' || this.current.loading || this.current.instrumental) return;
+        this.track = { id: t.id, title: t.title, artists: t.artists, album: t.album, durationMs: t.durationMs };
+        void this.loadLyrics(true);
+      },
     });
     let online = this.store.get().lyrics.online;
     this.store.onChange((s) => {
@@ -112,11 +118,11 @@ export class NowPlayingService {
     this.broadcast(IPC.lyrics, l);
   }
 
-  private async loadLyrics(): Promise<void> {
+  private async loadLyrics(fresh = false): Promise<void> {
     const track = this.track;
     if (!track) return this.setLyrics({ ...EMPTY_LYRICS });
     this.setLyrics({ ...EMPTY_LYRICS, trackId: track.id, loading: true });
-    const result = await this.lyrics.lookup(track).catch(() => ({ ...EMPTY_LYRICS, trackId: track.id }));
+    const result = await this.lyrics.lookup(track, fresh).catch(() => ({ ...EMPTY_LYRICS, trackId: track.id }));
     if (this.track?.id === track.id) this.setLyrics(result);
   }
 
