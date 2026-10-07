@@ -48,6 +48,7 @@ const applyLyricsSettings = (s: Settings): void => {
   renderer?.setLyricsOverlay(s.lyrics.overlay);
   renderer?.setLostMedia(s.lostMedia);
   renderer?.setRetroTv(s.retroTv);
+  renderer?.setNeoFlat(s.neoFlat);
 };
 
 // Register before any await so the analysis port can't arrive unheard.

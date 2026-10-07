@@ -1,4 +1,4 @@
-import type { LostMediaSettings, RetroTvSettings } from '@shared/settings';
+import type { LostMediaSettings, NeoFlatSettings, RetroTvSettings } from '@shared/settings';
 import type { ParamBag } from '@shared/types/engine';
 
 /**
@@ -167,8 +167,13 @@ export function lostMediaPost(s: LostMediaSettings | undefined): PostSpec | null
 }
 
 /** The global post chain: lost media first (the picture ages), then the TV set it plays on. */
-export function globalPost(lm: LostMediaSettings | undefined, tv: RetroTvSettings | undefined): PostSpec | null {
-  const base = lostMediaPost(lm);
+export function globalPost(lm: LostMediaSettings | undefined, tv: RetroTvSettings | undefined, neo?: NeoFlatSettings): PostSpec | null {
+  let base = lostMediaPost(lm);
+  // Neo-brutal flat goes first: the flat graphic is what then ages or plays on the TV.
+  if (neo?.enabled) {
+    const flat = { type: 'neoFlat', params: { colours: neo.colours, outline: neo.outline, shadow: neo.shadow, flatten: 1 } };
+    base = base ? { ...base, fx: [flat, ...base.fx] } : { under: null, fx: [flat], over: null };
+  }
   if (!tv?.enabled) return base;
   const set = { type: 'tvSet', params: { set: tv.set, zoom: tv.zoom, curve: 1, glare: 1, room: 1, powerOn: true } };
   return base ? { ...base, fx: [...base.fx], over: base.over, tv: set } : { under: null, fx: [], over: null, tv: set };

@@ -95,6 +95,14 @@ export interface RetroTvSettings {
   powerFx: boolean;
 }
 
+/** "Neo-brutal flat" over any look: flat loud colours, black outlines, hard offset shadows. */
+export interface NeoFlatSettings {
+  enabled: boolean;
+  colours: 'neo' | 'look';
+  outline: number;
+  shadow: number;
+}
+
 export interface Settings {
   version: 1;
   input: InputSettings;
@@ -107,6 +115,7 @@ export interface Settings {
   lyrics: LyricsSettings;
   lostMedia: LostMediaSettings;
   retroTv: RetroTvSettings;
+  neoFlat: NeoFlatSettings;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -136,6 +145,7 @@ export const DEFAULT_SETTINGS: Settings = {
   lyrics: { offsetMs: 0, online: true, textLooks: false, overlay: { enabled: false, params: { kind: 'lyricVideo', style: 'auto', mode: 'karaoke', position: 'center', size: 1, backdrop: 0.45 } } },
   lostMedia: { enabled: false, style: 'vhs', wear: 1, events: 0.3, mood: 0.3, date: 'JUN 14 1994', station: 'CHANNEL 9' },
   retroTv: { enabled: false, set: 'screen', zoom: 0.1, powerFx: true },
+  neoFlat: { enabled: false, colours: 'neo', outline: 4, shadow: 12 },
 };
 
 type DeepPartial<T> = T extends readonly unknown[] ? T : T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;

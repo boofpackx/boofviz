@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { LostMediaSettings, RetroTvSettings } from '@shared/settings';
+import type { LostMediaSettings, NeoFlatSettings, RetroTvSettings } from '@shared/settings';
 import { globalPost } from '../lostMedia';
 import type { AudioFrame } from '@shared/types/audio';
 import type { ParamBag, Renderer, RendererOptions, RenderContext, RenderStats, Scene } from '@shared/types/engine';
@@ -46,6 +46,7 @@ export class ThreeRenderer implements Renderer {
   private blackout = 0;
   private lostMedia: LostMediaSettings | undefined;
   private retroTv: RetroTvSettings | undefined;
+  private neoFlat: NeoFlatSettings | undefined;
   private css = { w: 1, h: 1, dpr: 1 };
   /** A scene waiting for its launch beat (quantized preset change). */
   private pending: { scene: Scene; atBeat: number; transition?: SceneTransition } | null = null;
@@ -180,8 +181,14 @@ export class ThreeRenderer implements Renderer {
     this.applyPost();
   }
 
+  /** "Neo-brutal flat" over every look (settings.neoFlat). */
+  setNeoFlat(s: NeoFlatSettings | undefined): void {
+    this.neoFlat = s;
+    this.applyPost();
+  }
+
   private applyPost(): void {
-    const spec = globalPost(this.lostMedia, this.retroTv);
+    const spec = globalPost(this.lostMedia, this.retroTv, this.neoFlat);
     this.compositor.setPost(spec);
     this.spare.setPost(spec);
   }

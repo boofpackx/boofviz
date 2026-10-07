@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BAND_NAMES, DEFAULT_ANALYSIS_SETTINGS, type BandName } from '@shared/types/audio';
-import type { LostMediaSettings, RetroTvSettings } from '@shared/settings';
+import type { LostMediaSettings, NeoFlatSettings, RetroTvSettings } from '@shared/settings';
 import { useControl } from '../store';
 import { Section, Segmented, Slider, Toggle } from './ui';
 
@@ -160,6 +160,7 @@ export function MasterPanel() {
       </Section>
       <LostMediaSection />
       <RetroTvSection />
+      <NeoFlatSection />
       <Section title="Output">
         <Slider label="Render scale" value={scale} min={0.5} max={2} step={0.05} defaultValue={1} format={(v) => `${Math.round(v * 100)}%`} onChange={(v) => update({ output: { renderScale: v } })} />
       </Section>
@@ -249,6 +250,27 @@ function RetroTvSection() {
       >
         Open my videos folder
       </button>
+    </Section>
+  );
+}
+
+function NeoFlatSection() {
+  const neo = useControl((s) => s.settings.neoFlat);
+  const update = useControl((s) => s.update);
+  const set = (patch: Partial<NeoFlatSettings>): void => update({ neoFlat: patch });
+  return (
+    <Section title="Neo-brutal flat (over any look)">
+      <Toggle label="Flat colour, outlines, hard shadows" checked={neo.enabled} onChange={(v) => set({ enabled: v })} hint="Turns whatever is playing into flat neo-brutal graphics" />
+      <Segmented
+        value={neo.colours}
+        onChange={(colours) => set({ colours, enabled: true })}
+        options={[
+          { value: 'neo', label: 'Loud colours' },
+          { value: 'look', label: 'The look\u2019s colours' },
+        ]}
+      />
+      <Slider label="Outline" value={neo.outline} min={0} max={16} step={0.5} defaultValue={4} onChange={(v) => set({ outline: v })} />
+      <Slider label="Shadow" value={neo.shadow} min={0} max={40} step={0.5} defaultValue={12} onChange={(v) => set({ shadow: v })} />
     </Section>
   );
 }

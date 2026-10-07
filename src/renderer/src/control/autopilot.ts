@@ -24,9 +24,9 @@ export interface PickContext {
 
 const WORD_KINDS = new Set(['lyrics', 'lyricVideo', 'kineticType', 'platinumType']);
 /** Generators that show the sung line when their source is lyrics. */
-const LYRIC_SOURCE_KINDS = new Set(['desktop90']);
+const LYRIC_SOURCE_KINDS = new Set(['desktop90', 'neoBrutal']);
 const hasWords = (e: PresetEntry): boolean =>
-  e.preset.layers.some((l) => l.enabled && (WORD_KINDS.has(l.source.kind) || (LYRIC_SOURCE_KINDS.has(l.source.kind) && l.source.params.source !== 'text' && l.source.params.mode !== 'pet') || (l.source.kind === 'broadcast' && !!l.source.params.captions && l.source.params.captions !== 'off')));
+  e.preset.layers.some((l) => l.enabled && (WORD_KINDS.has(l.source.kind) || (LYRIC_SOURCE_KINDS.has(l.source.kind) && l.source.params.source !== 'text' && !['pet', 'numbers', 'eq', 'data', 'stickers'].includes(String(l.source.params.mode))) || (l.source.kind === 'broadcast' && !!l.source.params.captions && l.source.params.captions !== 'off')));
 const tagged = (e: PresetEntry, tags: string[]): boolean => e.preset.tags.some((t) => tags.includes(t));
 
 /** Premade playlists: rules, not fixed lists, so new presets join automatically. */

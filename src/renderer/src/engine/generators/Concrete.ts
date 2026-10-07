@@ -2,13 +2,13 @@ import { GEN_HEADER } from '../shaders/common';
 import type { GenContext } from './Generator';
 import { num, ShaderGenerator } from './ShaderGenerator';
 
-export const CONCRETE_SCENES = ['panels', 'monolith', 'parking', 'walkways', 'watertower', 'wall', 'section'] as const;
+export const CONCRETE_SCENES = ['panels', 'monolith', 'parking', 'walkways', 'watertower', 'wall', 'section', 'modern'] as const;
 /** Scenes the slide projector cycles through. */
 const SLIDES = [0, 1, 3, 2, 4];
 
 const FRAG = /* glsl */ `${GEN_HEADER}
 uniform int uScene;
-uniform float uReact, uSnow, uSpeed, uLit, uView, uClunk, uLevel, uDrawT, uWarm;
+uniform float uReact, uSnow, uSpeed, uLit, uView, uClunk, uLevel, uDrawT, uWarm, uTurn;
 float PX;
 
 vec3 S(vec3 c) { return pow(max(c, 0.0), vec3(2.2)); }
@@ -374,6 +374,61 @@ vec3 sceneSection(vec2 p) {
   return c;
 }
 
+// ---------------------------------------------------------------- modern concrete
+float modernMap(vec3 p, out float id) {
+  vec3 q = vec3(rot2(uTurn) * p.xz, p.y).xzy;
+  q = vec3(q.x, p.y, q.z);
+  float slab = sdBox3(q - vec3(0.0, 0.5, 0.0), vec3(2.2, 0.5, 1.4));
+  float tower = sdBox3(q - vec3(-1.3, 2.2, -0.6), vec3(0.55, 1.7, 0.55));
+  float lever = sdBox3(q - vec3(0.9, 1.55, 0.3), vec3(1.6, 0.25, 0.7));
+  float plane = sdBox3(q - vec3(1.6, 1.0, -1.0), vec3(0.04, 1.0, 0.9));
+  float disc = sdBox3(q - vec3(-0.2, 3.0, 0.9), vec3(0.8, 0.04, 0.8));
+  float d = p.y;
+  id = 0.0;
+  if (slab < d) { d = slab; id = 1.0; }
+  if (tower < d) { d = tower; id = 1.0; }
+  if (lever < d) { d = lever; id = 1.0; }
+  if (plane < d) { d = plane; id = 2.0; }
+  if (disc < d) { d = disc; id = 3.0; }
+  return d;
+}
+
+vec3 sceneModern(vec2 p) {
+  vec3 ro = vec3(7.5, 4.5 + uView * 2.0, 8.5);
+  vec3 rd = camRay(p, ro, vec3(0.0, 1.3, 0.0), 1.6);
+  float d = 0.0;
+  float id = 0.0;
+  for (int i = 0; i < 90; i++) {
+    float h = modernMap(ro + rd * d, id);
+    if (h < 0.002 || d > 50.0) break;
+    d += h;
+  }
+  vec3 sky = mix(S(vec3(0.93, 0.92, 0.88)), S(vec3(0.75, 0.82, 0.9)), smoothstep(0.0, 0.5, rd.y));
+  if (d > 50.0) return sky;
+  vec3 hp = ro + rd * d;
+  float idd;
+  vec2 e = vec2(0.002, 0.0);
+  vec3 n = normalize(vec3(modernMap(hp + e.xyy, idd) - modernMap(hp - e.xyy, idd), modernMap(hp + e.yxy, idd) - modernMap(hp - e.yxy, idd), modernMap(hp + e.yyx, idd) - modernMap(hp - e.yyx, idd)));
+  // Hard sun: a straight shadow ray, no softening.
+  vec3 sun = normalize(vec3(-0.5, 0.8, 0.35));
+  float sh = 1.0;
+  float st = 0.02;
+  for (int i = 0; i < 40; i++) {
+    float h = modernMap(hp + n * 0.004 + sun * st, idd);
+    if (h < 0.001) { sh = 0.0; break; }
+    st += h;
+    if (st > 20.0) break;
+  }
+  float lam = max(dot(n, sun), 0.0) * sh;
+  vec3 base;
+  if (id < 0.5) base = S(vec3(0.9, 0.89, 0.86));
+  else if (id < 1.5) base = concrete(abs(n.y) > 0.5 ? hp.xz : (abs(n.x) > 0.5 ? hp.zy : hp.xy)) * 1.25;
+  else if (id < 2.5) base = palette(0.6) * 1.1;
+  else base = palette(0.9) * 1.1;
+  vec3 c = base * (0.32 + 0.85 * lam) * (1.0 + 0.08 * uKick * uReact);
+  return mix(c, sky, smoothstep(25.0, 50.0, d));
+}
+
 void main() {
   PX = 1.2 / uRes.y;
   vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
@@ -384,7 +439,8 @@ void main() {
   else if (uScene == 3) c = sceneWalkways(p);
   else if (uScene == 4) c = sceneWaterTower(p);
   else if (uScene == 5) c = sceneWall(p);
-  else c = sceneSection(p);
+  else if (uScene == 6) c = sceneSection(p);
+  else c = sceneModern(p);
   // Slide projector: a clunk of light and a jolt as each slide drops in.
   c *= 1.0 + uClunk * 1.5;
   fragColor = vec4(max(c, 0.0), 1.0);
@@ -412,6 +468,7 @@ export class Concrete extends ShaderGenerator {
       uLevel: { value: 1 },
       uDrawT: { value: 0 },
       uWarm: { value: 0 },
+      uTurn: { value: 0 },
     });
   }
 
@@ -442,5 +499,9 @@ export class Concrete extends ShaderGenerator {
     u.uWarm.value = num(p.warm, 0.3);
     u.uLevel.value = 9 - (Math.floor(ctx.beat / (bpb * 4)) % 9);
     u.uDrawT.value = ((ctx.beat / (bpb * 8)) % 1) * 1.15;
+    // Modern: a quarter turn at the top of every bar (a quick ease, then hold).
+    const bar = Math.floor(ctx.beat / bpb);
+    const k = Math.min(1, (ctx.beat - bar * bpb) / 0.5);
+    u.uTurn.value = (bar + k * k * (3 - 2 * k)) * (Math.PI / 2);
   }
 }

@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "name": "Big Numbers",
+  "category": "Brutalist",
+  "tags": [
+    "brutalist",
+    "neo-brutal",
+    "modern",
+    "flat",
+    "numbers",
+    "split-flap",
+    "data",
+    "grid"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "neo",
+      "name": "Neo-brutal",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "neoBrutal",
+        "params": {
+          "mode": "numbers",
+          "source": "lyrics",
+          "text": "RAW / LOUD / HONEST / NO DECORATION",
+          "lineBeats": 8,
+          "uppercase": true,
+          "speed": 1,
+          "lead": 120
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#111111",
+      "#2b59ff",
+      "#ff4fd8",
+      "#b8ff3c",
+      "#f5f2ea"
+    ]
+  },
+  "description": "BPM, bar, beat and running time as giant grotesk numerals on a heavy grid, the beat cell flipping like a split-flap board and lighting up in turn."
+}

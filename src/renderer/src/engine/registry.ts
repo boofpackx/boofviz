@@ -620,7 +620,7 @@ export const GENERATORS: ModuleDef[] = [
     label: 'Concrete age',
     description: 'Raw board-formed concrete: prefab panel blocks at night in the snow (windows lighting floor by floor on the beat), a monolith in fog with light slits, a parking spiral with stencilled level numbers, deck-access walkways with doors lighting in sequence, a water tower at dusk, a wall close-up, or an architect\u2019s section drawing. Slides: a projector changing view every few bars.',
     params: [
-      e('scene', 'Scene', 'panels', ['panels', 'monolith', 'parking', 'walkways', 'watertower', 'wall', 'section']),
+      e('scene', 'Scene', 'panels', ['panels', 'monolith', 'parking', 'walkways', 'watertower', 'wall', 'section', 'modern']),
       i('slides', 'Slide every (bars)', 0, 0, 16, '0 = stay on the scene'),
       f('speed', 'Camera speed', 1, 0, 4),
       f('lit', 'Windows lit', 0.6, 0, 1),
@@ -628,6 +628,20 @@ export const GENERATORS: ModuleDef[] = [
       f('view', 'Viewpoint', 0, 0, 1),
       f('warm', 'Warm light', 0.3, 0, 1),
       f('react', 'Music reaction', 1, 0, 2),
+    ],
+  },
+  {
+    kind: 'neoBrutal',
+    label: 'Neo-brutal',
+    description: 'Neo-brutal graphics: lyric cards slamming into a stack, a raw unstyled web page breaking on the beat, split-flap BPM/bar/beat/time numbers, a sticker bomb, an oversized mixer whose faders are the real bands, a monospace data dump, a wall of lyric marquees, or lyrics snapped into a Swiss grid.',
+    params: [
+      e('mode', 'Layout', 'cards', ['cards', 'html', 'numbers', 'stickers', 'eq', 'data', 'marquee', 'grid']),
+      e('source', 'Words from', 'lyrics', ['lyrics', 'text']),
+      t('text', 'Text', 'RAW / LOUD / HONEST / NO DECORATION', 'your own lines, split by "/"'),
+      i('lineBeats', 'Beats per line (own text)', 8, 1, 32),
+      b('uppercase', 'Uppercase', true),
+      f('speed', 'Marquee speed', 1, 0, 4),
+      i('lead', 'Lyrics lead (ms)', 120, -500, 1000),
     ],
   },
   {
@@ -770,6 +784,12 @@ export const EFFECTS: ModuleDef[] = [
     label: 'Two-colour print',
     description: 'A cheap two-colour print: the picture split into two inks with their own halftone screens, slightly misregistered (more on the kick), on grainy paper.',
     params: [e('inks', 'Inks', 'red-black', ['red-black', 'blue-pink', 'green-orange', 'black-yellow', 'look']), f('misregister', 'Misregistration', 1, 0, 4), f('dot', 'Dot size', 6, 2, 24, 0.5), f('grain', 'Paper grain', 0.3, 0, 1)],
+  },
+  {
+    kind: 'neoFlat',
+    label: 'Neo-brutal flat',
+    description: 'Turns any picture into neo-brutal graphics: flat loud colours, thick black outlines where colours meet, and a hard offset shadow (no blur) behind everything that isn\u2019t background.',
+    params: [e('colours', 'Colours', 'neo', ['neo', 'look']), f('outline', 'Outline', 4, 0, 16, 0.5), f('shadow', 'Shadow offset', 12, 0, 40, 0.5), f('flatten', 'Flatten', 1, 0, 1)],
   },
   {
     kind: 'tvSet',

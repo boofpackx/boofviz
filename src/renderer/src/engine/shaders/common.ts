@@ -103,3 +103,23 @@ ${PALETTE_GLSL}
 ${SDF_GLSL}
 ${UTIL_GLSL}
 `;
+
+/**
+ * For flat graphics drawn in display colours (canvas UI, posters): the scene
+ * value that the output pass (ACES fit, sRGB) turns back into exactly this
+ * sRGB colour, so whites stay white and loud colours stay loud.
+ */
+export const DISPLAY_GLSL = /* glsl */ `
+vec3 fromDisplay(vec3 srgb) {
+  const mat3 ACES_IN = mat3(0.59719, 0.07600, 0.02840, 0.35458, 0.90834, 0.13383, 0.04823, 0.01566, 0.83777);
+  const mat3 ACES_OUT = mat3(1.60475, -0.10208, -0.00327, -0.53108, 1.10813, -0.07276, -0.07367, -0.00605, 1.07602);
+  vec3 y = mix(srgb / 12.92, pow((srgb + 0.055) / 1.055, vec3(2.4)), step(0.04045, srgb));
+  vec3 v = clamp(inverse(ACES_OUT) * clamp(y, 0.0, 1.0), 0.0, 0.995);
+  // Invert the RRT/ODT rational fit per channel (positive root of a quadratic).
+  vec3 a = 1.0 - 0.983729 * v;
+  vec3 b = 0.0245786 - 0.4329510 * v;
+  vec3 c = -(0.000090537 + 0.238081 * v);
+  vec3 u = (-b + sqrt(max(b * b - 4.0 * a * c, 0.0))) / (2.0 * a);
+  return max(inverse(ACES_IN) * u, 0.0);
+}
+`;

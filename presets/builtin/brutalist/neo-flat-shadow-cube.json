@@ -1,0 +1,174 @@
+{
+  "schema": 1,
+  "name": "Flat Shadow Cube",
+  "category": "Brutalist",
+  "tags": [
+    "brutalist",
+    "neo-brutal",
+    "modern",
+    "flat",
+    "cube",
+    "3d",
+    "hard shadow",
+    "outline"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "paper",
+      "name": "Paper",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "background",
+        "params": {
+          "style": "vertical",
+          "from": 1,
+          "to": 1,
+          "intensity": 1,
+          "motion": 0,
+          "pulse": 0
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "cube",
+      "name": "Cube",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "twistCube",
+        "params": {
+          "style": "stickers",
+          "colors": "classic",
+          "turnsPerBar": 4,
+          "cyclePhrases": 1,
+          "snap": 0.35,
+          "slices": true,
+          "tumble": true,
+          "spin": 0.15,
+          "size": 1,
+          "punch": 0.06,
+          "explode": 1.2,
+          "round": 0.12,
+          "glow": 0.6,
+          "shadow": 0.6,
+          "tilt": 0.45
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "flat",
+      "name": "Flatten",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "neoFlat",
+          "enabled": true,
+          "params": {
+            "colours": "neo",
+            "outline": 5,
+            "shadow": 16,
+            "flatten": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Outline",
+      "value": 0.31,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.outline",
+          "range": [
+            0,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shadow",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.shadow",
+          "range": [
+            0,
+            40
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#111111",
+      "#2b59ff",
+      "#ff4fd8",
+      "#b8ff3c",
+      "#f5f2ea"
+    ]
+  },
+  "description": "The twisting cube put through the neo-brutal flattener: loud flat colours, thick black outlines and a hard offset shadow that jumps on the kick. (The same switch is in the Master tab for any look.)"
+}

@@ -862,7 +862,84 @@ class TwoColourPrint implements Effect {
   }
 }
 
+
+// ---------------------------------------------------------------------------
+// Neo-brutal flat
+
+const NEOFLAT = `${HEADER}
+uniform vec3 uCols[6];
+uniform float uOutline, uShadow, uFlatten;
+vec3 flatOf(vec2 uv, out float idx) {
+  vec3 c = gam(texture(uInput, uv).rgb);
+  float best = 1e9;
+  vec3 pick = uCols[0];
+  idx = 0.0;
+  for (int i = 0; i < 6; i++) {
+    vec3 d = c - uCols[i];
+    float dd = dot(d, d);
+    if (dd < best) { best = dd; pick = uCols[i]; idx = float(i); }
+  }
+  return mix(c, pick, uFlatten);
+}
+void main() {
+  vec2 px = 1.0 / uRes;
+  float id, idR, idU, idS, bg;
+  vec3 c = flatOf(vUv, id);
+  // Background: whatever flat colour the corners are.
+  flatOf(vec2(0.02, 0.03), bg);
+  // Thick black outlines where the flat colour changes.
+  float o = uOutline;
+  flatOf(vUv + vec2(o, 0.0) * px, idR);
+  flatOf(vUv + vec2(0.0, o) * px, idU);
+  float edge = step(0.5, abs(id - idR)) + step(0.5, abs(id - idU));
+  // Hard offset shadow: anything that isn't background casts a black block down and right.
+  vec3 sc = flatOf(vUv + vec2(-uShadow, uShadow) * px, idS);
+  float shadow = step(0.5, abs(idS - bg)) * step(abs(id - bg), 0.5);
+  c = mix(c, vec3(0.067), clamp(shadow, 0.0, 1.0));
+  c = mix(c, vec3(0.067), clamp(edge, 0.0, 1.0));
+  fragColor = vec4(lin(c), 1.0);
+}`;
+
+const NEO_COLS = ['#f5f2ea', '#b8ff3c', '#ff4fd8', '#2b59ff', '#ffe14a', '#111111'];
+
+class NeoFlat implements Effect {
+  readonly kind = 'neoFlat';
+  private readonly pass = new FullscreenPass(mat(NEOFLAT, { uCols: { value: Array.from({ length: 6 }, () => new THREE.Vector3()) }, uOutline: { value: 4 }, uShadow: { value: 12 }, uFlatten: { value: 1 } }));
+
+  render(renderer: THREE.WebGLRenderer, input: THREE.WebGLRenderTarget, out: THREE.WebGLRenderTarget, p: ParamBag, ctx: FxContext): THREE.WebGLRenderTarget {
+    const u = this.pass.material.uniforms;
+    u.uInput.value = input.texture;
+    (u.uRes.value as THREE.Vector2).set(out.width, out.height);
+    const cols = u.uCols.value as THREE.Vector3[];
+    const fromLook = p.colours === 'look';
+    for (let i = 0; i < 6; i++) {
+      if (fromLook && i > 0 && i < 5) {
+        const k = i;
+        cols[i].set(Math.pow(ctx.palette[k * 3], 1 / 2.2), Math.pow(ctx.palette[k * 3 + 1], 1 / 2.2), Math.pow(ctx.palette[k * 3 + 2], 1 / 2.2));
+      } else {
+        const c = new THREE.Color(NEO_COLS[i]);
+        cols[i].set(Math.pow(c.r, 1 / 2.2), Math.pow(c.g, 1 / 2.2), Math.pow(c.b, 1 / 2.2));
+      }
+    }
+    const scale = out.height / 1080;
+    u.uOutline.value = Math.max(1, n(p.outline, 4) * scale);
+    u.uShadow.value = n(p.shadow, 12) * scale * (1 + 0.3 * ctx.kick);
+    u.uFlatten.value = n(p.flatten, 1);
+    this.pass.render(renderer, out);
+    return out;
+  }
+
+  compileTargets(): FullscreenPass[] {
+    return [this.pass];
+  }
+
+  dispose(): void {
+    this.pass.dispose();
+  }
+}
+
 export function createTapeEffect(kind: string): Effect | null {
+  if (kind === 'neoFlat') return new NeoFlat();
   if (kind === 'print2') return new TwoColourPrint();
   if (kind === 'tvSet') return new TvSet();
   if (kind === 'tapeStack') return new TapeStack();

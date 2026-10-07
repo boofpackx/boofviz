@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "name": "Modern Concrete",
+  "category": "Brutalist",
+  "tags": [
+    "brutalist",
+    "neo-brutal",
+    "modern",
+    "flat",
+    "architecture",
+    "concrete",
+    "3d",
+    "hard light"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "form",
+      "name": "Forms",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "concrete",
+        "params": {
+          "scene": "modern",
+          "slides": 0,
+          "speed": 1,
+          "lit": 0.6,
+          "snow": 1,
+          "view": 0,
+          "warm": 0.3,
+          "react": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "air",
+      "name": "Air",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.03,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Viewpoint",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.view",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#111111",
+      "#3a3a3a",
+      "#ff4fd8",
+      "#2b59ff",
+      "#ffe14a"
+    ]
+  },
+  "description": "Clean concrete blocks with flat colour planes under a hard sun, turning a quarter turn at the top of every bar."
+}

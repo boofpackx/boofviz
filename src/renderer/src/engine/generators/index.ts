@@ -21,6 +21,7 @@ import { LyricVideo } from './LyricVideo';
 import { Memphis } from './Memphis';
 import { MusicChannel } from './MusicChannel';
 import { OpArt } from './OpArt';
+import { NeoBrutal } from './NeoBrutal';
 import { Orb } from './Orb';
 import { Pipes } from './Pipes';
 import { PlatinumStage } from './PlatinumStage';
@@ -81,6 +82,7 @@ const FACTORIES: Record<string, () => Generator> = {
   vitalSigns: () => new VitalSigns(),
   platinumStage: () => new PlatinumStage(),
   concrete: () => new Concrete(),
+  neoBrutal: () => new NeoBrutal(),
 };
 
 export function createGenerator(kind: string): Generator {

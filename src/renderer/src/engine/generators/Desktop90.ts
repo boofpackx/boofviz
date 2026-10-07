@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GEN_HEADER } from '../shaders/common';
+import { DISPLAY_GLSL, GEN_HEADER } from '../shaders/common';
 import { liveText, lyricsFeed, songPositionMs } from '../lyricsFeed';
 import { hash2 } from '../lostMedia';
 import type { GenContext } from './Generator';
@@ -8,10 +8,11 @@ import { num, ShaderGenerator } from './ShaderGenerator';
 const W = 640;
 
 const FRAG = /* glsl */ `${GEN_HEADER}
+${DISPLAY_GLSL}
 uniform sampler2D uTex;
 void main() {
-  vec3 c = texture(uTex, vec2(vUv.x, 1.0 - vUv.y)).rgb;
-  fragColor = vec4(pow(c, vec3(2.2)), 1.0);
+  // Drawn in display colours: hand the output pass exactly what it needs to show them as drawn.
+  fragColor = vec4(fromDisplay(texture(uTex, vec2(vUv.x, 1.0 - vUv.y)).rgb), 1.0);
 }
 `;
 
