@@ -5,6 +5,7 @@ import { sceneOf } from '@/engine/presetIO';
 import { engine, preview } from '../runtime';
 import { currentScene, useShow } from '../show';
 import { useControl } from '../store';
+import { transitionFor } from '../launcher';
 import { DebugHud } from '../hud/DebugHud';
 import { previewStats } from '../hooks';
 import { Button } from './ui';
@@ -39,9 +40,12 @@ export function Preview() {
         if (s.settings.lyrics.overlay !== prev.settings.lyrics.overlay) renderer.setLyricsOverlay(s.settings.lyrics.overlay);
       });
       const offShow = useShow.subscribe((s, prev) => {
-        if (s.doc !== prev.doc || (s.queued !== prev.queued && !s.queued)) renderer.setScene(sceneOf(s.doc));
+        // A queued launch going live: the renderer already holds it for its beat.
+        const fromQueue = !!prev.queued && !s.queued && prev.queued.entry.id === s.sourceId;
+        const newLook = s.sourceId !== prev.sourceId && !fromQueue;
+        if (!fromQueue && (s.doc !== prev.doc || (s.queued !== prev.queued && !s.queued))) renderer.setScene(sceneOf(s.doc), undefined, newLook ? transitionFor(s.doc) : undefined);
         // A queued launch goes live on its beat in the preview exactly as in the output.
-        if (s.queued && (s.queued !== prev.queued || s.doc !== prev.doc)) renderer.setScene(sceneOf(s.queued.entry.preset), s.queued.atBeat);
+        if (s.queued && (s.queued !== prev.queued || s.doc !== prev.doc)) renderer.setScene(sceneOf(s.queued.entry.preset), s.queued.atBeat, transitionFor(s.queued.entry.preset));
       });
       unsubscribe = () => {
         offShow();

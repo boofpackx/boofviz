@@ -3,28 +3,48 @@ import type { AudioFrame } from '@shared/types/audio';
 import type { ParamBag, Renderer, RendererOptions, RenderContext, RenderStats, Scene } from '@shared/types/engine';
 import type { LyricsRenderInfo } from '../generators/Lyrics';
 import { OUTPUT_FRAG, OUTPUT_VERT } from '../shaders/output';
+import { TRANSITION_FRAG, TRANSITION_INDEX, TRANSITION_VERT } from '../shaders/transition';
+import { hdrTarget } from '../fx/effects';
 import { Compositor } from './Compositor';
 import { FullscreenPass } from './fullscreen';
 import { ShaderWarmup } from './warmup';
 
 const MAX_DIM = 8192;
 
+/** How a new look comes in (settings.library.transition or a preset's transitionIn). */
+export interface SceneTransition {
+  type: string;
+  beats: number;
+}
+
+const EMPTY_SCENE: Scene = { layers: [], palette: 'Neon', paletteCycle: { mode: 'off', every: 1, fadeBeats: 1, list: [] }, hueRotate: { mode: 'off', rate: 0, amount: 0 }, macros: [] };
+
 /**
  * WebGL2 backend: the compositor renders the scene in linear HDR, then the
  * output pass applies master brightness/saturation/hue, ACES tonemapping,
  * sRGB encoding, dithering and blackout.
+ *
+ * Two compositors take turns so a new look can blend in over the old one:
+ * the transition runs for a number of beats from the launch beat, so every
+ * window shows the same point of the transition. Edits to the live look go
+ * straight to the active compositor without a transition.
  */
 export class ThreeRenderer implements Renderer {
   readonly backend = 'webgl2' as const;
   private renderer!: THREE.WebGLRenderer;
   private compositor!: Compositor;
+  /** The idle compositor; during a transition it renders the outgoing look. */
+  private spare!: Compositor;
   private output!: FullscreenPass;
+  private blend!: FullscreenPass;
+  private blendTarget: THREE.WebGLRenderTarget | null = null;
+  private transition: { type: number; startBeat: number; beats: number } | null = null;
   private options: RendererOptions = { renderScale: 1, isOutput: false };
   private frameIndex = 0;
   private blackout = 0;
   private css = { w: 1, h: 1, dpr: 1 };
   /** A scene waiting for its launch beat (quantized preset change). */
-  private pending: { scene: Scene; atBeat: number } | null = null;
+  private pending: { scene: Scene; atBeat: number; transition?: SceneTransition } | null = null;
   private readonly warmup = new ShaderWarmup();
   /** When the last queued scene went live: that frame's beat and the frame before's (sync checks). */
   lastSwitch: { beat: number; prevBeat: number } | null = null;
@@ -48,6 +68,17 @@ export class ThreeRenderer implements Renderer {
     this.renderer.autoClear = false;
     this.renderer.setPixelRatio(1);
     this.compositor = new Compositor(this.renderer);
+    this.spare = new Compositor(this.renderer);
+    this.blend = new FullscreenPass(
+      new THREE.RawShaderMaterial({
+        glslVersion: THREE.GLSL3,
+        vertexShader: TRANSITION_VERT,
+        fragmentShader: TRANSITION_FRAG,
+        depthTest: false,
+        depthWrite: false,
+        uniforms: { uA: { value: null }, uB: { value: null }, uT: { value: 0 }, uType: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) } },
+      }),
+    );
     this.output = new FullscreenPass(
       new THREE.RawShaderMaterial({
         glslVersion: THREE.GLSL3,
@@ -71,18 +102,45 @@ export class ThreeRenderer implements Renderer {
   /**
    * Show `scene`. With `applyAtBeat`, it goes live on the first frame whose
    * beat counter reaches that beat, so every window switches on the same beat.
+   * With a `transition`, it is a new look that blends in over the old one;
+   * without, it replaces the live look as is (edits, cuts).
    */
-  setScene(scene: Scene, applyAtBeat?: number): void {
+  setScene(scene: Scene, applyAtBeat?: number, transition?: SceneTransition): void {
     if (!this.warmupTimer) {
       // Once the first look is up, compile every other shader in the background.
       const kinds = scene.layers.map((l) => l.source.kind);
       this.warmupTimer = window.setTimeout(() => void this.warmup.run(this.renderer, kinds), 1500);
     }
-    if (applyAtBeat === undefined) {
+    if (applyAtBeat === undefined && !this.wantsBlend(transition)) {
       this.pending = null;
       this.compositor.setScene(scene);
-    } else this.pending = { scene, atBeat: applyAtBeat };
+    } else this.pending = { scene, atBeat: applyAtBeat ?? Number.NEGATIVE_INFINITY, transition };
   }
+
+  private wantsBlend(t: SceneTransition | undefined): t is SceneTransition {
+    return !!t && t.type !== 'cut' && t.beats > 0;
+  }
+
+  /** Make `scene` live now (frame beat `beat`), blending from the old look when asked. */
+  private goLive(scene: Scene, beat: number, transition: SceneTransition | undefined): void {
+    if (!this.wantsBlend(transition)) {
+      this.compositor.setScene(scene);
+      return;
+    }
+    // A transition still running ends here: its outgoing look is dropped.
+    const out = this.compositor;
+    this.compositor = this.spare;
+    this.spare = out;
+    this.compositor.setScene(scene);
+    this.transition = { type: TRANSITION_INDEX[transition.type] ?? 0, startBeat: beat, beats: transition.beats };
+  }
+
+  /** The running transition's type and progress (debug hooks). */
+  get transitionInfo(): { type: number; t: number } | null {
+    return this.transition ? { type: this.transition.type, t: this.transitionT } : null;
+  }
+
+  private transitionT = 0;
 
   /** Beat a queued scene is waiting for, if any. */
   get pendingBeat(): number | null {
@@ -103,6 +161,7 @@ export class ThreeRenderer implements Renderer {
   /** Lyrics over every look (settings.lyrics.overlay). */
   setLyricsOverlay(overlay: { enabled: boolean; params: ParamBag } | null): void {
     this.compositor.setOverlay(overlay?.enabled ? overlay.params : null);
+    this.spare.setOverlay(overlay?.enabled ? overlay.params : null);
   }
 
   /** What the lyrics overlay showed last frame (debug hooks). */
@@ -123,6 +182,8 @@ export class ThreeRenderer implements Renderer {
     if (w === this.stats.width && h === this.stats.height) return;
     this.renderer.setSize(w, h, false);
     this.compositor.resize(w, h);
+    this.spare.resize(w, h);
+    this.blendTarget?.setSize(w, h);
     this.stats.width = w;
     this.stats.height = h;
   }
@@ -132,14 +193,37 @@ export class ThreeRenderer implements Renderer {
     // Blackout eases over ~80 ms: instant to the eye, but never a hard flash.
     this.blackout += ((g.blackout ? 1 : 0) - this.blackout) * (1 - Math.exp(-ctx.dt / 0.03));
     if (this.pending && frame.beat >= this.pending.atBeat - 0.002) {
-      this.compositor.setScene(this.pending.scene);
+      const { scene, atBeat, transition } = this.pending;
       this.pending = null;
-      this.lastSwitch = { beat: frame.beat, prevBeat: this.lastBeat };
+      // Quantized launches count the transition from the launch beat itself, so windows agree.
+      this.goLive(scene, Number.isFinite(atBeat) ? atBeat : frame.beat, transition);
+      if (Number.isFinite(atBeat)) this.lastSwitch = { beat: frame.beat, prevBeat: this.lastBeat };
     }
     this.lastBeat = frame.beat;
-    const scene = this.compositor.render(frame, ctx.dt, g);
+    let result = this.compositor.render(frame, ctx.dt, g);
+    if (this.transition) {
+      const tr = this.transition;
+      this.transitionT = (frame.beat - tr.startBeat) / Math.max(1e-3, tr.beats);
+      if (this.transitionT >= 1) {
+        this.transition = null;
+        // Free the outgoing look's generators and buffers.
+        this.spare.setScene(EMPTY_SCENE);
+      } else {
+        const old = this.spare.render(frame, ctx.dt, g);
+        this.blendTarget ??= hdrTarget(result.width, result.height);
+        if (this.blendTarget.width !== result.width || this.blendTarget.height !== result.height) this.blendTarget.setSize(result.width, result.height);
+        const bu = this.blend.material.uniforms;
+        bu.uA.value = old.texture;
+        bu.uB.value = result.texture;
+        bu.uT.value = Math.max(0, this.transitionT);
+        bu.uType.value = tr.type;
+        (bu.uRes.value as THREE.Vector2).set(result.width, result.height);
+        this.blend.render(this.renderer, this.blendTarget);
+        result = this.blendTarget;
+      }
+    }
     const u = this.output.material.uniforms;
-    u.uScene.value = scene.texture;
+    u.uScene.value = result.texture;
     u.uExposure.value = g.brightness;
     u.uSaturation.value = g.saturation;
     u.uHueShift.value = (g.hueShift * Math.PI) / 180;
@@ -152,6 +236,9 @@ export class ThreeRenderer implements Renderer {
     window.clearTimeout(this.warmupTimer);
     this.warmup.dispose();
     this.compositor.dispose();
+    this.spare.dispose();
+    this.blend.dispose();
+    this.blendTarget?.dispose();
     this.output.dispose();
     this.renderer.dispose();
   }

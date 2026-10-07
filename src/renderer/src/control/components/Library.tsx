@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import type { PresetEntry } from '@/engine/library';
 import { libraryEntries, useShow } from '../show';
 import { useControl } from '../store';
-import { launchQuantized, toggleFavorite } from '../launcher';
+import { createPool, deletePool, launchQuantized, renamePool, toggleFavorite, togglePoolMember } from '../launcher';
 import { contextMenu } from './ContextMenu';
 import { Swatch } from './Inspector';
 import { Button, Segmented } from './ui';
@@ -13,11 +13,13 @@ type Tab = 'presets' | 'templates';
 export function filteredEntries(tab: Tab, query: string, category: string, tag: string | null): PresetEntry[] {
   const { presets, templates } = libraryEntries();
   const q = query.trim().toLowerCase();
-  const favs = useControl.getState().settings.library.favorites;
+  const { favorites: favs, pools } = useControl.getState().settings.library;
+  const pool = category.startsWith('pool:') ? pools.find((x) => `pool:${x.id}` === category) : undefined;
   return (tab === 'presets' ? presets : templates).filter((e) => {
     const p = e.preset;
     if (category === '★ Favorites' && !favs.includes(e.id)) return false;
-    if (category !== 'All' && category !== '★ Favorites' && p.category !== category) return false;
+    if (category.startsWith('pool:') && !pool?.ids.includes(e.id)) return false;
+    if (category !== 'All' && category !== '★ Favorites' && !category.startsWith('pool:') && p.category !== category) return false;
     if (tag && !p.tags.includes(tag)) return false;
     if (!q) return true;
     return p.name.toLowerCase().includes(q) || p.tags.some((t) => t.includes(q)) || p.category.toLowerCase().includes(q);
@@ -37,11 +39,14 @@ export function Library() {
   const queuedId = useShow((s) => s.queued?.entry.id);
   const dirty = useShow((s) => s.dirty);
   const favorites = useControl((s) => s.settings.library.favorites);
+  const pools = useControl((s) => s.settings.library.pools);
+  const update = useControl((s) => s.update);
+  const [renaming, setRenaming] = useState<string | null>(null);
   const { deleteUser, importFiles } = useShow.getState();
   const load = (e: PresetEntry): void => launchQuantized(e);
   Object.assign(libraryView, { tab, query, category, tag });
 
-  const entries = useMemo(() => filteredEntries(tab, query, category, tag), [tab, query, category, tag, userPresets, favorites]); // eslint-disable-line react-hooks/exhaustive-deps
+  const entries = useMemo(() => filteredEntries(tab, query, category, tag), [tab, query, category, tag, userPresets, favorites, pools]); // eslint-disable-line react-hooks/exhaustive-deps
   const all = tab === 'presets' ? libraryEntries().presets : libraryEntries().templates;
   const categories = ['All', ...(tab === 'presets' ? ['★ Favorites'] : []), ...Array.from(new Set(all.map((e) => e.preset.category)))];
   const tags = useMemo(() => {
@@ -81,6 +86,51 @@ export function Library() {
               {c}
             </button>
           ))}
+          {tab === 'presets' &&
+            pools.map((p) =>
+              renaming === p.id ? (
+                <input
+                  key={p.id}
+                  autoFocus
+                  defaultValue={p.name}
+                  onBlur={(e) => {
+                    renamePool(p.id, e.target.value);
+                    setRenaming(null);
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+                  className="w-24 rounded-full border border-accent-2 bg-ink-800 px-2 py-0.5 text-[10px] text-ink-100 outline-none"
+                />
+              ) : (
+                <button
+                  key={p.id}
+                  type="button"
+                  title="Pool for shuffle and auto-play (right-click to rename, delete or shuffle from it)"
+                  onClick={() => setCategory(`pool:${p.id}`)}
+                  onContextMenu={contextMenu(() => [
+                    { label: 'Shuffle and auto-play from this pool', onSelect: () => update({ library: { shufflePool: `pool:${p.id}` } }) },
+                    { label: 'Rename', onSelect: () => setRenaming(p.id) },
+                    { label: 'Delete pool', onSelect: () => deletePool(p.id) },
+                  ])}
+                  className={`rounded-full border px-2 py-0.5 text-[10px] ${category === `pool:${p.id}` ? 'border-accent-2 bg-accent-2/15 text-ink-100' : 'border-ink-600 text-ink-400 hover:text-ink-200'}`}
+                >
+                  ● {p.name} · {p.ids.length}
+                </button>
+              ),
+            )}
+          {tab === 'presets' && (
+            <button
+              type="button"
+              title="New pool for shuffle and auto-play"
+              onClick={() => {
+                const p = createPool();
+                setCategory(`pool:${p.id}`);
+                setRenaming(p.id);
+              }}
+              className="rounded-full border border-dashed border-ink-600 px-2 py-0.5 text-[10px] text-ink-500 hover:text-ink-200"
+            >
+              + Pool
+            </button>
+          )}
         </div>
         <div className="flex flex-wrap gap-1">
           {tags.map((t) => (
@@ -114,6 +164,8 @@ export function Library() {
                       { label: 'Load', onSelect: () => load(e) },
                       { label: 'Load now (skip quantize)', onSelect: () => launchQuantized(e, 'now') },
                       { label: favorites.includes(e.id) ? 'Remove from favorites' : 'Add to favorites', onSelect: () => toggleFavorite(e.id) },
+                      ...pools.map((pl) => ({ label: pl.ids.includes(e.id) ? `Remove from pool "${pl.name}"` : `Add to pool "${pl.name}"`, onSelect: () => togglePoolMember(pl.id, e.id) })),
+                      { label: 'New pool with this look', onSelect: () => setRenaming(createPool(e.id).id) },
                       { label: 'Delete', disabled: e.source !== 'user', hint: e.source !== 'user' ? 'built-in' : '', onSelect: () => setConfirm(e.id) },
                     ])}
                     title={p.description}

@@ -75,6 +75,8 @@ export class AudioFrameBuilder {
   private port: MessagePort | null = null;
   /** Packets received (for connection status). */
   packetCount = 0;
+  /** Drops that have gone live so far (a counter, so a slower reader never misses one). */
+  dropCount = 0;
   lastPacketEpoch = 0;
 
   attach(port: MessagePort): void {
@@ -128,6 +130,7 @@ export class AudioFrameBuilder {
       this.pendingHat ||= p.hat;
       this.pendingAny ||= p.any;
       this.pendingDrop ||= p.drop;
+      if (p.drop) this.dropCount++;
       applied = p;
     }
     if (applied) this.apply(applied);

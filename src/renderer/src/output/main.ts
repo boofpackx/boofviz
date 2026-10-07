@@ -23,6 +23,7 @@ let renderer: ThreeRenderer | null = null;
   scene: () => scene,
   pendingBeat: () => renderer?.pendingBeat ?? null,
   lastSwitch: () => renderer?.lastSwitch ?? null,
+  transition: () => renderer?.transitionInfo ?? null,
   gpu: () => renderer?.gpuInfo ?? null,
   beatAtEpoch: (ms: number) => builder.beatAtEpoch(ms),
   /** Current lyric line at an epoch time (with the overlay's lead), and what the overlay drew last frame. */
@@ -55,7 +56,7 @@ api.onOutputCommand((cmd) => {
   if (cmd.scene) {
     scene = cmd.scene;
     applyAtBeat = cmd.applyAtBeat;
-    renderer?.setScene(scene, applyAtBeat);
+    renderer?.setScene(scene, applyAtBeat, cmd.transition);
   }
 });
 

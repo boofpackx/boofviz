@@ -27,6 +27,8 @@ export interface OutputCommand {
   scene?: Scene;
   /** Apply `scene` when the beat counter reaches this beat (quantized launch). */
   applyAtBeat?: number;
+  /** A new look: blend it in like this (absent for edits). */
+  transition?: { type: string; beats: number };
 }
 
 /** Ableton Link session snapshot (main → control → analysis worker). */

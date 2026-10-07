@@ -21,16 +21,43 @@ export interface OutputSettings {
 
 export type LaunchQuantize = 'now' | 'beat' | 'bar' | 'phrase';
 
+/** A named set of looks for shuffle and auto-play. */
+export interface PresetPool {
+  id: string;
+  name: string;
+  ids: string[];
+}
+
+/** Where shuffle picks from: favorites, everything, the current look's category, what the Library shows, or a named pool. */
+export type ShufflePool = 'favorites' | 'all' | 'category' | 'view' | `pool:${string}`;
+
+export type TransitionType = 'cut' | 'crossfade' | 'flashBlack' | 'flashWhite' | 'lumaWipe' | 'zoomThrough' | 'glitchCut' | 'blurDissolve' | 'feedbackSmear';
+
 export interface LibrarySettings {
   /** Preset ids starred by the user, in the order they were starred (keys 1–9 launch the first nine). */
   favorites: string[];
   /** When a picked preset goes live. */
   quantize: LaunchQuantize;
+  /** Auto-play: change looks by itself. */
   autoShuffle: boolean;
-  /** Auto-shuffle interval in bars. */
+  /** Auto-play rhythm: every N bars, every N phrases, or on each drop. */
+  autoMode: 'bars' | 'phrases' | 'drops';
+  /** Interval for autoMode 'bars'. */
   shuffleBars: number;
-  /** Shuffle from favorites (falls back to every preset when there are none). */
-  shufflePool: 'favorites' | 'all';
+  /** Interval for autoMode 'phrases'. */
+  autoPhrases: number;
+  /** In bars/phrases mode, also change on the next beat after a drop. */
+  alsoOnDrop: boolean;
+  /** Prefer looks whose energy rating matches the music right now. */
+  energyMatch: boolean;
+  /** Random picks, or the pool in Library order. */
+  order: 'random' | 'sequence';
+  /** Don't repeat any of the last N looks. */
+  noRepeat: number;
+  shufflePool: ShufflePool;
+  pools: PresetPool[];
+  /** How every new look comes in (a preset's own transitionIn wins). */
+  transition: { type: TransitionType; beats: number };
 }
 
 export interface LyricsSettings {
@@ -63,7 +90,21 @@ export const DEFAULT_SETTINGS: Settings = {
   output: { fullscreen: false, renderScale: 1, openOnLaunch: true },
   globals: DEFAULT_GLOBALS,
   ui: { showHud: true },
-  library: { favorites: [], quantize: 'bar', autoShuffle: false, shuffleBars: 16, shufflePool: 'favorites' },
+  library: {
+    favorites: [],
+    quantize: 'bar',
+    autoShuffle: false,
+    autoMode: 'bars',
+    shuffleBars: 16,
+    autoPhrases: 1,
+    alsoOnDrop: false,
+    energyMatch: true,
+    order: 'random',
+    noRepeat: 4,
+    shufflePool: 'favorites',
+    pools: [],
+    transition: { type: 'crossfade', beats: 2 },
+  },
   spotify: { clientId: '' },
   // Overlay params are a partial bag: the lyrics generator's defaults fill the rest.
   lyrics: { offsetMs: 0, online: true, textLooks: false, overlay: { enabled: false, params: { mode: 'karaoke', position: 'lower', size: 0.7, backdrop: 0.45 } } },

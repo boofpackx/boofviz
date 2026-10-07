@@ -4,7 +4,7 @@ import { engine, initEngine } from './runtime';
 import { useControl } from './store';
 import { useShow } from './show';
 import { applyTempoSource, initExternalTempo } from './externalTempo';
-import { favoriteEntries, launchQuantized, shuffleNow, startLauncher } from './launcher';
+import { favoriteEntries, launchQuantized, shuffleNow, startLauncher, toggleAuto, transitionFor } from './launcher';
 import { TopBar } from './components/TopBar';
 import { SourcePanel, useFileDrop } from './components/SourcePanel';
 import { Preview } from './components/Preview';
@@ -32,12 +32,13 @@ function useBootstrap(): void {
     let timer = 0;
     const pushQueued = (): void => {
       const q = useShow.getState().queued;
-      if (q) api.sendOutputCommand({ scene: sceneOf(q.entry.preset), applyAtBeat: q.atBeat });
+      if (q) api.sendOutputCommand({ scene: sceneOf(q.entry.preset), applyAtBeat: q.atBeat, transition: transitionFor(q.entry.preset) });
     };
-    const pushScene = (): void => {
+    // `look`: a new look (blend it in); `send: false` when the output already holds it (a queued launch going live).
+    const pushScene = (look = false, send = true): void => {
       pending = false;
       const { doc, sourceId, dirty } = useShow.getState();
-      api.sendOutputCommand({ scene: sceneOf(doc) });
+      if (send) api.sendOutputCommand(look ? { scene: sceneOf(doc), transition: transitionFor(doc) } : { scene: sceneOf(doc) });
       pushQueued();
       api.writeSession(JSON.stringify({ doc, sourceId, dirty }));
     };
@@ -51,7 +52,8 @@ function useBootstrap(): void {
       if (s.sourceId !== prev.sourceId) {
         // A new look goes out at once, before this window spends a frame building its preview.
         window.clearTimeout(timer);
-        pushScene();
+        const fromQueue = !!prev.queued && !s.queued && prev.queued.entry.id === s.sourceId;
+        pushScene(true, !fromQueue);
         return;
       }
       if (pending) return;
@@ -136,6 +138,9 @@ function useShortcuts(): void {
           break;
         case 's':
           shuffleNow();
+          break;
+        case 'a':
+          toggleAuto();
           break;
         case 'escape':
           if (!show.queued) return;

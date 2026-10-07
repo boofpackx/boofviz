@@ -1,10 +1,12 @@
 import type { AudioFrame } from '@shared/types/audio';
-import type { LaunchQuantize } from '@shared/settings';
+import type { LaunchQuantize, PresetPool, TransitionType } from '@shared/settings';
+import type { Preset } from '@shared/types/engine';
 import { BUILTIN_PRESETS, type PresetEntry } from '@/engine/library';
-import { hash01 } from '@/engine/modulation';
 import { engine } from './runtime';
 import { libraryEntries, useShow } from './show';
 import { useControl } from './store';
+import { autoInterval, nextAutoBeat, pickNext, resolvePool, type PickContext } from './autopilot';
+import { filteredEntries, libraryView } from './components/Library';
 
 /**
  * Beat-quantized launching, favorites and shuffle.
@@ -55,21 +57,30 @@ export function favoriteEntries(): PresetEntry[] {
 }
 
 const recent: string[] = [];
-let shuffleCount = 0;
 
-/** Pick the next shuffle preset: from favorites (or everything), never the current or the last few. */
+function pickContext(): PickContext {
+  return {
+    all: libraryEntries().presets.length ? libraryEntries().presets : BUILTIN_PRESETS,
+    view: filteredEntries(libraryView.tab, libraryView.query, libraryView.category, libraryView.tag).filter((e) => !e.preset.isTemplate),
+    currentId: useShow.getState().sourceId,
+    recent,
+    energy: engine.builder.frame.energy,
+    rand: Math.random(),
+  };
+}
+
+/** What the shuffle pool holds right now, for the UI. */
+export function poolLabel(): string {
+  return resolvePool(useControl.getState().settings.library, pickContext()).label;
+}
+
+/** Pick the next shuffle preset from the configured pool (see autopilot.ts). */
 export function pickShuffle(): PresetEntry | null {
-  const lib = useControl.getState().settings.library;
-  const favs = favoriteEntries();
-  const pool = lib.shufflePool === 'favorites' && favs.length >= 2 ? favs : libraryEntries().presets.length ? libraryEntries().presets : BUILTIN_PRESETS;
-  const current = useShow.getState().sourceId;
-  const avoid = new Set([current, ...recent.slice(-Math.min(3, Math.floor(pool.length / 2)))]);
-  const choices = pool.filter((e) => !avoid.has(e.id));
-  const list = choices.length ? choices : pool.filter((e) => e.id !== current);
-  if (!list.length) return null;
-  const pick = list[Math.floor(hash01(shuffleCount++, Date.now() & 0xffff) * list.length)];
-  recent.push(pick.id);
-  if (recent.length > 8) recent.shift();
+  const pick = pickNext(useControl.getState().settings.library, pickContext());
+  if (pick) {
+    recent.push(pick.id);
+    if (recent.length > 32) recent.shift();
+  }
   return pick;
 }
 
@@ -81,31 +92,93 @@ export function shuffleNow(): void {
   }
 }
 
-let nextAuto: number | null = null;
+export function toggleAuto(): void {
+  const st = useControl.getState();
+  const on = !st.settings.library.autoShuffle;
+  st.update({ library: { autoShuffle: on } });
+  useShow.getState().notify(on ? 'Auto-play on' : 'Auto-play off');
+}
 
-/** Drives queued launches and auto-shuffle off the control window's beat clock. */
+/** How a look comes in: its own transitionIn, else the global setting. */
+export function transitionFor(preset: Preset | null): { type: TransitionType; beats: number } {
+  const own = preset?.transitionIn;
+  return own ? { type: own.type, beats: own.beats } : useControl.getState().settings.library.transition;
+}
+
+// ---- Named pools -------------------------------------------------------------
+
+function setPools(pools: PresetPool[]): void {
+  useControl.getState().update({ library: { pools } });
+}
+
+export function createPool(withId?: string): PresetPool {
+  const pools = useControl.getState().settings.library.pools;
+  let n = pools.length + 1;
+  while (pools.some((p) => p.name === `Pool ${n}`)) n++;
+  const pool: PresetPool = { id: Math.random().toString(36).slice(2, 9), name: `Pool ${n}`, ids: withId ? [withId] : [] };
+  setPools([...pools, pool]);
+  return pool;
+}
+
+export function togglePoolMember(poolId: string, presetId: string): void {
+  setPools(useControl.getState().settings.library.pools.map((p) => (p.id !== poolId ? p : { ...p, ids: p.ids.includes(presetId) ? p.ids.filter((x) => x !== presetId) : [...p.ids, presetId] })));
+}
+
+export function renamePool(poolId: string, name: string): void {
+  setPools(useControl.getState().settings.library.pools.map((p) => (p.id === poolId ? { ...p, name: name.trim().slice(0, 32) || p.name } : p)));
+}
+
+export function deletePool(poolId: string): void {
+  const st = useControl.getState();
+  setPools(st.settings.library.pools.filter((p) => p.id !== poolId));
+  if (st.settings.library.shufflePool === `pool:${poolId}`) st.update({ library: { shufflePool: 'favorites' } });
+}
+
+// ---- Auto-play -----------------------------------------------------------------
+
+let nextAuto: number | null = null;
+let seenDrops = -1;
+let lastChangeBeat = Number.NEGATIVE_INFINITY;
+
+/** Drives queued launches and auto-play off the control window's beat clock. */
 export function startLauncher(): () => void {
   const id = window.setInterval(() => {
     const f = engine.builder.frame;
     const show = useShow.getState();
     const q = show.queued;
-    if (q && f.beat >= q.atBeat - 0.002) show.launch(q.entry);
+    if (q && f.beat >= q.atBeat - 0.002) {
+      show.launch(q.entry);
+      lastChangeBeat = q.atBeat;
+    }
 
     const lib = useControl.getState().settings.library;
+    const drops = engine.builder.dropCount;
+    const dropped = seenDrops >= 0 && drops > seenDrops;
+    seenDrops = drops;
     if (!lib.autoShuffle || !engine.builder.connected) {
       nextAuto = null;
       return;
     }
-    const every = Math.max(1, lib.shuffleBars) * f.beatsPerBar;
-    if (nextAuto === null || nextAuto - f.beat > every + 1) {
-      // Align the first auto change to the next phrase-aligned multiple of the interval.
-      const start = Math.round(f.beat - f.phrasePhase * f.beatsPerPhrase);
-      nextAuto = start + every * Math.ceil((f.beat - start + 0.5) / every);
+    const queueAt = (atBeat: number): void => {
+      const pick = pickShuffle();
+      if (pick) show.launch(pick, atBeat);
+    };
+    // A drop is the moment: change on the very next beat (drops mode, or "also on drops").
+    if (dropped && (lib.autoMode === 'drops' || lib.alsoOnDrop) && !show.queued) {
+      queueAt(Math.ceil(f.beat + 0.05));
+      nextAuto = null;
+      return;
     }
+    if (lib.autoMode === 'drops') {
+      // No drop for a long stretch (64 bars): move on at the next phrase anyway.
+      if (f.beat - lastChangeBeat > 64 * f.beatsPerBar && !show.queued) queueAt(nextBoundary(f, 'phrase') ?? Math.ceil(f.beat + 0.05));
+      return;
+    }
+    const every = autoInterval(lib, f.beatsPerBar, f.beatsPerPhrase);
+    if (nextAuto === null || nextAuto - f.beat > every + 1) nextAuto = nextAutoBeat(f.beat, f.phrasePhase, f.beatsPerPhrase, every);
     // Queue a bar ahead so both windows have the scene before the boundary.
     if (!show.queued && nextAuto - f.beat <= f.beatsPerBar) {
-      const pick = pickShuffle();
-      if (pick) show.launch(pick, nextAuto);
+      queueAt(nextAuto);
       nextAuto += every;
     }
   }, 20);

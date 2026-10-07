@@ -45,6 +45,19 @@ interface ShowState {
 }
 
 let lastCoalesce = '';
+
+/** State change that makes `entry` the working look (undoable: undo returns to the previous one). */
+function loadPatch(state: { doc: Preset; past: Preset[] }, entry: PresetEntry): Partial<ShowState> {
+  lastCoalesce = '';
+  return {
+    doc: structuredClone(entry.preset),
+    sourceId: entry.id,
+    dirty: false,
+    past: [...state.past, state.doc].slice(-HISTORY_LIMIT),
+    future: [],
+    selectedLayer: Math.max(0, entry.preset.layers.length - 1),
+  };
+}
 let toastTimer = 0;
 
 // A new pointer press or key press starts a new gesture, so the next edit is its own undo step.
@@ -69,25 +82,12 @@ export const useShow = create<ShowState>((set, get) => ({
   toast: null,
   queued: null,
 
-  load: (entry) => {
-    const { doc, past } = get();
-    lastCoalesce = '';
-    set({
-      doc: structuredClone(entry.preset),
-      sourceId: entry.id,
-      dirty: false,
-      // Loading is undoable too: undo returns to the previous look.
-      past: [...past, doc].slice(-HISTORY_LIMIT),
-      future: [],
-      selectedLayer: Math.max(0, entry.preset.layers.length - 1),
-    });
-  },
+  load: (entry) => set(loadPatch(get(), entry)),
 
   launch: (entry, atBeat) => {
-    if (atBeat === undefined) {
-      set({ queued: null });
-      get().load(entry);
-    } else set({ queued: { entry, atBeat } });
+    // One update: clearing the queue on its own would read as a cancel and flash the old look back.
+    if (atBeat === undefined) set({ ...loadPatch(get(), entry), queued: null });
+    else set({ queued: { entry, atBeat } });
   },
 
   cancelQueued: () => set({ queued: null }),

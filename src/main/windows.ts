@@ -166,6 +166,7 @@ export class WindowManager {
   sendOutputCommand(cmd: OutputCommand): void {
     this.outputState = { ...this.outputState, ...cmd };
     if (cmd.scene && cmd.applyAtBeat === undefined) delete this.outputState.applyAtBeat;
+    if (cmd.scene && cmd.transition === undefined) delete this.outputState.transition;
     if (this.output && this.ready.output) this.output.webContents.send(IPC.outputCommand, cmd);
   }
 

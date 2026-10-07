@@ -73,6 +73,17 @@ try {
     for (const end = Date.now() + ms; Date.now() < end; await sleep(50)) if (await dbg(fn)) return true;
     return false;
   };
+  // Watch what the output window is told to show, and whether a transition runs, through the switch.
+  await output.evaluate(() => {
+    window.__seq = [];
+    window.__trans = 0;
+    setInterval(() => {
+      const s = window.__BOOFVIZ_DEBUG__.scene();
+      const k = s ? s.layers.map((l) => `${l.id}:${l.source.kind}`).join(',') : '';
+      if (window.__seq[window.__seq.length - 1] !== k) window.__seq.push(k);
+      if (window.__BOOFVIZ_DEBUG__.transition()) window.__trans++;
+    }, 5);
+  });
   await control.getByRole('button', { name: 'Library', exact: true }).click();
   await control.getByText('Shape Morph', { exact: true }).first().click();
   const q = await dbg(() => {
@@ -91,6 +102,10 @@ try {
   const onTime = (s) => !!s && !!q && s.prevBeat < q.atBeat - 0.002 && s.beat >= q.atBeat - 0.002;
   const late = (s) => (s && q ? (((s.beat - q.atBeat) * 60000) / f.bpm).toFixed(1) : '?');
   check(onTime(pSw) && onTime(oSw), `preview and output both switch on the first frame of the bar (preview +${late(pSw)} ms, output +${late(oSw)} ms after the downbeat)`);
+  await sleep(1500);
+  const seq = await output.evaluate(() => window.__seq);
+  check(seq.length >= 2 && seq.indexOf(seq[seq.length - 1]) === seq.length - 1, `no flash of the old look around the switch (${seq.length} scene changes seen by the output)`);
+  check((await output.evaluate(() => window.__trans)) > 0, 'the new look blends in with the default crossfade');
 
   for (const name of ['Prism Spectrum', 'Arcade Maze']) {
     await control.locator('div[role=button]', { hasText: name }).first().getByTitle('Add to favorites').click();
@@ -107,6 +122,17 @@ try {
   const shuffled = await dbg(() => window.__BOOFVIZ_DEBUG__.show().queued?.entry.id);
   check(favs.includes(shuffled), `S shuffles from the favorites (${shuffled})`);
   await control.keyboard.press('Escape');
+
+  // Auto-play every 4 bars from everything; then back to Shape Morph for the checks below.
+  const lookBefore = await dbg(() => window.__BOOFVIZ_DEBUG__.show().sourceId);
+  await dbg(() => window.__BOOFVIZ_DEBUG__.updateSettings({ library: { autoShuffle: true, autoMode: 'bars', shuffleBars: 4, shufflePool: 'all' } }));
+  let autoChanged = false;
+  for (const end = Date.now() + 15000; Date.now() < end && !autoChanged; await sleep(200)) autoChanged = (await control.evaluate((id) => window.__BOOFVIZ_DEBUG__.show().sourceId !== id, lookBefore)) === true;
+  check(autoChanged, 'auto-play changes the look by itself (every 4 bars)');
+  await dbg(() => window.__BOOFVIZ_DEBUG__.updateSettings({ library: { autoShuffle: false } }));
+  await sleep(300);
+  await dbg(() => window.__BOOFVIZ_DEBUG__.load('builtin:shape-morph'));
+  await sleep(1500);
 
   // ---- Phase 2: modulation, macros, undo, save ---------------------------
 

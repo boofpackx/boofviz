@@ -6,10 +6,10 @@ import { useShow } from '../show';
 import { useControl } from '../store';
 import { engine } from '../runtime';
 import { useTicker } from '../hooks';
-import { shuffleNow } from '../launcher';
-import type { LaunchQuantize } from '@shared/settings';
+import { poolLabel, shuffleNow, toggleAuto } from '../launcher';
+import type { LaunchQuantize, ShufflePool, TransitionType } from '@shared/settings';
 import { contextMenu } from './ContextMenu';
-import { Button } from './ui';
+import { Button, Segmented, Toggle } from './ui';
 
 /** Rotary knob: drag up/down (Shift = fine), wheel, double-click resets to the preset's value. */
 function Knob({ value, onChange, onReset, active }: { value: number; onChange: (v: number) => void; onReset: () => void; active: boolean }) {
@@ -182,7 +182,7 @@ function LaunchControls() {
   const update = useControl((s) => s.update);
   const queued = useShow((s) => s.queued);
   const cancel = useShow((s) => s.cancelQueued);
-  const favCount = lib.favorites.length;
+  const [open, setOpen] = useState(false);
   const beatsLeft = queued ? Math.max(0, queued.atBeat - engine.builder.frame.beat) : 0;
   const q: Array<[LaunchQuantize, string]> = [
     ['now', 'Now'],
@@ -190,8 +190,9 @@ function LaunchControls() {
     ['bar', 'Bar'],
     ['phrase', 'Phr'],
   ];
+  const rhythm = lib.autoMode === 'drops' ? 'drops' : lib.autoMode === 'phrases' ? `${lib.autoPhrases} phr` : `${lib.shuffleBars} bars`;
   return (
-    <div className="flex w-[196px] shrink-0 flex-col justify-center gap-1">
+    <div className="relative flex w-[196px] shrink-0 flex-col justify-center gap-1">
       <div className="flex rounded border border-ink-600 bg-ink-850 p-0.5" title="When a picked preset goes live">
         {q.map(([v, label]) => (
           <button
@@ -205,19 +206,15 @@ function LaunchControls() {
         ))}
       </div>
       <div className="flex gap-1">
-        <Button onClick={shuffleNow} title={`Shuffle (S) from ${lib.shufflePool === 'favorites' && favCount >= 2 ? `${favCount} favorites` : 'all presets'}`} className="flex-1">
+        <Button onClick={shuffleNow} title={`Shuffle (S) from ${poolLabel()}`} className="flex-1">
           ⤮ Shuffle
         </Button>
-        <Button active={lib.autoShuffle} onClick={() => update({ library: { autoShuffle: !lib.autoShuffle } })} title="Auto-shuffle on the phrase">
-          Auto
+        <Button active={lib.autoShuffle} onClick={toggleAuto} title={`Auto-play (A): changes looks every ${rhythm}`}>
+          Auto · {rhythm}
         </Button>
-        <select value={lib.shuffleBars} onChange={(e) => update({ library: { shuffleBars: Number(e.target.value) } })} className="text-[10px]" title="Auto-shuffle every N bars">
-          {[4, 8, 16, 32, 64].map((n) => (
-            <option key={n} value={n}>
-              {n} bars
-            </option>
-          ))}
-        </select>
+        <Button active={open} onClick={() => setOpen(!open)} title="Auto-play, pool and transition settings">
+          ⚙
+        </Button>
       </div>
       <div className="flex h-4 items-center gap-1 text-[10px]">
         {queued ? (
@@ -230,17 +227,132 @@ function LaunchControls() {
             </button>
           </>
         ) : (
-          <button
-            type="button"
-            className="truncate text-ink-500 hover:text-ink-300"
-            onClick={() => update({ library: { shufflePool: lib.shufflePool === 'favorites' ? 'all' : 'favorites' } })}
-            title="Click to switch the shuffle pool"
-          >
-            Pool: {lib.shufflePool === 'favorites' ? `★ favorites (${favCount})` : 'all presets'}
-            {lib.shufflePool === 'favorites' && favCount < 2 ? ' · star 2+ to use' : ''}
+          <button type="button" className="truncate text-ink-500 hover:text-ink-300" onClick={() => setOpen(true)} title="Shuffle pool">
+            Pool: {poolLabel()}
           </button>
         )}
       </div>
+      {open && <AutoPanel onClose={() => setOpen(false)} />}
+    </div>
+  );
+}
+
+const TRANSITIONS: Array<[TransitionType, string]> = [
+  ['cut', 'Cut'],
+  ['crossfade', 'Crossfade'],
+  ['flashBlack', 'Dip to black'],
+  ['flashWhite', 'White flash'],
+  ['lumaWipe', 'Luma wipe'],
+  ['zoomThrough', 'Zoom through'],
+  ['glitchCut', 'Glitch cut'],
+];
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="flex items-center justify-between gap-2 text-[11px] text-ink-300">
+      <span>{label}</span>
+      {children}
+    </label>
+  );
+}
+
+const sel = 'rounded border border-ink-600 bg-ink-800 px-1 py-0.5 text-[11px] text-ink-100';
+
+function AutoPanel({ onClose }: { onClose: () => void }) {
+  const lib = useControl((s) => s.settings.library);
+  const update = useControl((s) => s.update);
+  const set = (patch: Partial<typeof lib>): void => update({ library: patch });
+  return (
+    <div className="absolute right-0 bottom-[86px] z-40 w-[300px] space-y-2 rounded-md border border-ink-600 bg-ink-850 p-3 shadow-2xl">
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] font-semibold tracking-[0.12em] text-ink-300 uppercase">Auto-play</span>
+        <button type="button" onClick={onClose} className="text-ink-400 hover:text-ink-100">
+          ✕
+        </button>
+      </div>
+      <Row label="Pick from">
+        <select className={sel} value={lib.shufflePool} onChange={(e) => set({ shufflePool: e.target.value as ShufflePool })}>
+          <option value="favorites">★ Favorites</option>
+          <option value="all">All presets</option>
+          <option value="category">Same category as now</option>
+          <option value="view">What the Library shows</option>
+          {lib.pools.map((p) => (
+            <option key={p.id} value={`pool:${p.id}`}>
+              ● {p.name} ({p.ids.length})
+            </option>
+          ))}
+        </select>
+      </Row>
+      <div className="-mt-1 text-right text-[10px] text-ink-500">{poolLabel()}</div>
+      <Row label="Change">
+        <span className="flex gap-1">
+          <select className={sel} value={lib.autoMode} onChange={(e) => set({ autoMode: e.target.value as typeof lib.autoMode })}>
+            <option value="bars">every N bars</option>
+            <option value="phrases">every N phrases</option>
+            <option value="drops">on drops</option>
+          </select>
+          {lib.autoMode === 'bars' && (
+            <select className={sel} value={lib.shuffleBars} onChange={(e) => set({ shuffleBars: Number(e.target.value) })}>
+              {[4, 8, 16, 32, 64].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          )}
+          {lib.autoMode === 'phrases' && (
+            <select className={sel} value={lib.autoPhrases} onChange={(e) => set({ autoPhrases: Number(e.target.value) })}>
+              {[1, 2, 4, 8].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          )}
+        </span>
+      </Row>
+      {lib.autoMode !== 'drops' && <Toggle label="Also change on every drop" checked={lib.alsoOnDrop} onChange={(alsoOnDrop) => set({ alsoOnDrop })} />}
+      <Toggle label="Match the music's energy" hint="Calm looks in breakdowns, high-energy looks at the peak (uses each preset's energy rating)" checked={lib.energyMatch} onChange={(energyMatch) => set({ energyMatch })} />
+      <Row label="Order">
+        <Segmented
+          value={lib.order}
+          onChange={(order) => set({ order })}
+          options={[
+            { value: 'random', label: 'Random' },
+            { value: 'sequence', label: 'In order' },
+          ]}
+        />
+      </Row>
+      <Row label="Don't repeat the last">
+        <select className={sel} value={lib.noRepeat} onChange={(e) => set({ noRepeat: Number(e.target.value) })}>
+          {[0, 2, 4, 8, 16].map((n) => (
+            <option key={n} value={n}>
+              {n} looks
+            </option>
+          ))}
+        </select>
+      </Row>
+      <Row label="Transition">
+        <span className="flex gap-1">
+          <select className={sel} value={lib.transition.type} onChange={(e) => set({ transition: { ...lib.transition, type: e.target.value as TransitionType } })}>
+            {TRANSITIONS.map(([v, l]) => (
+              <option key={v} value={v}>
+                {l}
+              </option>
+            ))}
+          </select>
+          {lib.transition.type !== 'cut' && (
+            <select className={sel} value={lib.transition.beats} onChange={(e) => set({ transition: { ...lib.transition, beats: Number(e.target.value) } })}>
+              {[0.5, 1, 2, 4, 8, 16].map((n) => (
+                <option key={n} value={n}>
+                  {n} {n === 1 ? 'beat' : 'beats'}
+                </option>
+              ))}
+            </select>
+          )}
+        </span>
+      </Row>
+      <div className="text-[10px] leading-snug text-ink-500">Build named pools in the Library: right-click a look → Add to pool. Keys: S shuffle · A auto-play · Esc cancel the next look.</div>
     </div>
   );
 }
