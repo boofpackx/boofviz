@@ -5,6 +5,7 @@ import { Broadcast } from './Broadcast';
 import { Desktop90 } from './Desktop90';
 import { BarCity } from './BarCity';
 import { CodeRain } from './CodeRain';
+import { Concrete } from './Concrete';
 import { DemoParts } from './DemoParts';
 import { DeStijl } from './DeStijl';
 import { Dots } from './Dots';
@@ -79,6 +80,7 @@ const FACTORIES: Record<string, () => Generator> = {
   musicChannel: () => new MusicChannel(),
   vitalSigns: () => new VitalSigns(),
   platinumStage: () => new PlatinumStage(),
+  concrete: () => new Concrete(),
 };
 
 export function createGenerator(kind: string): Generator {

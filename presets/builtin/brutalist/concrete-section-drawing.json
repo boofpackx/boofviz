@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "name": "Section Drawing",
+  "category": "Brutalist",
+  "tags": [
+    "brutalist",
+    "concrete",
+    "vintage",
+    "blueprint",
+    "architecture",
+    "drawing",
+    "lines"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "plan",
+      "name": "Blueprint",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "concrete",
+        "params": {
+          "scene": "section",
+          "slides": 0,
+          "speed": 1,
+          "lit": 0.6,
+          "snow": 1,
+          "view": 0,
+          "warm": 0.3,
+          "react": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "paper",
+      "name": "Paper",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.04,
+            "size": 1.2
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.4,
+            "size": 0.8,
+            "softness": 0.6
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Glow",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#06204a",
+      "#1c4a8a",
+      "#6aa0e0",
+      "#dcecff",
+      "#ffffff"
+    ]
+  },
+  "description": "The track drawn as an architect's section on blueprint paper: ground, slabs, columns and a stair drawn in line by line over eight bars, glowing with the bass."
+}

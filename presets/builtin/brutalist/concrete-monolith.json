@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "name": "Monolith",
+  "category": "Brutalist",
+  "tags": [
+    "brutalist",
+    "concrete",
+    "vintage",
+    "monolith",
+    "fog",
+    "light"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "form",
+      "name": "Monolith",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "concrete",
+        "params": {
+          "scene": "monolith",
+          "slides": 0,
+          "speed": 1,
+          "lit": 0.6,
+          "snow": 1,
+          "view": 0,
+          "warm": 0.3,
+          "react": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "air",
+      "name": "Air",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.8,
+            "threshold": 0.6,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.04,
+            "size": 1.2
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Camera",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Slits",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0c0c0d",
+      "#3a3b3d",
+      "#8a8b8e",
+      "#ff5a2a",
+      "#f2f2f2"
+    ]
+  },
+  "description": "One enormous concrete form in fog, the camera creeping along its face as light slits open on the kick."
+}

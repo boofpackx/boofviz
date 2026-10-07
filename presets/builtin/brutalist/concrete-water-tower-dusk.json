@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "name": "Water Tower Dusk",
+  "category": "Brutalist",
+  "tags": [
+    "brutalist",
+    "concrete",
+    "vintage",
+    "water tower",
+    "dusk",
+    "black and white",
+    "cold wave"
+  ],
+  "energy": 1,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "tower",
+      "name": "Tower",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "concrete",
+        "params": {
+          "scene": "watertower",
+          "slides": 0,
+          "speed": 1,
+          "lit": 0.6,
+          "snow": 1,
+          "view": 0,
+          "warm": 0.3,
+          "react": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "film",
+      "name": "Film",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "filmStock",
+          "enabled": true,
+          "params": {
+            "stock": "16mm",
+            "tone": "color",
+            "fps": 0,
+            "wear": 0.5,
+            "weave": 0.6,
+            "dust": 0.6,
+            "flicker": 0.5,
+            "fade": 0.25,
+            "leaks": 0,
+            "splices": 0.05,
+            "gate": false,
+            "seed": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Beacon",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Placement",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.view",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#08090c",
+      "#20283a",
+      "#6a7080",
+      "#ff3a20",
+      "#ffd0a0"
+    ]
+  },
+  "description": "A lone concrete water tower against a cold sky at dusk, its red beacon pulsing on every beat, on grainy film."
+}

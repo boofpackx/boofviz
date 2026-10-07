@@ -268,6 +268,9 @@ const MATERIALS: Array<[string, string]> = [
   ['paper', 'Paper'],
   ['led', 'LED sign'],
   ['phosphor', 'CRT phosphor'],
+  ['stencil', 'Spray stencil'],
+  ['mimeo', 'Mimeograph ink'],
+  ['rubdown', 'Rub-down letters'],
 ];
 
 function OverlaySection() {

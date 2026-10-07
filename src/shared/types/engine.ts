@@ -214,6 +214,7 @@ export const PRESET_CATEGORIES = [
   'Lyrics',
   'Lost Media',
   'Retro TV',
+  'Brutalist',
 ] as const;
 export type PresetCategory = (typeof PRESET_CATEGORIES)[number];
 

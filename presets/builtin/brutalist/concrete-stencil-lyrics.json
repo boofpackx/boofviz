@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "name": "Stencil Lyrics",
+  "category": "Brutalist",
+  "tags": [
+    "brutalist",
+    "concrete",
+    "vintage",
+    "stencil",
+    "spray paint",
+    "lyrics",
+    "words",
+    "street"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "wall",
+      "name": "Wall",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "concrete",
+        "params": {
+          "scene": "wall",
+          "slides": 0,
+          "speed": 1,
+          "lit": 0.6,
+          "snow": 1,
+          "view": 0,
+          "warm": 0.3,
+          "react": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "words",
+      "name": "Lyrics",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "lyricVideo",
+        "params": {
+          "style": "slam",
+          "material": "stencil",
+          "hero": 0.8,
+          "camera": 0.2,
+          "drama": 0.7,
+          "exit": "auto",
+          "source": "lyrics",
+          "text": "CONCRETE / BLOCK SEVEN / THE LIGHTS GO ON / FLOOR BY FLOOR",
+          "lineBeats": 8,
+          "font": "heavy",
+          "size": 1,
+          "position": "center",
+          "depth": 0,
+          "outline": 0,
+          "glow": 0,
+          "shadow": 0,
+          "colorMode": "palette",
+          "dimPast": 0.25,
+          "speed": 1,
+          "punch": 1,
+          "lead": 120,
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "grain",
+      "name": "Grain",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.04,
+            "size": 1.2
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Hero word",
+      "value": 0.8,
+      "targets": [
+        {
+          "path": "layers.1.source.params.hero",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.1.source.params.size",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Raking light",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#141414",
+      "#3a3a3a",
+      "#d4241a",
+      "#f2f2f2",
+      "#ffffff"
+    ]
+  },
+  "description": "Each sung line sprayed through a stencil onto a raw concrete wall: cut bridges in the letters, overspray round the edges and a few drips, the hero word huge."
+}

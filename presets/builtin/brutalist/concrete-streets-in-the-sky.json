@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "name": "Streets in the Sky",
+  "category": "Brutalist",
+  "tags": [
+    "brutalist",
+    "concrete",
+    "vintage",
+    "walkways",
+    "housing estate",
+    "overcast"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "decks",
+      "name": "Decks",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "concrete",
+        "params": {
+          "scene": "walkways",
+          "slides": 0,
+          "speed": 1,
+          "lit": 0.6,
+          "snow": 1,
+          "view": 0,
+          "warm": 0.3,
+          "react": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "film",
+      "name": "Film",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "filmStock",
+          "enabled": true,
+          "params": {
+            "stock": "16mm",
+            "tone": "color",
+            "fps": 0,
+            "wear": 0.4,
+            "weave": 0.6,
+            "dust": 0.6,
+            "flicker": 0.6,
+            "fade": 0.35,
+            "leaks": 0,
+            "splices": 0.05,
+            "gate": false,
+            "seed": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Walk",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Viewpoint",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.view",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0e0e10",
+      "#3c3c40",
+      "#8c8c90",
+      "#d0d0d4",
+      "#f6f6f6"
+    ]
+  },
+  "description": "Deck-access walkways stacked into the distance on an overcast day, doors lighting up one after another along each deck in time with the beat."
+}

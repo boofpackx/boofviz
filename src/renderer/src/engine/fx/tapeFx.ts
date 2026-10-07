@@ -777,7 +777,93 @@ class TvSet implements Effect {
   }
 }
 
+
+// ---------------------------------------------------------------------------
+// Two-colour print
+
+const PRINT = `${HEADER}
+uniform vec3 uInkA, uInkB, uPaper;
+uniform float uMis, uCell, uTime, uGrain, uSeed;
+float dots(vec2 px, float ang, float cov) {
+  vec2 q = mat2(cos(ang), -sin(ang), sin(ang), cos(ang)) * px / uCell;
+  vec2 f = fract(q) - 0.5;
+  return smoothstep(0.08, -0.08, length(f) - sqrt(clamp(cov, 0.0, 1.0)) * 0.56);
+}
+void main() {
+  // Each ink is printed from its own (slightly misregistered) plate.
+  vec2 off = vec2(sin(uTime * 0.31 + uSeed), cos(uTime * 0.23 + uSeed)) * uMis * 0.006;
+  vec3 a = gam(texture(uInput, vUv + off).rgb);
+  vec3 b = gam(texture(uInput, vUv - off).rgb);
+  float la = luma(a);
+  float lb = luma(b);
+  // Ink A carries the darks; ink B the colour and the mid-tones.
+  float covA = smoothstep(0.65, 0.05, la);
+  float sat = max(max(b.r, b.g), b.b) - min(min(b.r, b.g), b.b);
+  float covB = clamp(smoothstep(0.95, 0.25, lb) * 0.7 + sat * 0.8, 0.0, 1.0);
+  float dA = dots(gl_FragCoord.xy, 0.26, covA);
+  float dB = dots(gl_FragCoord.xy + 3.0, 1.31, covB);
+  float grain = (hash21(floor(gl_FragCoord.xy / 1.5) + uSeed) - 0.5) * uGrain;
+  vec3 paper = uPaper * (1.0 + grain * 0.6) * (0.97 + 0.03 * vnoise(vUv * 40.0));
+  // Inks multiply like real overprinting, with a little unevenness in the coverage.
+  float ink = 0.85 + 0.15 * vnoise(vUv * vec2(3.0, 30.0) + uSeed);
+  vec3 c = paper * mix(vec3(1.0), uInkB, dB * ink) * mix(vec3(1.0), uInkA, dA * ink);
+  fragColor = vec4(lin(c), 1.0);
+}`;
+
+const INKS: Record<string, [string, string, string]> = {
+  'red-black': ['#1d1a1a', '#e8402a', '#f1ece0'],
+  'blue-pink': ['#2a4bd6', '#ff4fa3', '#f4f0e6'],
+  'green-orange': ['#1c6b4a', '#ff7a1a', '#efe9da'],
+  'black-yellow': ['#151515', '#ffd31a', '#f2eee4'],
+};
+
+class TwoColourPrint implements Effect {
+  readonly kind = 'print2';
+  private readonly pass = new FullscreenPass(
+    mat(PRINT, { uInkA: { value: new THREE.Vector3() }, uInkB: { value: new THREE.Vector3() }, uPaper: { value: new THREE.Vector3() }, uMis: { value: 1 }, uCell: { value: 6 }, uTime: { value: 0 }, uGrain: { value: 0.3 }, uSeed: { value: 0 } }),
+  );
+
+  render(renderer: THREE.WebGLRenderer, input: THREE.WebGLRenderTarget, out: THREE.WebGLRenderTarget, p: ParamBag, ctx: FxContext): THREE.WebGLRenderTarget {
+    const u = this.pass.material.uniforms;
+    u.uInput.value = input.texture;
+    (u.uRes.value as THREE.Vector2).set(out.width, out.height);
+    const set = String(p.inks ?? 'red-black');
+    const toV = (hex: string, v: THREE.Vector3): void => {
+      const c = new THREE.Color(hex);
+      v.set(Math.pow(c.r, 1 / 2.2), Math.pow(c.g, 1 / 2.2), Math.pow(c.b, 1 / 2.2));
+    };
+    if (set === 'look') {
+      const pal = ctx.palette;
+      const g = (i: number, v: THREE.Vector3): void => void v.set(Math.pow(pal[i * 3], 1 / 2.2), Math.pow(pal[i * 3 + 1], 1 / 2.2), Math.pow(pal[i * 3 + 2], 1 / 2.2));
+      g(0, u.uInkA.value as THREE.Vector3);
+      g(3, u.uInkB.value as THREE.Vector3);
+      (u.uPaper.value as THREE.Vector3).set(0.95, 0.93, 0.88);
+    } else {
+      const [a, b, paper] = INKS[set] ?? INKS['red-black'];
+      toV(a, u.uInkA.value as THREE.Vector3);
+      toV(b, u.uInkB.value as THREE.Vector3);
+      toV(paper, u.uPaper.value as THREE.Vector3);
+    }
+    u.uMis.value = n(p.misregister, 1) * (1 + 0.6 * ctx.kick);
+    u.uCell.value = Math.max(2, n(p.dot, 6) * out.height / 1080);
+    u.uTime.value = ctx.time;
+    u.uGrain.value = n(p.grain, 0.3);
+    u.uSeed.value = n(p.seed, 0);
+    this.pass.render(renderer, out);
+    return out;
+  }
+
+  compileTargets(): FullscreenPass[] {
+    return [this.pass];
+  }
+
+  dispose(): void {
+    this.pass.dispose();
+  }
+}
+
 export function createTapeEffect(kind: string): Effect | null {
+  if (kind === 'print2') return new TwoColourPrint();
   if (kind === 'tvSet') return new TvSet();
   if (kind === 'tapeStack') return new TapeStack();
   if (kind === 'filmStock') return new FilmStock();

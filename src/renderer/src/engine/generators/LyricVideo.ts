@@ -66,7 +66,7 @@ in vec2 vUv;
 in vec2 vLocal;
 in vec4 vCol;
 in vec2 vKind;
-in vec4 vFx;     // x material (0 plain 1 chrome 2 neon 3 paper 4 led 5 phosphor) · y burn · z per-letter random · w solid card
+in vec4 vFx;     // x material (0 plain 1 chrome 2 neon 3 paper 4 led 5 phosphor 6 stencil 7 mimeo 8 rub-down) · y burn · z per-letter random · w solid card
 out vec4 fragColor;
 ${UTIL_GLSL}
 void main() {
@@ -112,6 +112,30 @@ void main() {
     float dotm = smoothstep(0.42, 0.28, length(cell));
     col = vCol.rgb * dotm * 1.6;
     cover = face * max(dotm, 0.15);
+  } else if (front && mat == 6) {
+    // Spray stencil: bridges cut through the letters, overspray speckle round the edges, a few drips.
+    float bridge = step(abs(fract(vLocal.x * 2.3 + vFx.z) - 0.5), 0.035) * step(0.3, vLocal.y) * step(vLocal.y, 0.75);
+    face *= 1.0 - bridge;
+    float spray = step(0.55, hash21(floor(gl_FragCoord.xy * 0.7) + vFx.z * 50.0)) * smoothstep(-0.22, 0.0, d) * (1.0 - face);
+    float dripCol = step(0.86, hash21(vec2(floor(vLocal.x * 18.0), vFx.z * 20.0)));
+    float above = max(texture(uAtlas, vUv - vec2(0.0, 0.006)).r, texture(uAtlas, vUv - vec2(0.0, 0.014)).r) - 0.5;
+    float drip = dripCol * step(0.0, above) * (1.0 - face) * step(0.08, vLocal.y);
+    cover = clamp(face + spray * 0.55 + drip, 0.0, 1.0);
+    col = vCol.rgb;
+  } else if (front && mat == 7) {
+    // Mimeograph: purple ditto ink, rolled on unevenly, soft edges and a faint second impression.
+    float roll = 0.55 + 0.45 * fbm(vec2(vLocal.y * 14.0 + vFx.z * 9.0, vLocal.x * 1.5));
+    float soft = smoothstep(-w * 3.0, w * 3.0, d + (vnoise(vLocal * 30.0) - 0.5) * 0.06);
+    float ghost = smoothstep(-w * 3.0, w * 3.0, texture(uAtlas, vUv + vec2(0.004, 0.003)).r - 0.5) * 0.25;
+    cover = clamp(soft * roll + ghost, 0.0, 1.0);
+    col = mix(vec3(0.42, 0.16, 0.72), vCol.rgb, 0.2);
+  } else if (front && mat == 8) {
+    // Rub-down transfer letters: cracked where the film didn't fully stick, a few chips missing.
+    float crack = smoothstep(0.035, 0.0, abs(vnoise(vLocal * 9.0 + vFx.z * 17.0) - 0.5));
+    float chip = step(0.82, vnoise(vLocal * 5.0 + vFx.z * 3.0));
+    face *= (1.0 - crack * 0.9) * (1.0 - chip);
+    cover = face;
+    col = vCol.rgb;
   } else if (front && mat == 5) {
     // Phosphor: one glowing colour, scanlines, a slow persistence bloom.
     col = vCol.rgb * (1.2 + 0.4 * smoothstep(0.0, 0.25, d)) * (0.72 + 0.28 * sin(gl_FragCoord.y * 3.14159));
@@ -175,7 +199,7 @@ const PAPERS: Array<[number, number, number]> = [
   [0.06, 0.06, 0.06],
   [0.85, 0.2, 0.15],
 ];
-const MATERIAL_INDEX: Record<LetterMaterial, number> = { plain: 0, chrome: 1, neon: 2, paper: 3, led: 4, phosphor: 5 };
+const MATERIAL_INDEX: Record<LetterMaterial, number> = { plain: 0, chrome: 1, neon: 2, paper: 3, led: 4, phosphor: 5, stencil: 6, mimeo: 7, rubdown: 8 };
 
 function hsv(h: number, s: number, v: number): [number, number, number] {
   const f = (n: number): number => {

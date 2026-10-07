@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "name": "Panel Blocks at Night",
+  "category": "Brutalist",
+  "tags": [
+    "brutalist",
+    "concrete",
+    "vintage",
+    "panel blocks",
+    "night",
+    "snow",
+    "cold wave",
+    "post-punk",
+    "sodium"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "blocks",
+      "name": "Blocks",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "concrete",
+        "params": {
+          "scene": "panels",
+          "slides": 0,
+          "speed": 1,
+          "lit": 0.55,
+          "snow": 1,
+          "view": 0,
+          "warm": 0.3,
+          "react": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "grain",
+      "name": "Grain",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.06,
+            "size": 1.2
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.5,
+            "size": 0.75,
+            "softness": 0.6
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Windows lit",
+      "value": 0.55,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lit",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Snow",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.snow",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Drift",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#05060a",
+      "#1a1f2e",
+      "#6a6058",
+      "#ff9a3c",
+      "#ffe2b0"
+    ]
+  },
+  "description": "Prefab apartment blocks in falling snow under sodium lamps: a floor lights up on every beat, windows come and go with the music, and on the drop a block goes bright all at once. Made for cold-wave and post-punk."
+}

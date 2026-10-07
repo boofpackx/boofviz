@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "name": "Architecture Slides",
+  "category": "Brutalist",
+  "tags": [
+    "brutalist",
+    "concrete",
+    "vintage",
+    "slides",
+    "projector",
+    "black and white",
+    "photography"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "slides",
+      "name": "Slides",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "concrete",
+        "params": {
+          "scene": "panels",
+          "slides": 2,
+          "speed": 0.3,
+          "lit": 0.6,
+          "snow": 0.3,
+          "view": 0,
+          "warm": 0.3,
+          "react": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "projector",
+      "name": "Projector",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "filmStock",
+          "enabled": true,
+          "params": {
+            "stock": "16mm",
+            "tone": "bw",
+            "fps": 0,
+            "wear": 0.8,
+            "weave": 1.4,
+            "dust": 1.1,
+            "flicker": 1,
+            "fade": 0,
+            "leaks": 0,
+            "splices": 0.05,
+            "gate": false,
+            "seed": 0
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.65,
+            "size": 0.65,
+            "softness": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Slide every",
+      "value": 0.13,
+      "targets": [
+        {
+          "path": "layers.0.source.params.slides",
+          "range": [
+            1,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dust",
+      "value": 0.55,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.dust",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0e0e10",
+      "#3c3c40",
+      "#8c8c90",
+      "#d0d0d4",
+      "#f6f6f6"
+    ]
+  },
+  "description": "A carousel slide projector clicking through black-and-white photographs of concrete buildings, a new slide every two bars, dust in the beam."
+}

@@ -216,7 +216,7 @@ export const GENERATORS: ModuleDef[] = [
     description: 'Music-video lyrics: every letter is its own 3D object that drops, slams, shuffles, flips, spins, flies through the camera or orbits on the sung timing of its word, with extruded depth and crisp edges at any size.',
     params: [
       e('style', 'Style', 'auto', ['auto', 'drop', 'slam', 'pop', 'shuffle', 'flip', 'spin3d', 'zoomthrough', 'stack', 'wave', 'glitch', 'scatter', 'orbit3d', 'highway', 'credits', 'infomercial', 'ransom', 'teletext', 'screensaver'], 'auto: picks a style that suits the look'),
-      e('material', 'Letters made of', 'auto', ['auto', 'plain', 'chrome', 'neon', 'paper', 'led', 'phosphor']),
+      e('material', 'Letters made of', 'auto', ['auto', 'plain', 'chrome', 'neon', 'paper', 'led', 'phosphor', 'stencil', 'mimeo', 'rubdown']),
       f('hero', 'Hero word', 0.6, 0, 1, 0.01, 'the key word of each line takes the frame (bigger in the chorus)'),
       f('camera', 'Camera moves', 0.5, 0, 1, 0.01, 'push-ins, whip-pans into new lines, chorus orbits, punch-ins'),
       f('drama', 'Song shape', 0.7, 0, 1, 0.01, 'how much verses stay calm and choruses and drops go big'),
@@ -616,6 +616,21 @@ export const GENERATORS: ModuleDef[] = [
     params: [f('swing', 'Swing', 0.6, 0, 1), f('glints', 'Glint size', 1, 0, 2), f('beams', 'Beams', 1, 0, 2), f('rings', 'Rings', 1, 0, 1), f('velvet', 'Velvet', 1, 0, 1.5)],
   },
   {
+    kind: 'concrete',
+    label: 'Concrete age',
+    description: 'Raw board-formed concrete: prefab panel blocks at night in the snow (windows lighting floor by floor on the beat), a monolith in fog with light slits, a parking spiral with stencilled level numbers, deck-access walkways with doors lighting in sequence, a water tower at dusk, a wall close-up, or an architect\u2019s section drawing. Slides: a projector changing view every few bars.',
+    params: [
+      e('scene', 'Scene', 'panels', ['panels', 'monolith', 'parking', 'walkways', 'watertower', 'wall', 'section']),
+      i('slides', 'Slide every (bars)', 0, 0, 16, '0 = stay on the scene'),
+      f('speed', 'Camera speed', 1, 0, 4),
+      f('lit', 'Windows lit', 0.6, 0, 1),
+      f('snow', 'Snow', 1, 0, 2),
+      f('view', 'Viewpoint', 0, 0, 1),
+      f('warm', 'Warm light', 0.3, 0, 1),
+      f('react', 'Music reaction', 1, 0, 2),
+    ],
+  },
+  {
     kind: 'adjust',
     label: 'Everything below',
     description: 'An adjustment layer: its effects treat every layer underneath (put a tape deck or old film here to age the whole picture).',
@@ -749,6 +764,12 @@ export const EFFECTS: ModuleDef[] = [
       b('gate', 'Show film edge', false),
       i('seed', 'Reel', 0, 0, 99),
     ],
+  },
+  {
+    kind: 'print2',
+    label: 'Two-colour print',
+    description: 'A cheap two-colour print: the picture split into two inks with their own halftone screens, slightly misregistered (more on the kick), on grainy paper.',
+    params: [e('inks', 'Inks', 'red-black', ['red-black', 'blue-pink', 'green-orange', 'black-yellow', 'look']), f('misregister', 'Misregistration', 1, 0, 4), f('dot', 'Dot size', 6, 2, 24, 0.5), f('grain', 'Paper grain', 0.3, 0, 1)],
   },
   {
     kind: 'tvSet',

@@ -12,7 +12,7 @@ export const LYRIC_STYLES = [
 ] as const;
 export type LyricStyle = (typeof LYRIC_STYLES)[number];
 
-export const LETTER_MATERIALS = ['plain', 'chrome', 'neon', 'paper', 'led', 'phosphor'] as const;
+export const LETTER_MATERIALS = ['plain', 'chrome', 'neon', 'paper', 'led', 'phosphor', 'stencil', 'mimeo', 'rubdown'] as const;
 export type LetterMaterial = (typeof LETTER_MATERIALS)[number];
 
 /** Material each style uses when the look leaves it on 'auto'. */
