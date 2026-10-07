@@ -2,7 +2,7 @@
 
 Real-time audio visualizer and auto-VJ for Windows (macOS second). It listens to anything playing on the computer (Serato, Rekordbox, Traktor, Spotify, YouTube, DAWs) and renders beat-locked visuals to a clean output window for a projector, LED wall or second screen.
 
-> **Status: Phase 5 (Clip engine) complete.** Over 200 built-in looks, synced lyrics from Spotify, archive footage, and clips cut to the beat. See [Roadmap](#roadmap).
+> **Status: Phase 6 (Performance layer) complete.** Over 200 built-in looks, synced lyrics from Spotify, archive footage, and clips cut to the beat. See [Roadmap](#roadmap).
 
 ## Run it (Windows)
 
@@ -82,10 +82,19 @@ Limits and caveats:
 | `F` | Fullscreen output (opens it if it's closed) |
 | `O` | Open or close the output window |
 | `B` | Blackout |
+| `C` | Cue mode on/off (looks load into the preview only) |
+| `G` | GO: the cued look goes to the screen on the next bar |
 | `D` | Toggle the debug HUD (preview only, never in the output) |
 | `H` | Hide UI (preview fills the window) |
 
 Settings are saved to `%APPDATA%/BOOFVIZ/settings.json`.
+
+### Performing live (Perform tab)
+
+* **Cue and GO:** with Cue mode on, looks you pick load into the preview only, so you can tweak the next one while the screen keeps the current one; GO sends it on the next bar (or beat / phrase, per the launch setting) with its transition. Autopilot waits while you cue.
+* **Live buttons:** blackout, strobe while held, and freeze (the screen holds its last frame while the preview keeps running).
+* **Sets:** a pool of looks played in order (choose the pool as the shuffle pool and set the order to In order); autopilot walks through it, or step through it from MIDI.
+* **MIDI learn:** any controller (a DJ controller works alongside your DJ software). Press **Learn** next to a function, then press the pad or move the knob: GO, cue, next / previous look, browse with an endless knob, set steps, shuffle, autopilot, starred looks 1–9, macros 1–8, blackout, strobe, freeze, brightness, speed, reactivity, saturation, hue, trails, tap tempo, downbeat and nudges. Mappings are saved. If your DJ software has the controller open and BOOFVIZ doesn't see it, Windows is letting one app use it at a time; an up-to-date Windows 11 shares it between apps.
 
 ## Architecture
 
@@ -165,6 +174,6 @@ Both windows receive identical packets. Each one rebuilds the same `AudioFrame` 
 3. **Beat engine**: done ✅. Stronger beat tracker, Ableton Link, MIDI Clock in, beat-quantized changes
 4. **3D, techniques and looks**: done ✅. 3D scenes, raymarching, SDF text, particles, post-FX, and the era looks (Real 90s, Y2K, Lost Media, Retro TV, Brutalist, Neo 90s, Vintage, Lyrics)
 5. **Clip engine**: done ✅. Clips cut to the beat from the archive or your own videos folder (the next clip cued before its cut), beat-synced stutter, reverse, scratch and freeze, and music-video mode: your own video for the playing song (named "Artist - Title" in the videos folder), in time with the song
-6. Performance layer: transitions, cue, MIDI learn, sets
+6. **Performance layer**: done ✅. Cue and GO, MIDI learn for any controller, sets played in order, blackout / strobe / freeze, on top of the beat-quantized launches and 9 transition types
 7. Output pro: Spout, recording, keystone, auto-quality, photosensitivity limiter
 8. Polish: onboarding, packs, more Trippy, Mellow and 3D Worlds looks

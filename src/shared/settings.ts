@@ -103,6 +103,17 @@ export interface NeoFlatSettings {
   shadow: number;
 }
 
+/** One MIDI control mapped to a BOOFVIZ function (see control/midiMap.ts for the targets). */
+export interface MidiMapping {
+  target: string;
+  /** Input port name ('' = any controller). */
+  input: string;
+  type: 'cc' | 'note';
+  /** 0–15. */
+  channel: number;
+  number: number;
+}
+
 export interface Settings {
   version: 1;
   input: InputSettings;
@@ -116,6 +127,7 @@ export interface Settings {
   lostMedia: LostMediaSettings;
   retroTv: RetroTvSettings;
   neoFlat: NeoFlatSettings;
+  midiMap: { mappings: MidiMapping[] };
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -146,6 +158,7 @@ export const DEFAULT_SETTINGS: Settings = {
   lostMedia: { enabled: false, style: 'vhs', wear: 1, events: 0.3, mood: 0.3, date: 'JUN 14 1994', station: 'CHANNEL 9' },
   retroTv: { enabled: false, set: 'screen', zoom: 0.1, powerFx: true },
   neoFlat: { enabled: false, colours: 'neo', outline: 4, shadow: 12 },
+  midiMap: { mappings: [] },
 };
 
 type DeepPartial<T> = T extends readonly unknown[] ? T : T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;

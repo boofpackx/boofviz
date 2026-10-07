@@ -4,17 +4,19 @@ import { engine, initEngine } from './runtime';
 import { useControl } from './store';
 import { useShow } from './show';
 import { applyTempoSource, initExternalTempo } from './externalTempo';
-import { favoriteEntries, launchQuantized, shuffleNow, startLauncher, toggleAuto, transitionFor } from './launcher';
+import { cueGo, favoriteEntries, launchQuantized, setCue, shuffleNow, startLauncher, stepPreset, toggleAuto, transitionFor } from './launcher';
 import { startSpotifyAutoSync } from './spotifySync';
 import { TopBar } from './components/TopBar';
 import { SourcePanel, useFileDrop } from './components/SourcePanel';
 import { Preview } from './components/Preview';
 import { AnalysisPanel, MasterPanel } from './components/AnalysisPanel';
 import { Inspector } from './components/Inspector';
-import { filteredEntries, Library, libraryView } from './components/Library';
+import { Library } from './components/Library';
 import { MacroStrip } from './components/MacroStrip';
 import { ContextMenuHost } from './components/ContextMenu';
 import { LyricsPanel } from './components/LyricsPanel';
+import { PerformPanel } from './components/PerformPanel';
+import { startMidiMap } from './midiMap';
 import { Kbd, Segmented } from './components/ui';
 
 function useBootstrap(): void {
@@ -39,7 +41,7 @@ function useBootstrap(): void {
     const pushScene = (look = false, send = true): void => {
       pending = false;
       const { doc, sourceId, dirty } = useShow.getState();
-      if (send) api.sendOutputCommand(look ? { scene: sceneOf(doc), transition: transitionFor(doc) } : { scene: sceneOf(doc) });
+      if (send && !useControl.getState().cue) api.sendOutputCommand(look ? { scene: sceneOf(doc), transition: transitionFor(doc) } : { scene: sceneOf(doc) });
       pushQueued();
       api.writeSession(JSON.stringify({ doc, sourceId, dirty }));
     };
@@ -47,7 +49,7 @@ function useBootstrap(): void {
       if (s.queued !== prev.queued) {
         // Newly queued launch: hand it to the output now so it switches on the same beat.
         if (s.queued) pushQueued();
-        else if (s.doc === prev.doc) api.sendOutputCommand({ scene: sceneOf(s.doc) });
+        else if (s.doc === prev.doc && !useControl.getState().cue) api.sendOutputCommand({ scene: sceneOf(s.doc) });
       }
       if (s.doc === prev.doc && s.sourceId === prev.sourceId && s.dirty === prev.dirty) return;
       if (s.sourceId !== prev.sourceId) {
@@ -62,6 +64,7 @@ function useBootstrap(): void {
       timer = window.setTimeout(pushScene, 33);
     });
     const stopLauncher = startLauncher();
+    void startMidiMap();
     const stopSpotifySync = startSpotifyAutoSync();
 
     void (async () => {
@@ -105,14 +108,6 @@ function useBootstrap(): void {
   useEffect(() => {
     if (loaded) void applyTempoSource(analysis.tempoSource, analysis.midiInputId);
   }, [analysis.tempoSource, analysis.midiInputId, loaded]);
-}
-
-function stepPreset(dir: 1 | -1): void {
-  const list = filteredEntries(libraryView.tab, libraryView.query, libraryView.category, libraryView.tag);
-  if (!list.length) return;
-  const { sourceId, queued } = useShow.getState();
-  const i = list.findIndex((e) => e.id === (queued?.entry.id ?? sourceId));
-  launchQuantized(list[(i + dir + list.length) % list.length]);
 }
 
 function useShortcuts(): void {
@@ -185,6 +180,12 @@ function useShortcuts(): void {
         case 'b':
           s.setGlobals({ blackout: !s.globals.blackout });
           break;
+        case 'c':
+          setCue(!s.cue);
+          break;
+        case 'g':
+          if (s.cue) cueGo();
+          break;
         case '[':
           engine.tempo({ cmd: 'nudge', beats: -1 / 16 });
           break;
@@ -205,7 +206,7 @@ function useShortcuts(): void {
   }, []);
 }
 
-type LeftTab = 'library' | 'input' | 'lyrics';
+type LeftTab = 'library' | 'input' | 'lyrics' | 'perform';
 type RightTab = 'layers' | 'audio' | 'master';
 
 export function App() {
@@ -230,10 +231,11 @@ export function App() {
                   { value: 'library', label: 'Library' },
                   { value: 'input', label: 'Input' },
                   { value: 'lyrics', label: 'Lyrics' },
+                  { value: 'perform', label: 'Perform' },
                 ]}
               />
             </div>
-            <div className="min-h-0 flex-1">{left === 'library' ? <Library /> : left === 'input' ? <SourcePanel /> : <LyricsPanel />}</div>
+            <div className="min-h-0 flex-1">{left === 'library' ? <Library /> : left === 'input' ? <SourcePanel /> : left === 'lyrics' ? <LyricsPanel /> : <PerformPanel />}</div>
           </aside>
         )}
         <main className="flex min-w-0 flex-1 flex-col">

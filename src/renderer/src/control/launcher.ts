@@ -2,6 +2,7 @@ import type { AudioFrame } from '@shared/types/audio';
 import type { LaunchQuantize, PresetPool, TransitionType } from '@shared/settings';
 import type { Preset } from '@shared/types/engine';
 import { BUILTIN_PRESETS, type PresetEntry } from '@/engine/library';
+import { sceneOf } from '@/engine/presetIO';
 import { engine } from './runtime';
 import { libraryEntries, useShow } from './show';
 import { useControl } from './store';
@@ -32,10 +33,57 @@ export function nextBoundary(f: AudioFrame, q: LaunchQuantize, lead = 0.05): num
 }
 
 export function launchQuantized(entry: PresetEntry, q?: LaunchQuantize): void {
+  // Cueing: the look loads into the preview only, ready for GO.
+  if (useControl.getState().cue) {
+    useShow.getState().launch(entry);
+    return;
+  }
   const quant = q ?? useControl.getState().settings.library.quantize;
   // Without audio the clock still runs, but there's no beat to wait for.
   const live = engine.builder.connected;
   useShow.getState().launch(entry, live ? nextBoundary(engine.builder.frame, quant) : undefined);
+}
+
+/** GO: the look in the preview goes to the screen on the next boundary, with its transition. */
+export function cueGo(): void {
+  const st = useControl.getState();
+  const { doc } = useShow.getState();
+  const at = engine.builder.connected ? nextBoundary(engine.builder.frame, st.settings.library.quantize) : undefined;
+  window.boofviz.sendOutputCommand(at === undefined ? { scene: sceneOf(doc), transition: transitionFor(doc) } : { scene: sceneOf(doc), applyAtBeat: at, transition: transitionFor(doc) });
+  st.set({ liveName: doc.name });
+  useShow.getState().notify(`GO → ${doc.name}`);
+}
+
+/** Cue mode on (the screen keeps its look while you prepare the next) or off (the screen catches up with the preview). */
+export function setCue(on: boolean): void {
+  const st = useControl.getState();
+  if (on === st.cue) return;
+  if (on) {
+    useShow.getState().cancelQueued();
+    st.set({ cue: true, liveName: useShow.getState().doc.name });
+    useShow.getState().notify('Cue on: looks load here first, GO sends them');
+  } else {
+    st.set({ cue: false });
+    cueGo();
+  }
+}
+
+/** Step through the shuffle pool (a set) in its own order. */
+export function stepPool(dir: 1 | -1): void {
+  const { entries } = resolvePool(useControl.getState().settings.library, pickContext());
+  if (!entries.length) return;
+  const { sourceId, queued } = useShow.getState();
+  const i = entries.findIndex((e) => e.id === (queued?.entry.id ?? sourceId));
+  launchQuantized(entries[mod(i + dir, entries.length)]);
+}
+
+/** Step through the looks the Library shows. */
+export function stepPreset(dir: 1 | -1): void {
+  const list = filteredEntries(libraryView.tab, libraryView.query, libraryView.category, libraryView.tag);
+  if (!list.length) return;
+  const { sourceId, queued } = useShow.getState();
+  const i = list.findIndex((e) => e.id === (queued?.entry.id ?? sourceId));
+  launchQuantized(list[(i + dir + list.length) % list.length]);
 }
 
 export function isFavorite(id: string): boolean {
@@ -186,7 +234,7 @@ export function startLauncher(): () => void {
     const drops = engine.builder.dropCount;
     const dropped = seenDrops >= 0 && drops > seenDrops;
     seenDrops = drops;
-    if (!lib.autoShuffle) {
+    if (!lib.autoShuffle || useControl.getState().cue) {
       nextAuto = null;
       return;
     }

@@ -68,7 +68,7 @@ api.onOutputCommand((cmd) => {
 async function start(): Promise<void> {
   const canvas = document.getElementById('out') as HTMLCanvasElement;
   const settings = await api.getSettings();
-  globals = { ...settings.globals, blackout: false };
+  globals = { ...settings.globals, blackout: false, freeze: false, strobe: false };
   const r = new ThreeRenderer();
   try {
     await r.init(canvas, { renderScale: settings.output.renderScale, isOutput: true });
@@ -90,7 +90,7 @@ async function start(): Promise<void> {
     applyLyricsSettings(s);
   });
 
-  const loop = new RenderLoop(r, builder, () => globals);
+  const loop = new RenderLoop(r, builder, () => globals, undefined, () => globals.freeze);
   loop.run();
 
   setInterval(() => {

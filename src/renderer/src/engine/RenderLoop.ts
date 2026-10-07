@@ -17,6 +17,8 @@ export class RenderLoop {
     private readonly builder: AudioFrameBuilder,
     private readonly globals: () => GlobalControls,
     private readonly onFrame?: (dt: number) => void,
+    /** While true nothing is drawn, so the screen keeps the last frame (freeze). */
+    private readonly hold?: () => boolean,
   ) {}
 
   run(): void {
@@ -24,6 +26,7 @@ export class RenderLoop {
       this.raf = requestAnimationFrame(tick);
       const dt = this.last ? Math.min((now - this.last) / 1000, 0.25) : 1 / 60;
       this.last = now;
+      if (this.hold?.()) return;
       if (dt > 0) this.fps += (1 / dt - this.fps) * 0.05;
       const t0 = performance.now();
       const frame = this.builder.build();

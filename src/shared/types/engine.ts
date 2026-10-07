@@ -265,6 +265,8 @@ export interface GlobalControls {
   trails: number;
   strobe: boolean;
   blackout: boolean;
+  /** The output holds its last frame (performance freeze). */
+  freeze: boolean;
 }
 
 export const DEFAULT_GLOBALS: GlobalControls = {
@@ -276,6 +278,7 @@ export const DEFAULT_GLOBALS: GlobalControls = {
   trails: 0,
   strobe: false,
   blackout: false,
+  freeze: false,
 };
 
 export interface RenderStats {

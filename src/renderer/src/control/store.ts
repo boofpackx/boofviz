@@ -31,6 +31,14 @@ interface ControlState {
   /** Spotify now playing (art kept across the 1 Hz updates) and the track's lyrics. */
   nowPlaying: NowPlaying;
   trackLyrics: TrackLyrics;
+  /** Cue mode: looks load into the preview only; GO sends them to the screen. */
+  cue: boolean;
+  /** Name of what the screen shows while cueing. */
+  liveName: string;
+  /** MIDI learn: the function waiting for a control to be moved (null: not learning). */
+  midiLearn: string | null;
+  /** The last MIDI message seen (shown in the Perform tab). */
+  midiSeen: string;
 
   hydrate(s: Settings): void;
   update(patch: SettingsPatch): void;
@@ -54,8 +62,12 @@ export const useControl = create<ControlState>((set, get) => ({
   midi: { supported: typeof navigator !== 'undefined' && 'requestMIDIAccess' in navigator, inputs: [], bpm: 0, running: false, receiving: false },
   nowPlaying: { ...EMPTY_NOW_PLAYING },
   trackLyrics: { ...EMPTY_LYRICS },
+  cue: false,
+  liveName: '',
+  midiLearn: null,
+  midiSeen: '',
 
-  hydrate: (s) => set({ settings: s, loaded: true, hud: s.ui.showHud, globals: { ...s.globals, blackout: false } }),
+  hydrate: (s) => set({ settings: s, loaded: true, hud: s.ui.showHud, globals: { ...s.globals, blackout: false, freeze: false, strobe: false } }),
   update: (patch) => {
     // Optimistic local update; main persists and echoes back.
     set({ settings: mergeSettings(get().settings, patch) });
