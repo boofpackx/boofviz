@@ -241,6 +241,14 @@ function RetroTvSection() {
       </div>
       {tv.set !== 'screen' && <Slider label="Zoom in" value={tv.zoom} min={0} max={1} defaultValue={0.1} onChange={(v) => set({ zoom: v })} />}
       <Toggle label="Tube switch-off on blackout" checked={tv.powerFx} onChange={(v) => set({ powerFx: v })} hint="Blackout collapses the picture to a line and a dot before going dark" />
+      <button
+        type="button"
+        className="mt-1 w-full rounded border border-ink-600 px-2 py-1 text-[11px] text-ink-200 hover:bg-ink-700"
+        title="Drop your own music videos or clips (mp4 / webm) here; looks set to 'My videos' play them through the retro filters"
+        onClick={() => void window.boofviz.openVideosFolder()}
+      >
+        Open my videos folder
+      </button>
     </Section>
   );
 }

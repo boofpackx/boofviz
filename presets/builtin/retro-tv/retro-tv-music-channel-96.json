@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "name": "Music Channel '96",
+  "category": "Retro TV",
+  "tags": [
+    "retro tv",
+    "spotify",
+    "now playing",
+    "music channel",
+    "cable",
+    "90s",
+    "album art",
+    "lyrics",
+    "words"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "channel",
+      "name": "Now playing",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "musicChannel",
+        "params": {
+          "layout": "cable",
+          "style": "cable90",
+          "channel": "RETRO ALTERNATIVE",
+          "number": 812,
+          "fit": "cover",
+          "pan": 1,
+          "punch": 1,
+          "title": "Your Song Here",
+          "artist": "Now Playing"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "cable",
+      "name": "Cable",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "cable",
+            "generation": 1,
+            "wear": 0.5,
+            "events": 0.05,
+            "eventList": "signal",
+            "overwrite": 0,
+            "mood": 0.25,
+            "seed": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tv",
+      "name": "Old screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tvSet",
+          "enabled": true,
+          "params": {
+            "set": "screen",
+            "zoom": 0.1,
+            "fit": "crop",
+            "curve": 1,
+            "glare": 1,
+            "room": 1,
+            "powerOn": true
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Reception",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glass curve",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.curve",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#1a0f08",
+      "#5c2a14",
+      "#d0643a",
+      "#f2b56b",
+      "#fff1d6"
+    ]
+  },
+  "description": "A 90s cable music channel: the song you're playing with its real album art, title, artist and album, a progress bar, a channel bug, and a panel that rotates through the sung line, on an old screen."
+}

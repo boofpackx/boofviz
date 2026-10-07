@@ -18,6 +18,7 @@ import { LiquidChrome } from './LiquidChrome';
 import { Lyrics } from './Lyrics';
 import { LyricVideo } from './LyricVideo';
 import { Memphis } from './Memphis';
+import { MusicChannel } from './MusicChannel';
 import { OpArt } from './OpArt';
 import { Orb } from './Orb';
 import { Pipes } from './Pipes';
@@ -73,6 +74,7 @@ const FACTORIES: Record<string, () => Generator> = {
   pipes: () => new Pipes(),
   lowPoly: () => new LowPoly(),
   desktop90: () => new Desktop90(),
+  musicChannel: () => new MusicChannel(),
 };
 
 export function createGenerator(kind: string): Generator {

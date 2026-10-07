@@ -23,7 +23,11 @@ export const ARCHIVE_COLLECTIONS: ArchiveCollection[] = [
   { id: 'homemovies', label: 'Home movies', query: 'collection:prelinger AND (subject:"home movies" OR title:"home movie")', rights: 'mostly public domain' },
   { id: 'commercials', label: 'TV commercials', query: 'collection:classic_tv_commercials', rights: 'check rights' },
   { id: 'custom', label: 'My search', query: '', rights: 'check rights' },
+  { id: 'myvideos', label: 'My videos folder', query: '', rights: 'check rights' },
 ];
+
+/** Video files the players can open from the user's videos folder. */
+export const VIDEO_EXT = /\.(mp4|m4v|webm|ogv|mov|mkv)$/i;
 
 export const FALLBACK_QUERY = 'collection:prelinger';
 

@@ -149,7 +149,23 @@ try {
   check(!!vid.info && vid.info.index >= 0 && Math.abs(vid.info.index - vid.at.index) <= 1 && !!vid.info.text, `music-video lyrics show the sung line over the look ("${vid.info?.text ?? ''}")`);
   const [va, vb] = await Promise.all([dbg(control, () => window.__BOOFVIZ_DEBUG__.lyricsOverlay()), dbg(output, () => window.__BOOFVIZ_DEBUG__.lyricsOverlay())]);
   check(!!va && !!vb && Math.abs(va.index - vb.index) <= 1, `preview and output agree on the music-video line (${va?.index} / ${vb?.index})`);
-  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { params: { kind: 'lyrics' } } } }));
+  // Lyric Cinema styles with the real synced lines (the mock song repeats lines, so it has a chorus).
+  for (const style of ['credits', 'teletext', 'infomercial', 'ransom']) {
+    await dbg(control, (st) => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { params: { kind: 'lyricVideo', style: st } } } }), style);
+    await sleep(1800);
+    await output.screenshot({ path: join(outDir, `lyrics-cinema-${style}.png`) });
+  }
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { enabled: false, params: { kind: 'lyrics' } } } }));
+  // ---- The song as TV: the music channel with the real album art -------------------
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.load('builtin:retro-tv-music-channel-96'));
+  await sleep(2500);
+  await output.screenshot({ path: join(outDir, 'lyrics-music-channel.png') });
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.load('builtin:retro-tv-album-art-tv'));
+  await sleep(2500);
+  await output.screenshot({ path: join(outDir, 'lyrics-album-art-tv.png') });
+  // Back to a look without its own captions, so the overlay checks below see the overlay.
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.load('builtin:twist-cube'));
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { enabled: true } } }));
   await sleep(600);
 
   // ---- Pause freezes the position ---------------------------------------------

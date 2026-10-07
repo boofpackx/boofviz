@@ -1,0 +1,226 @@
+{
+  "schema": 1,
+  "name": "My Music Videos",
+  "category": "Retro TV",
+  "tags": [
+    "retro tv",
+    "spotify",
+    "now playing",
+    "my videos",
+    "music video",
+    "vhs",
+    "channel",
+    "lyrics",
+    "words"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "footage",
+      "name": "My videos",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "archiveFootage",
+        "params": {
+          "collection": "myvideos",
+          "channels": "",
+          "decade": "any",
+          "search": "",
+          "yearFrom": 1930,
+          "yearTo": 2002,
+          "changeBars": 16,
+          "jumpBeats": 0,
+          "skip": 0,
+          "fit": "cover",
+          "punch": 0.15,
+          "switchStatic": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tape",
+      "name": "Tape",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "vhs",
+            "generation": 2,
+            "wear": 0.8,
+            "events": 0.2,
+            "eventList": "eat,signal,rewind",
+            "overwrite": 0,
+            "mood": 0.3,
+            "seed": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "text",
+      "name": "Channel & lyrics",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "broadcast",
+        "params": {
+          "kit": "channel",
+          "captions": "cc",
+          "lyrics": 1,
+          "safe43": false,
+          "date": "JUN 14 1994",
+          "station": "CHANNEL 9",
+          "title": "",
+          "ticker": "",
+          "events": 0,
+          "eventList": "all",
+          "seed": 0,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tv",
+      "name": "Old screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tvSet",
+          "enabled": true,
+          "params": {
+            "set": "screen",
+            "zoom": 0.1,
+            "fit": "crop",
+            "curve": 1,
+            "glare": 1,
+            "room": 1,
+            "powerOn": true
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Lyrics on",
+      "value": 1,
+      "targets": [
+        {
+          "path": "layers.2.source.params.lyrics",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Next clip",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.skip",
+          "range": [
+            0,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wear",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cut every",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.jumpBeats",
+          "range": [
+            0,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#1a0f08",
+      "#5c2a14",
+      "#d0643a",
+      "#f2b56b",
+      "#fff1d6"
+    ]
+  },
+  "description": "Your own music videos or clips, a new one every 16 bars, taped off cable onto an old screen with a channel number and lyric captions. Drop mp4 or webm files in the videos folder (Master tab: Open my videos folder)."
+}

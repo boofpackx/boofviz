@@ -1,0 +1,214 @@
+{
+  "schema": 1,
+  "name": "Album Art TV",
+  "category": "Retro TV",
+  "tags": [
+    "retro tv",
+    "spotify",
+    "now playing",
+    "album art",
+    "broadcast",
+    "vhs",
+    "lyrics",
+    "words"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "art",
+      "name": "Album art",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "musicChannel",
+        "params": {
+          "layout": "art",
+          "style": "cable90",
+          "channel": "RETRO ALTERNATIVE",
+          "number": 812,
+          "fit": "cover",
+          "pan": 1,
+          "punch": 1,
+          "title": "Your Song Here",
+          "artist": "Now Playing"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "text",
+      "name": "Lower third & lyrics",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "broadcast",
+        "params": {
+          "kit": "tv",
+          "captions": "cc",
+          "lyrics": 1,
+          "safe43": false,
+          "date": "JUN 14 1994",
+          "station": "CHANNEL 9",
+          "title": "",
+          "ticker": "",
+          "events": 0,
+          "eventList": "all",
+          "seed": 0,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tape",
+      "name": "Tape",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "broadcast",
+            "generation": 2,
+            "wear": 0.8,
+            "events": 0.15,
+            "eventList": "signal,eat",
+            "overwrite": 0,
+            "mood": 0.3,
+            "seed": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tv",
+      "name": "Old screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tvSet",
+          "enabled": true,
+          "params": {
+            "set": "screen",
+            "zoom": 0.1,
+            "fit": "crop",
+            "curve": 1,
+            "glare": 1,
+            "room": 1,
+            "powerOn": true
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Lyrics on",
+      "value": 1,
+      "targets": [
+        {
+          "path": "layers.1.source.params.lyrics",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pan & zoom",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.pan",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wear",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#1a0f08",
+      "#5c2a14",
+      "#d0643a",
+      "#f2b56b",
+      "#fff1d6"
+    ]
+  },
+  "description": "The song's own cover as the picture, drifting and zooming slowly, taped off an old TV with a lower third naming the song and the lyrics as captions."
+}

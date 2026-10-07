@@ -95,6 +95,8 @@ export interface BoofvizApi {
   saveLyricsForCurrentTrack(lrcText: string): Promise<string | null>;
   /** Archive footage: the clip for a slot (downloaded and cached by main), or null. */
   archiveClip(req: ArchiveRequest): Promise<ArchiveClip | null>;
+  /** Open the folder of the user's own clips (created if missing). */
+  openVideosFolder(): Promise<void>;
 }
 
 export const IPC = {
@@ -129,6 +131,7 @@ export const IPC = {
   openLyricsFolder: 'lyrics:openFolder',
   saveLyrics: 'lyrics:save',
   archiveClip: 'archive:clip',
+  openVideosFolder: 'archive:openVideos',
 } as const;
 
 /** window.postMessage tag the preload uses to hand a MessagePort to the page. */

@@ -532,7 +532,7 @@ export const GENERATORS: ModuleDef[] = [
     label: 'Archive footage',
     description: 'Real old films and TV from the Internet Archive (before 2003): a random clip every few bars, downloaded once and cached, kept in step with the beat. Optional jump cuts to a new moment every few beats.',
     params: [
-      e('collection', 'Collection', 'ephemeral', ['ephemeral', 'newsreels', 'classictv', 'cartoons', 'government', 'space', 'homemovies', 'commercials', 'custom']),
+      e('collection', 'Collection', 'ephemeral', ['ephemeral', 'newsreels', 'classictv', 'cartoons', 'government', 'space', 'homemovies', 'commercials', 'custom', 'myvideos'], 'myvideos: your own clips from the BOOFVIZ videos folder (Master tab)'),
       t('channels', 'Surf channels', '', 'channel surfing: a list of collections, e.g. cartoons, classictv, commercials (empty = just the collection above)'),
       e('decade', 'Decade', 'any', ['any', '30s', '40s', '50s', '60s', '70s', '80s', '90s', '00s'], 'any = the years below'),
       t('search', 'Search words', '', 'narrow the collection, e.g. dance, cars, television (My search: any query)'),
@@ -585,6 +585,22 @@ export const GENERATORS: ModuleDef[] = [
       f('speed', 'Marquee speed', 1, 0, 4),
       f('react', 'Music reaction', 1, 0, 2),
       i('lead', 'Lyrics lead (ms)', 150, -500, 1000),
+    ],
+  },
+  {
+    kind: 'musicChannel',
+    label: 'Music channel',
+    description: 'The song you are playing as TV: a cable music channel now-playing screen (album art, title, artist, album, progress bar, channel bug, a rotating panel with the sung line), or the album art itself filling the screen with a slow pan and zoom.',
+    params: [
+      e('layout', 'Layout', 'cable', ['cable', 'art']),
+      e('style', 'Era', 'cable90', ['cable90', 'digital00']),
+      t('channel', 'Channel name', 'RETRO ALTERNATIVE'),
+      i('number', 'Channel number', 812, 1, 999),
+      e('fit', 'Art fit', 'cover', ['cover', 'contain']),
+      f('pan', 'Pan & zoom', 1, 0, 2),
+      f('punch', 'Kick punch', 1, 0, 3),
+      t('title', 'Title (nothing playing)', 'Your Song Here'),
+      t('artist', 'Artist (nothing playing)', 'Now Playing'),
     ],
   },
   {

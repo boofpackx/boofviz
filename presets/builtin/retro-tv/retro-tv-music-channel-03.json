@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "name": "Music Channel 2003",
+  "category": "Retro TV",
+  "tags": [
+    "retro tv",
+    "spotify",
+    "now playing",
+    "music channel",
+    "digital cable",
+    "2000s",
+    "y2k",
+    "album art",
+    "lyrics",
+    "words"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "channel",
+      "name": "Now playing",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "musicChannel",
+        "params": {
+          "layout": "cable",
+          "style": "digital00",
+          "channel": "ALT NATION",
+          "number": 853,
+          "fit": "cover",
+          "pan": 1,
+          "punch": 1,
+          "title": "Your Song Here",
+          "artist": "Now Playing"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "digital",
+      "name": "Digital cable",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "digitalRot",
+          "enabled": true,
+          "params": {
+            "lowres": 0.15,
+            "blocks": 0.25,
+            "bitrate": 0.3,
+            "mosh": 0,
+            "buffering": 0.05,
+            "seed": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tv",
+      "name": "Old screen",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "tvSet",
+          "enabled": true,
+          "params": {
+            "set": "screen",
+            "zoom": 0.1,
+            "fit": "crop",
+            "curve": 1,
+            "glare": 1,
+            "room": 1,
+            "powerOn": true
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Compression",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.blocks",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glass curve",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.curve",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#020812",
+      "#0b2a4a",
+      "#2f7fbf",
+      "#9fd8ff",
+      "#f2fbff"
+    ]
+  },
+  "description": "Early digital cable: the glossy blue now-playing screen with album art and the sung line, with the blocky compression of a 2003 cable box."
+}

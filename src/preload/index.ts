@@ -52,6 +52,7 @@ const api: BoofvizApi = {
   openLyricsFolder: () => ipcRenderer.invoke(IPC.openLyricsFolder),
   saveLyricsForCurrentTrack: (text) => ipcRenderer.invoke(IPC.saveLyrics, text),
   archiveClip: (req) => ipcRenderer.invoke(IPC.archiveClip, req),
+  openVideosFolder: () => ipcRenderer.invoke(IPC.openVideosFolder),
 };
 
 contextBridge.exposeInMainWorld('boofviz', api);

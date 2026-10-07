@@ -3,6 +3,7 @@
 // playback in both windows, the same clip in preview and output, a clip
 // change on the slot boundary, and the lyrics toggle.
 //   npm run build && npm run archive:e2e        (Linux CI: wrap in xvfb-run)
+import { execFileSync } from 'node:child_process';
 import { mkdirSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,6 +17,10 @@ const configDir = join(outDir, 'archive-config');
 mkdirSync(outDir, { recursive: true });
 rmSync(configDir, { recursive: true, force: true });
 
+// One of "my videos": a generated clip in the user's videos folder.
+const videosDir = join(configDir, 'BOOFVIZ', 'videos');
+mkdirSync(videosDir, { recursive: true });
+execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', 'mandelbrot=size=320x240:rate=25', '-t', '12', '-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-movflags', '+faststart', join(videosDir, 'My_Band_Live.mp4')]);
 const mock = await startMockServices({ port: 0 });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const failures = [];
@@ -102,6 +107,16 @@ try {
   await control.evaluate(() => window.__BOOFVIZ_DEBUG__.load('builtin:lost-media-emergency-test'));
   await sleep(2500);
   await output.screenshot({ path: join(outDir, 'archive-global-tv.png') });
+
+  // My videos: the user's own clip plays through the retro chain.
+  check(await control.evaluate(() => window.__BOOFVIZ_DEBUG__.load('builtin:retro-tv-my-music-videos')), 'my-videos look loads');
+  const mine = await waitFor(output, () => {
+    const s = window.__BOOFVIZ_DEBUG__.archive();
+    return s.showing && /My Band Live/.test(s.title) ? s : null;
+  }, 20000);
+  check(!!mine, `plays the clip from the videos folder (${mine?.title ?? 'nothing'})`);
+  await sleep(2000);
+  await output.screenshot({ path: join(outDir, 'archive-my-videos.png') });
 
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(' | ')}` : ''}`);
 } catch (err) {

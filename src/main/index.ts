@@ -59,6 +59,7 @@ function registerIpc(): void {
   ipcMain.handle(IPC.openLyricsFolder, () => nowPlaying.openLyricsFolder());
   ipcMain.handle(IPC.saveLyrics, (_e, text: string) => nowPlaying.saveLrc(String(text)));
   ipcMain.handle(IPC.archiveClip, (_e, req: ArchiveRequest) => archive.clip(req));
+  ipcMain.handle(IPC.openVideosFolder, () => archive.openVideosFolder());
 
   store.onChange((s) => {
     for (const w of BrowserWindow.getAllWindows()) w.webContents.send(IPC.settingsChanged, s);

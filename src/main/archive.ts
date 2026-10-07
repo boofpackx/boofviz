@@ -2,8 +2,9 @@ import { createReadStream, createWriteStream, promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
-import { app, net, protocol } from 'electron';
-import { archiveQuery, cacheName, parseLength, pickArchiveFile, type ArchiveClip, type ArchiveFile, type ArchiveRequest } from '@shared/archive';
+import { app, net, protocol, shell } from 'electron';
+import { archiveQuery, cacheName, parseLength, pickArchiveFile, VIDEO_EXT, type ArchiveClip, type ArchiveFile, type ArchiveRequest } from '@shared/archive';
+import { hashSlot } from './archiveHash';
 
 /**
  * Archive footage: searches the Internet Archive, downloads one clip at a
@@ -32,6 +33,8 @@ export function registerArchiveScheme(): void {
 
 export class ArchiveService {
   private readonly dir = join(app.getPath('userData'), 'archive-cache');
+  /** The user's own clips (music videos, home movies...) for the archive and TV looks. */
+  readonly videosDir = join(app.getPath('userData'), 'videos');
   private readonly docs = new Map<string, Promise<Doc[]>>();
   private readonly slots = new Map<string, Promise<ArchiveClip | null>>();
   private readonly recent: string[] = [];
@@ -43,6 +46,7 @@ export class ArchiveService {
 
   /** The clip for a slot (resolving and downloading it the first time it is asked for). */
   clip(req: ArchiveRequest): Promise<ArchiveClip | null> {
+    if (req.collection === 'myvideos') return this.localClip(req.slot);
     const key = `${archiveQuery(req)}|${Math.round(req.slot)}`;
     let p = this.slots.get(key);
     if (!p) {
@@ -55,6 +59,23 @@ export class ArchiveService {
       if (this.slots.size > SLOT_MEMORY) this.slots.delete(this.slots.keys().next().value!);
     }
     return p;
+  }
+
+  /** A clip from the user's videos folder: the same file for the same slot, never the same one twice running. */
+  private async localClip(slot: number): Promise<ArchiveClip | null> {
+    await fs.mkdir(this.videosDir, { recursive: true });
+    const names = (await fs.readdir(this.videosDir).catch(() => [] as string[])).filter((n) => VIDEO_EXT.test(n) && !n.startsWith('.')).sort();
+    if (!names.length) return null;
+    const pick = (s: number): number => Math.floor(hashSlot(s) * names.length);
+    let i = pick(slot);
+    if (names.length > 1 && i === pick(slot - 1)) i = (i + 1) % names.length;
+    const name = names[i];
+    return { id: `local:${name}`, title: name.replace(VIDEO_EXT, '').replace(/[_]+/g, ' '), year: null, url: `${ARCHIVE_SCHEME}://local/${encodeURIComponent(name)}`, duration: 0, seed: hashSlot(slot + 7777) };
+  }
+
+  async openVideosFolder(): Promise<void> {
+    await fs.mkdir(this.videosDir, { recursive: true });
+    await shell.openPath(this.videosDir);
   }
 
   private async json<T>(url: string): Promise<T> {
@@ -156,11 +177,13 @@ export class ArchiveService {
   private async serve(req: Request): Promise<Response> {
     const url = new URL(req.url);
     const name = decodeURIComponent(url.pathname.replace(/^\/+/, ''));
-    if (url.host !== 'cache' || !name || name.includes('/') || name.includes('\\') || name.startsWith('.')) return new Response('not found', { status: 404 });
-    const file = join(this.dir, name);
+    if ((url.host !== 'cache' && url.host !== 'local') || !name || name.includes('/') || name.includes('\\') || name.startsWith('.')) return new Response('not found', { status: 404 });
+    const file = join(url.host === 'local' ? this.videosDir : this.dir, name);
     const stat = await fs.stat(file).catch(() => null);
     if (!stat) return new Response('not found', { status: 404 });
-    const headers: Record<string, string> = { 'Content-Type': 'video/mp4', 'Accept-Ranges': 'bytes', 'Access-Control-Allow-Origin': '*' };
+    const ext = name.split('.').pop()?.toLowerCase() ?? 'mp4';
+    const type = ext === 'webm' ? 'video/webm' : ext === 'ogv' ? 'video/ogg' : ext === 'mov' ? 'video/quicktime' : ext === 'mkv' ? 'video/x-matroska' : 'video/mp4';
+    const headers: Record<string, string> = { 'Content-Type': type, 'Accept-Ranges': 'bytes', 'Access-Control-Allow-Origin': '*' };
     const range = /bytes=(\d*)-(\d*)/.exec(req.headers.get('range') ?? '');
     let start = 0;
     let end = stat.size - 1;

@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "name": "Album Art Archive",
+  "category": "Retro TV",
+  "tags": [
+    "retro tv",
+    "spotify",
+    "now playing",
+    "album art",
+    "film",
+    "archive",
+    "vintage",
+    "lyrics",
+    "words",
+    "handwritten"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "art",
+      "name": "Album art",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "musicChannel",
+        "params": {
+          "layout": "art",
+          "style": "cable90",
+          "channel": "RETRO ALTERNATIVE",
+          "number": 812,
+          "fit": "cover",
+          "pan": 0.7,
+          "punch": 1,
+          "title": "Your Song Here",
+          "artist": "Now Playing"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "film",
+      "name": "Film",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "filmStock",
+          "enabled": true,
+          "params": {
+            "stock": "16mm",
+            "tone": "color",
+            "fps": 0,
+            "wear": 1,
+            "weave": 1.2,
+            "dust": 1,
+            "flicker": 1,
+            "fade": 0.55,
+            "leaks": 0.25,
+            "splices": 0.15,
+            "gate": false,
+            "seed": 0
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "text",
+      "name": "Lyrics",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "broadcast",
+        "params": {
+          "kit": "none",
+          "captions": "slate",
+          "lyrics": 1,
+          "safe43": false,
+          "date": "JUN 14 1994",
+          "station": "CHANNEL 9",
+          "title": "",
+          "ticker": "",
+          "events": 0,
+          "eventList": "all",
+          "seed": 0,
+          "lead": 150
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Lyrics on",
+      "value": 1,
+      "targets": [
+        {
+          "path": "layers.2.source.params.lyrics",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Faded",
+      "value": 0.55,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.fade",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wear",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.1.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#1a0f08",
+      "#5c2a14",
+      "#d0643a",
+      "#f2b56b",
+      "#fff1d6"
+    ]
+  },
+  "description": "The cover as a faded 16 mm archive print: weave, dust and flicker, with each sung line written on a slate."
+}
