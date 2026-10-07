@@ -55,7 +55,7 @@ export interface TrackLyrics {
   loading?: boolean;
 }
 
-export type SpotifyCommand = 'play' | 'pause' | 'next' | 'previous';
+export type SpotifyCommand = 'play' | 'pause' | 'next' | 'previous' | 'sync';
 
 export const SPOTIFY_REDIRECT_PORT = 43821;
 export const SPOTIFY_REDIRECT_URI = `http://127.0.0.1:${SPOTIFY_REDIRECT_PORT}/callback`;

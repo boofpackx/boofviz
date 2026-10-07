@@ -5,6 +5,7 @@ import { useControl } from './store';
 import { useShow } from './show';
 import { applyTempoSource, initExternalTempo } from './externalTempo';
 import { favoriteEntries, launchQuantized, shuffleNow, startLauncher, toggleAuto, transitionFor } from './launcher';
+import { startSpotifyAutoSync } from './spotifySync';
 import { TopBar } from './components/TopBar';
 import { SourcePanel, useFileDrop } from './components/SourcePanel';
 import { Preview } from './components/Preview';
@@ -61,6 +62,7 @@ function useBootstrap(): void {
       timer = window.setTimeout(pushScene, 33);
     });
     const stopLauncher = startLauncher();
+    const stopSpotifySync = startSpotifyAutoSync();
 
     void (async () => {
       const settings = await api.getSettings();
@@ -87,6 +89,7 @@ function useBootstrap(): void {
       offLink();
       unsubscribe();
       stopLauncher();
+      stopSpotifySync();
       window.clearTimeout(timer);
     };
   }, [hydrate, set]);

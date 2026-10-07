@@ -10,7 +10,15 @@ import { EMPTY_NOW_PLAYING, SPOTIFY_REDIRECT_PORT, SPOTIFY_REDIRECT_URI, type No
  */
 
 export const SPOTIFY_SCOPES = 'user-read-currently-playing user-read-playback-state user-modify-playback-state';
+/** Base retry step for errors (doubles per failure). */
 const POLL_MS = 1000;
+/**
+ * Polling is adaptive: the song position is extrapolated locally between
+ * samples, so a steady poll every few seconds is plenty, plus one right when
+ * the track should end (to catch the next song at once). Far fewer requests
+ * than polling every second, which is what trips Spotify's rate limit.
+ */
+export const POLL = { playing: 4000, paused: 3000, idle: 8000, min: 1000, endGrace: 400, slowFactor: 2, slowForMs: 10 * 60 * 1000 };
 const MAX_BACKOFF_MS = 30000;
 const LOGIN_TIMEOUT_MS = 5 * 60 * 1000;
 
@@ -346,6 +354,18 @@ export class SpotifyClient {
     }, ms);
   }
 
+  /** After a rate limit, poll slower for a while. */
+  private slowUntil = 0;
+
+  /** Delay to the next poll in a steady state. */
+  private steady(kind: 'playing' | 'paused' | 'idle', progressMs = 0, durationMs = 0): number {
+    let ms = POLL[kind];
+    // Catch the track change: poll just after the song should end.
+    if (kind === 'playing' && durationMs > 0) ms = Math.min(ms, Math.max(POLL.min, durationMs - progressMs + POLL.endGrace));
+    if (this.deps.now() < this.slowUntil) ms *= POLL.slowFactor;
+    return ms;
+  }
+
   private backoff(error: string): number {
     this.failures++;
     this.set({ error });
@@ -366,15 +386,18 @@ export class SpotifyClient {
     const sampleEpochMs = Math.round((this.lastSendMs + this.deps.now()) / 2);
     if (res.status === 429) {
       const after = Number(res.headers.get('retry-after'));
-      this.set({ error: 'Spotify rate limit: waiting…' });
-      return Math.max(POLL_MS, (Number.isFinite(after) && after > 0 ? after : 5) * 1000);
+      const wait = Math.max(POLL_MS, (Number.isFinite(after) && after > 0 ? after : 5) * 1000);
+      this.slowUntil = this.deps.now() + POLL.slowForMs;
+      const secs = Math.round(wait / 1000);
+      this.set({ error: `Spotify asked us to slow down; checking again in ${secs >= 90 ? `${Math.round(secs / 60)} min` : `${secs} s`}. Lyrics keep running.` });
+      return wait;
     }
     if (res.status >= 500) return this.backoff(`Spotify error ${res.status}. Retrying…`);
     if (res.status === 204 || res.status === 202) {
       this.failures = 0;
       this.applyTrack(null);
       this.set({ error: undefined, playing: false, trackId: null, title: '', artists: [], album: '', artDataUrl: undefined, durationMs: 0, progressMs: 0, sampleEpochMs });
-      return POLL_MS;
+      return this.steady('idle');
     }
     if (!res.ok) return this.backoff(`Spotify error ${res.status}.`);
     type Body = {
@@ -393,7 +416,7 @@ export class SpotifyClient {
       this.applyTrack(null);
       const label = body.currently_playing_type === 'ad' ? 'Advertisement' : body.currently_playing_type === 'episode' ? 'Podcast episode' : '';
       this.set({ error: undefined, playing, trackId: null, title: item?.name ?? label, artists: [], album: '', artDataUrl: undefined, durationMs: item?.duration_ms ?? 0, progressMs, sampleEpochMs });
-      return POLL_MS;
+      return playing ? this.steady('playing', progressMs, item?.duration_ms ?? 0) : this.steady('paused');
     }
     const track: SpotifyTrack = {
       id: item.id,
@@ -417,7 +440,7 @@ export class SpotifyClient {
       sampleEpochMs,
     });
     if (changed) this.applyTrack(track);
-    return POLL_MS;
+    return playing ? this.steady('playing', progressMs, track.durationMs) : this.steady('paused');
   }
 
   private applyTrack(track: SpotifyTrack | null): void {
@@ -435,7 +458,12 @@ export class SpotifyClient {
   /** Play / pause / next / previous. Resolves to an error message, or null. */
   async control(cmd: SpotifyCommand): Promise<string | null> {
     if (!this.refreshToken) return 'Not connected to Spotify.';
-    const route: Record<SpotifyCommand, ['PUT' | 'POST', string]> = {
+    if (cmd === 'sync') {
+      // Check now (after seeking or switching songs in Spotify itself).
+      this.schedule(0);
+      return null;
+    }
+    const route: Record<Exclude<SpotifyCommand, 'sync'>, ['PUT' | 'POST', string]> = {
       play: ['PUT', '/me/player/play'],
       pause: ['PUT', '/me/player/pause'],
       next: ['POST', '/me/player/next'],

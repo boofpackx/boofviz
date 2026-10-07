@@ -284,7 +284,7 @@ describe('Spotify client', () => {
       '/v1/me/player/currently-playing': () => playing(),
     });
     const { c } = client(m.fn, tokens);
-    expect(await c.pollOnce()).toBe(1000);
+    expect(await c.pollOnce()).toBe(4000);
     const body = form(m.calls[0].init);
     expect(Object.fromEntries(body)).toEqual({ grant_type: 'refresh_token', refresh_token: 'rt-old', client_id: 'cid123' });
     expect(tokens.value).toBe('rt-new');
@@ -312,7 +312,7 @@ describe('Spotify client', () => {
       '/v1/me/player/currently-playing': (_u, init) => (new Headers(init.headers).get('authorization') === 'Bearer at1' ? json({ error: { status: 401 } }, 401) : playing()),
     });
     const { c } = client(m.fn, memoryTokens('rt'));
-    expect(await c.pollOnce()).toBe(1000);
+    expect(await c.pollOnce()).toBe(4000);
     expect(m.calls.map((x) => x.url.pathname)).toEqual(['/api/token', '/v1/me/player/currently-playing', '/api/token', '/v1/me/player/currently-playing']);
     expect(c.state.trackId).toBe('abc');
   });
@@ -330,8 +330,24 @@ describe('Spotify client', () => {
     expect(await c.pollOnce()).toBe(4000);
     expect(c.state.error).toMatch(/503/);
     status = 200;
-    expect(await c.pollOnce()).toBe(1000);
+    // After a rate limit it keeps polling at half speed for a while.
+    expect(await c.pollOnce()).toBe(8000);
     expect(c.state.error).toBeUndefined();
+  });
+
+  it('polls gently: every few seconds, right at the end of a song, slower when paused or idle', async () => {
+    let body = (): Response => playing(199500);
+    const m = mockFetch({
+      '/api/token': () => json({ access_token: 'at', token_type: 'Bearer', expires_in: 3600 }),
+      '/v1/me/player/currently-playing': () => body(),
+    });
+    const { c } = client(m.fn, memoryTokens('rt'));
+    // 1.5 s left of a 201 s track: check just after it ends.
+    expect(await c.pollOnce()).toBe(1900);
+    body = () => playing(10000);
+    expect(await c.pollOnce()).toBe(4000);
+    body = () => new Response(null, { status: 204 });
+    expect(await c.pollOnce()).toBe(8000);
   });
 
   it('treats 204 as nothing playing and non-tracks as no lyrics', async () => {
@@ -346,7 +362,7 @@ describe('Spotify client', () => {
     res = () => playing();
     await c.pollOnce();
     res = () => new Response(null, { status: 204 });
-    expect(await c.pollOnce()).toBe(1000);
+    expect(await c.pollOnce()).toBe(8000);
     expect(c.state).toMatchObject({ playing: false, trackId: null, title: '' });
     res = () => json({ is_playing: true, progress_ms: 5, currently_playing_type: 'episode', item: null });
     await c.pollOnce();
@@ -428,5 +444,28 @@ describe('text looks', () => {
     const w = liveText('lyrics', 0, 0, 3, 4);
     expect(w.lines).toEqual(['first line', 'second line', '♪', 'third line']);
     expect(w.current).toBe(1);
+  });
+});
+
+describe('hearing Spotify changes', () => {
+  it('asks Spotify after a pause, when music comes back, and on a sudden jump, but not too often', async () => {
+    const { AudioChangeDetector } = await import('@/control/audioChange');
+    const d = new AudioChangeDetector();
+    const loud = { silence: false, loudnessLUFS: -10 };
+    const quiet = { silence: true, loudnessLUFS: -Infinity };
+    let t = 0;
+    const run = (f: typeof loud, ms: number): number => {
+      let n = 0;
+      for (let end = t + ms; t < end; t += 100) if (d.update(t, f, 100)) n++;
+      return n;
+    };
+    expect(run(loud, 20000)).toBe(0); // steady music: nothing
+    expect(run(quiet, 2000)).toBe(1); // paused: once
+    expect(run(loud, 3000)).toBe(1); // resumed: once
+    expect(run({ silence: false, loudnessLUFS: -28 }, 3000)).toBe(1); // skipped to a much quieter song
+    // Never more than 10 a minute, however choppy the audio.
+    let n = 0;
+    for (let i = 0; i < 60; i++) n += run(i % 2 ? loud : quiet, 1000);
+    expect(n).toBeLessThanOrEqual(10);
   });
 });
