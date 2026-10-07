@@ -1,0 +1,212 @@
+{
+  "schema": 1,
+  "name": "Aurora Glass Dusk",
+  "category": "Y2K & Aero",
+  "tags": [
+    "aero",
+    "glossy",
+    "aurora",
+    "dusk",
+    "orbs",
+    "chill"
+  ],
+  "energy": 2,
+  "palette": "Glass Dusk",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "meadow",
+      "name": "Glass meadow",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "glassMeadow",
+        "params": {
+          "timeOfDay": "dusk",
+          "orbs": 12,
+          "orbSize": 1.1,
+          "rise": 0.8,
+          "heroOrb": true,
+          "refraction": 1.2,
+          "bubbles": 1.3,
+          "sway": 0.8,
+          "clouds": 0.8,
+          "aurora": 1.6,
+          "flare": 1.2,
+          "dew": 0.5,
+          "burst": 1,
+          "quality": "high"
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.75,
+            "radius": 0.65,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1.05,
+            "saturation": 1.15,
+            "hue": 0,
+            "temperature": 0.05
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.35,
+            "size": 0.85,
+            "softness": 0.6
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.015,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Orbs",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.orbs",
+          "range": [
+            0,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Orb size",
+      "value": 0.462,
+      "targets": [
+        {
+          "path": "layers.0.source.params.orbSize",
+          "range": [
+            0.5,
+            1.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rise",
+      "value": 0.267,
+      "targets": [
+        {
+          "path": "layers.0.source.params.rise",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Refraction",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.refraction",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grass sway",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.sway",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ribbons",
+      "value": 0.8,
+      "targets": [
+        {
+          "path": "layers.0.source.params.aurora",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lens flare",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.flare",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Glass Dusk": [
+      "#0a1036",
+      "#2348a8",
+      "#2fae6a",
+      "#7ff5d8",
+      "#fff3e4"
+    ]
+  },
+  "description": "The glass meadow between golden hour and a starry twilight: green-to-cyan aurora ribbons sweep the sky on every bar, glossy orbs and bubbles rise and catch the low sun, and the drop pops every orb into droplets on the lens under a slow star flare."
+}

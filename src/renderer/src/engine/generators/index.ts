@@ -5,6 +5,7 @@ import { DemoParts } from './DemoParts';
 import { DeStijl } from './DeStijl';
 import { Dots } from './Dots';
 import type { Generator } from './Generator';
+import { GlassMeadow } from './GlassMeadow';
 import { KineticType } from './KineticType';
 import { Lines } from './Lines';
 import { LiquidChrome } from './LiquidChrome';
@@ -43,6 +44,7 @@ const FACTORIES: Record<string, () => Generator> = {
   synthSunset: () => new SynthSunset(),
   opArt: () => new OpArt(),
   dots: () => new Dots(),
+  glassMeadow: () => new GlassMeadow(),
   deStijl: () => new DeStijl(),
   pixelArcade: () => new PixelArcade(),
   demoParts: () => new DemoParts(),

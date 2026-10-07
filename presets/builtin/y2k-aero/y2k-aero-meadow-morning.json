@@ -1,0 +1,204 @@
+{
+  "schema": 1,
+  "name": "Morning Glass Meadow",
+  "category": "Y2K & Aero",
+  "tags": [
+    "aero",
+    "glossy",
+    "meadow",
+    "orbs",
+    "sky",
+    "optimistic"
+  ],
+  "energy": 2,
+  "palette": "Meadow Morning",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "meadow",
+      "name": "Glass meadow",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "glassMeadow",
+        "params": {
+          "timeOfDay": "cycle",
+          "orbs": 14,
+          "orbSize": 1,
+          "rise": 1,
+          "heroOrb": true,
+          "refraction": 1,
+          "bubbles": 1,
+          "sway": 1,
+          "clouds": 1,
+          "aurora": 1,
+          "flare": 1,
+          "dew": 0.35,
+          "burst": 1,
+          "quality": "high"
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.5,
+            "threshold": 0.8,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1.05,
+            "saturation": 1.15,
+            "hue": 0,
+            "temperature": 0
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.25,
+            "size": 0.9,
+            "softness": 0.6
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Orbs",
+      "value": 0.583,
+      "targets": [
+        {
+          "path": "layers.0.source.params.orbs",
+          "range": [
+            0,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Orb size",
+      "value": 0.385,
+      "targets": [
+        {
+          "path": "layers.0.source.params.orbSize",
+          "range": [
+            0.5,
+            1.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rise",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.rise",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Refraction",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.refraction",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grass sway",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.sway",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ribbons",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.aurora",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lens flare",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.flare",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    }
+  ],
+  "customPalettes": {
+    "Meadow Morning": [
+      "#06264d",
+      "#1067c9",
+      "#3fbf3f",
+      "#9ff0ff",
+      "#ffffff"
+    ]
+  },
+  "description": "A glossy green hill of swaying grass under a deep blue cumulus sky: glass orbs drift up refracting the world upside-down, a big orb bounces up on every downbeat, a light ribbon sweeps the sky each bar, the time of day steps every phrase and the drop bursts every orb into dew on the lens."
+}
