@@ -9,19 +9,20 @@ export const LYRIC_STYLES = [
   'drop', 'slam', 'pop', 'shuffle', 'flip', 'spin3d', 'zoomthrough', 'stack', 'wave', 'glitch', 'scatter', 'orbit3d',
   // Lyric Cinema
   'highway', 'credits', 'infomercial', 'ransom', 'teletext', 'screensaver',
+  'neonalley', 'jcard', 'laser', 'highscore', 'explosion', 'shatterdrop',
 ] as const;
 export type LyricStyle = (typeof LYRIC_STYLES)[number];
 
-export const LETTER_MATERIALS = ['plain', 'chrome', 'neon', 'paper', 'led', 'phosphor', 'stencil', 'mimeo', 'rubdown'] as const;
+export const LETTER_MATERIALS = ['plain', 'chrome', 'neon', 'paper', 'led', 'phosphor', 'stencil', 'mimeo', 'rubdown', 'laser'] as const;
 export type LetterMaterial = (typeof LETTER_MATERIALS)[number];
 
 /** Material each style uses when the look leaves it on 'auto'. */
-export const STYLE_MATERIAL: Partial<Record<LyricStyle, LetterMaterial>> = { infomercial: 'chrome', screensaver: 'chrome', ransom: 'paper' };
+export const STYLE_MATERIAL: Partial<Record<LyricStyle, LetterMaterial>> = { infomercial: 'chrome', screensaver: 'chrome', ransom: 'paper', neonalley: 'neon', laser: 'laser', shatterdrop: 'chrome' };
 
 /** Styles that show several lines at once (a scrolling roll, a teletext page). */
 export const MULTI_LINE: ReadonlySet<LyricStyle> = new Set<LyricStyle>(['credits', 'teletext']);
 /** Styles that show words before they are sung (coming down the road, the whole line tumbling). */
-const PRESHOW: ReadonlySet<LyricStyle> = new Set<LyricStyle>(['highway', 'credits', 'teletext', 'screensaver']);
+const PRESHOW: ReadonlySet<LyricStyle> = new Set<LyricStyle>(['highway', 'credits', 'teletext', 'screensaver', 'highscore']);
 /** Styles drawn front-on with no camera moves. */
 export const FLAT: ReadonlySet<LyricStyle> = new Set<LyricStyle>(['credits', 'teletext']);
 
@@ -77,6 +78,8 @@ export interface Pose {
   a: number;
   /** Extra brightness: the word being sung, landings, glitches. */
   glow: number;
+  /** 0..1 how much of the letter is drawn, left to right (handwriting, laser tracing). */
+  reveal?: number;
 }
 
 /** Deterministic 0..1 hash of two integers. */
@@ -256,6 +259,13 @@ export interface MotionInput {
   viewH?: number;
   /** Multi-line styles: this line's vertical place in em (the renderer stacks lines by their real heights). */
   rowY?: number;
+  /** This line is part of the chorus. */
+  chorus?: boolean;
+}
+
+/** High-score entry: when each letter locks in (a little after its word starts, left to right). */
+export function lockTime(line: TimedLine, L: LetterLayout): number {
+  return (line.words[L.word]?.start ?? line.start) + L.li * 0.06;
 }
 
 /** Pose one letter for a style; a = 0 means hidden. */
@@ -491,6 +501,79 @@ export function poseLetter(style: LyricStyle, L: LetterLayout, W: WordLayout, m:
       p.s = Math.max(0, grow) * (1 - outT);
       p.ry += (1 - clamp01(tl / 0.5)) * Math.PI + outT * Math.PI;
       p.a = clamp01(tl / 0.15) * (1 - outT);
+      break;
+    }
+    case 'neonalley': {
+      // Neon tubes buzzing on: each letter stutters before it holds, then the odd flicker.
+      const on = tw - L.li * 0.04;
+      if (on < 0) return { ...p, a: 0 };
+      const stutter = on < 0.45 ? (hash2(Math.floor(on * 22), L.index + m.seed * 7) > 0.45 ? 1 : 0.08) : hash2(Math.floor(m.now * 9), L.index * 3 + m.seed) > 0.985 ? 0.25 : 1;
+      p.rz = (hash2(L.word, m.seed) - 0.5) * 0.06;
+      p.a = stutter * (1 - outT);
+      p.glow += on < 0.45 ? 0.6 : 0.2;
+      break;
+    }
+    case 'jcard': {
+      // Handwritten in marker: each letter drawn in turn, a little uneven.
+      const start = wordStart + L.li * 0.05;
+      const tl = (m.now - start) * sp;
+      if (tl < 0) return { ...p, a: 0 };
+      p.reveal = clamp01(tl / 0.12);
+      p.y += (h(21) - 0.5) * 0.09;
+      p.rz = (h(22) - 0.5) * 0.09;
+      p.s = 1 + (h(23) - 0.5) * 0.12;
+      p.a = 1 - outT;
+      p.y -= inCubic(outT) * 0.6;
+      break;
+    }
+    case 'laser': {
+      // Vector beams tracing each letter, jittering like a scanning projector.
+      const tl = tw - L.li * 0.03;
+      if (tl < 0) return { ...p, a: 0 };
+      p.reveal = clamp01(tl / 0.15);
+      const jit = Math.floor(m.now * 30);
+      p.x += (hash2(jit, L.index) - 0.5) * 0.025;
+      p.y += (hash2(jit + 1, L.index) - 0.5) * 0.025;
+      p.s *= 1 - inCubic(outT) * 0.9;
+      p.a = 1 - outT * 0.5;
+      p.glow += 0.4;
+      break;
+    }
+    case 'highscore': {
+      // Arcade name entry: letters spin through the alphabet and lock in, left to right.
+      const lock = lockTime(m.line, L);
+      const since = (m.now - lock) * sp;
+      p.s = since >= 0 ? 1 + 0.35 * Math.max(0, 1 - since / 0.2) : 1;
+      p.a = 1 - outT;
+      p.glow += since >= 0 && since < 0.2 ? 0.8 : 0;
+      break;
+    }
+    case 'explosion': {
+      // Verses whispered small; the chorus detonates to fill the screen.
+      if (!m.chorus) {
+        const a = outCubic(tw / 0.3);
+        p.s = 0.55;
+        p.y += (1 - a) * 0.3;
+        p.a = clamp01(tw / 0.25) * 0.85 * (1 - outT);
+      } else {
+        wordPivot();
+        const a = outCubic(tw / 0.16);
+        p.s = 3.2 - 2.2 * a;
+        p.z = (1 - a) * 3;
+        const shake = Math.max(0, 1 - tw / 0.35) * I;
+        p.x += (h(2) - 0.5) * 0.3 * shake;
+        p.y += (h(3) - 0.5) * 0.3 * shake;
+        p.glow += shake;
+        p.a = clamp01(tw / 0.06) * (1 - outT);
+      }
+      break;
+    }
+    case 'shatterdrop': {
+      // The line holds and floats; the drop shatters it (the renderer breaks the letters apart).
+      const a = outBack(tw / 0.35);
+      p.s = Math.max(0, a);
+      p.y += Math.sin(m.beat * Math.PI * 0.5 + L.index * 0.35) * 0.05;
+      p.a = clamp01(tw / 0.15) * (1 - outT);
       break;
     }
   }

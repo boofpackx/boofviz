@@ -1,19 +1,20 @@
 {
   "schema": 1,
-  "name": "Chorus Explosion",
+  "name": "High-Score Entry",
   "category": "Lyrics",
   "tags": [
     "lyric cinema",
     "lyrics",
     "words",
     "music video",
-    "chorus",
-    "drop",
-    "big",
-    "shatter",
-    "club"
+    "arcade",
+    "high score",
+    "pixel",
+    "80s",
+    "90s",
+    "game"
   ],
-  "energy": 5,
+  "energy": 3,
   "palette": "Custom",
   "paletteCycle": {
     "mode": "off",
@@ -29,28 +30,18 @@
   "layers": [
     {
       "id": "bg",
-      "name": "Chrome",
+      "name": "Black",
       "enabled": true,
       "source": {
         "type": "generator",
-        "kind": "liquidChrome",
+        "kind": "background",
         "params": {
-          "formation": "cycle",
-          "count": "cycle",
-          "cycleBars": 1,
-          "droplets": 4,
-          "size": 1,
-          "goo": 0.34,
-          "punch": 1,
-          "ripple": 1,
-          "spin": 0.15,
-          "iridescence": 0.6,
-          "holo": 1,
-          "room": 1,
-          "grid": 0.7,
-          "mirror": 0.6,
-          "starburst": 0.6,
-          "quality": "high"
+          "style": "radial",
+          "from": 0,
+          "to": 0.1,
+          "intensity": 0.1,
+          "motion": 0,
+          "pulse": 0
         }
       },
       "fx": [],
@@ -66,22 +57,22 @@
         "type": "generator",
         "kind": "lyricVideo",
         "params": {
-          "style": "explosion",
+          "style": "highscore",
           "material": "auto",
-          "hero": 1,
-          "camera": 1,
-          "drama": 1,
+          "hero": 0.6,
+          "camera": 0.1,
+          "drama": 0.7,
           "exit": "auto",
           "source": "lyrics",
           "text": "TURN THE STATIC UP / WE WERE ORBITING THE LAUNDROMAT / HOLD THE DOOR / PAPER LANTERNS OVER THE PARKING LOT / HOLD THE DOOR",
           "lineBeats": 8,
           "font": "heavy",
-          "size": 1.15,
+          "size": 1,
           "position": "center",
-          "depth": 0.7,
+          "depth": 0,
           "outline": 0,
-          "glow": 0.2,
-          "shadow": 0.6,
+          "glow": 0.5,
+          "shadow": 0.2,
           "colorMode": "palette",
           "dimPast": 0.25,
           "speed": 1,
@@ -91,6 +82,31 @@
         }
       },
       "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    },
+    {
+      "id": "tube",
+      "name": "Tube",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "adjust",
+        "params": {}
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.4,
+            "scanlines": 0.6,
+            "mask": 0.4,
+            "vignette": 0.5
+          }
+        }
+      ],
       "blend": "normal",
       "opacity": 1,
       "modulators": []
@@ -137,17 +153,9 @@
       ]
     },
     {
-      "name": "Song shape",
-      "value": 0.7,
-      "targets": [
-        {
-          "path": "layers.1.source.params.drama",
-          "range": [
-            0,
-            1
-          ]
-        }
-      ]
+      "name": "",
+      "value": 0.5,
+      "targets": []
     },
     {
       "name": "",
@@ -172,12 +180,12 @@
   ],
   "customPalettes": {
     "Custom": [
-      "#0b0420",
-      "#3b0a6b",
-      "#ff2fa8",
-      "#22e0d0",
-      "#fff6c8"
+      "#000000",
+      "#0a0a2a",
+      "#ff3030",
+      "#ffe14a",
+      "#ffffff"
     ]
   },
-  "description": "Verses stay small and calm; the chorus detonates. The hero word fills the frame, the camera punches and whips, and big lines shatter into pieces as they leave."
+  "description": "Arcade name entry: each letter of the lyrics spins through the alphabet and locks in as it is sung, the cursor blinking on the letter being entered."
 }

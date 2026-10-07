@@ -15,6 +15,7 @@ export const FONT_STACKS: Record<string, string> = {
   condensed: `700 {px}px Impact, "Bahnschrift Condensed", "Arial Narrow", "Roboto Condensed", sans-serif`,
   mono: `700 {px}px "Cascadia Mono", Consolas, "DejaVu Sans Mono", "Courier New", monospace`,
   serif: `700 {px}px Georgia, "Times New Roman", "DejaVu Serif", serif`,
+  marker: `700 {px}px "Segoe Print", "Comic Sans MS", "Bradley Hand", "Chalkboard SE", "Comic Neue", cursive`,
 };
 
 export function fontCss(name: string, px: number): string {

@@ -101,6 +101,7 @@ export class Desktop90 extends ShaderGenerator {
     if (mode === 'popups') this.popups(ctx, H);
     else if (mode === 'pager') this.pager(ctx, H);
     else if (mode === 'pet') this.pet(ctx, H);
+    else if (mode === 'jcard') this.jcard(ctx, H);
     else this.web(ctx, H);
     this.tex.needsUpdate = true;
   }
@@ -479,6 +480,66 @@ export class Desktop90 extends ShaderGenerator {
       g.arc(cx - 40 + i * 40, cy + 92, 9, 0, Math.PI * 2);
       g.fill();
     }
+  }
+
+  /** A cassette J-card insert: spine, ruled lines, a margin and a "side A" box (the lyrics are written over it). */
+  private jcard(ctx: GenContext, H: number): void {
+    const g = this.g;
+    const p = ctx.params;
+    g.fillStyle = '#2a2622';
+    g.fillRect(0, 0, W, H);
+    const cx = 40;
+    const cy = 24;
+    const cw = W - 80;
+    const ch = H - 48;
+    g.fillStyle = '#f3ecd8';
+    g.fillRect(cx, cy, cw, ch);
+    // Spine strip, folded.
+    g.fillStyle = '#e8dfc6';
+    g.fillRect(cx, cy, 70, ch);
+    g.fillStyle = 'rgba(0,0,0,0.12)';
+    g.fillRect(cx + 70, cy, 3, ch);
+    g.save();
+    g.translate(cx + 44, cy + ch - 20);
+    g.rotate(-Math.PI / 2);
+    g.font = f(COMIC, 22);
+    g.fillStyle = '#1b2a8a';
+    g.fillText(String(p.title || 'MIXTAPE  ·  SIDE A'), 0, 0);
+    g.restore();
+    // Ruled lines and a red margin.
+    g.strokeStyle = 'rgba(70,110,200,0.35)';
+    g.lineWidth = 1;
+    for (let y = cy + 60; y < cy + ch - 10; y += 34) {
+      g.beginPath();
+      g.moveTo(cx + 90, y);
+      g.lineTo(cx + cw - 16, y);
+      g.stroke();
+    }
+    g.strokeStyle = 'rgba(210,60,60,0.5)';
+    g.beginPath();
+    g.moveTo(cx + 130, cy + 8);
+    g.lineTo(cx + 130, cy + ch - 8);
+    g.stroke();
+    // "Side A" box and a noise-reduction tick box.
+    g.strokeStyle = '#333';
+    g.lineWidth = 2;
+    g.strokeRect(cx + cw - 150, cy + 14, 130, 34);
+    g.font = f(SANS, 14);
+    g.fillStyle = '#333';
+    g.fillText('SIDE', cx + cw - 140, cy + 36);
+    g.font = f(COMIC, 24);
+    g.fillStyle = '#c0301f';
+    g.fillText(Math.floor(ctx.beat / 128) % 2 ? 'B' : 'A', cx + cw - 70, cy + 40);
+    g.strokeRect(cx + 150, cy + 18, 16, 16);
+    g.font = f(SANS, 13);
+    g.fillStyle = '#333';
+    g.fillText('NR ON', cx + 172, cy + 31);
+    g.font = f(COMIC, 20);
+    g.fillStyle = '#1b2a8a';
+    g.fillText('✓', cx + 151, cy + 33);
+    // Paper wear.
+    g.fillStyle = 'rgba(120,90,40,0.06)';
+    for (let i = 0; i < 40; i++) g.fillRect(cx + hash2(i, 1) * cw, cy + hash2(i, 2) * ch, 2 + hash2(i, 3) * 30, 1);
   }
 
   dispose(): void {

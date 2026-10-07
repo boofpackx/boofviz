@@ -258,6 +258,12 @@ const VIDEO_STYLES: Array<[string, string]> = [
   ['ransom', 'Ransom note: cut-out letters'],
   ['teletext', 'Teletext: a page of coloured rows'],
   ['screensaver', 'Screensaver: the line tumbles and bounces'],
+  ['neonalley', 'Neon alley: neon words buzz on over a wet street'],
+  ['jcard', 'J-card: handwritten in marker'],
+  ['laser', 'Laser show: beams trace the words'],
+  ['highscore', 'High score: letters spin and lock in'],
+  ['explosion', 'Chorus explosion: small verses, huge chorus'],
+  ['shatterdrop', 'Shatter drop: the drop breaks the line'],
 ];
 
 const MATERIALS: Array<[string, string]> = [
@@ -271,6 +277,7 @@ const MATERIALS: Array<[string, string]> = [
   ['stencil', 'Spray stencil'],
   ['mimeo', 'Mimeograph ink'],
   ['rubdown', 'Rub-down letters'],
+  ['laser', 'Laser beam'],
 ];
 
 function OverlaySection() {

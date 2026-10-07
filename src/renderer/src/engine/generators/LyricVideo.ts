@@ -13,6 +13,7 @@ import {
   layoutLine,
   LETTER_MATERIALS,
   LYRIC_STYLES,
+  lockTime,
   MULTI_LINE,
   poseLetter,
   STYLE_MATERIAL,
@@ -136,6 +137,12 @@ void main() {
     face *= (1.0 - crack * 0.9) * (1.0 - chip);
     cover = face;
     col = vCol.rgb;
+  } else if (front && mat == 9) {
+    // Laser: a thin vector beam tracing the outline, scanning and flickering.
+    float beam = smoothstep(0.045, 0.0, abs(d - 0.01));
+    float scan = 0.7 + 0.3 * step(0.5, fract(gl_FragCoord.y * 0.5 + uTime * 47.0));
+    col = vCol.rgb * beam * 2.4 * scan + vec3(1.0) * smoothstep(0.015, 0.0, abs(d - 0.01)) * 0.7;
+    cover = beam;
   } else if (front && mat == 5) {
     // Phosphor: one glowing colour, scanlines, a slow persistence bloom.
     col = vCol.rgb * (1.2 + 0.4 * smoothstep(0.0, 0.25, d)) * (0.72 + 0.28 * sin(gl_FragCoord.y * 3.14159));
@@ -143,6 +150,13 @@ void main() {
   if (uOutline > 0.0 && mat != 2) {
     cover = max(cover, smoothstep(-w, w, d + uOutline * 0.32));
     col = mix(uOutlineCol, col, face);
+  }
+  // Drawn in: handwriting or a laser trace reveals the letter left to right.
+  if (vFx.y < 0.0) {
+    float r = -vFx.y;
+    float m = 1.0 - smoothstep(r - 0.05, r + 0.001, vLocal.x);
+    cover *= m;
+    col += vec3(1.0) * smoothstep(0.06, 0.0, abs(vLocal.x - r)) * face * 0.6;
   }
   // Burning away: the letter erodes from a noise front with a glowing edge.
   if (vFx.y > 0.0) {
@@ -199,7 +213,11 @@ const PAPERS: Array<[number, number, number]> = [
   [0.06, 0.06, 0.06],
   [0.85, 0.2, 0.15],
 ];
-const MATERIAL_INDEX: Record<LetterMaterial, number> = { plain: 0, chrome: 1, neon: 2, paper: 3, led: 4, phosphor: 5, stencil: 6, mimeo: 7, rubdown: 8 };
+const MATERIAL_INDEX: Record<LetterMaterial, number> = { plain: 0, chrome: 1, neon: 2, paper: 3, led: 4, phosphor: 5, stencil: 6, mimeo: 7, rubdown: 8, laser: 9 };
+
+/** Glyph quad centre offset from the pen position (em). */
+const qx0 = (g: { x: number; w: number; advance: number }): number => g.x + g.w / 2 - g.advance / 2;
+const qy0 = (g: { y: number; h: number }, cap: number): number => g.y + g.h / 2 - cap / 2;
 
 function hsv(h: number, s: number, v: number): [number, number, number] {
   const f = (n: number): number => {
@@ -394,7 +412,8 @@ export class LyricVideo implements Generator {
     const chosen = String(p.style ?? 'auto');
     const style: LyricStyle = (LYRIC_STYLES as readonly string[]).includes(chosen) ? (chosen as LyricStyle) : (AUTO_STYLE[ctx.category ?? ''] ?? 'drop');
     // Some styles have a typeface of their own unless the look picks one.
-    const styleFont = p.font === undefined || p.font === 'heavy' ? (style === 'teletext' ? 'mono' : style === 'credits' ? 'serif' : font) : font;
+    const STYLE_FONT: Partial<Record<LyricStyle, string>> = { teletext: 'mono', credits: 'serif', highscore: 'mono', jcard: 'marker' };
+    const styleFont = p.font === undefined || p.font === 'heavy' ? (STYLE_FONT[style] ?? font) : font;
     if (styleFont !== this.font || !this.atlas) {
       this.font = styleFont;
       this.atlas = sdfAtlas(styleFont);
@@ -526,7 +545,7 @@ export class LyricVideo implements Generator {
         if (now >= w.start) current = i;
       });
       // Exits: a look can override the style's own exit with a shatter or a burn.
-      const exit = exitChoice === 'auto' ? (shown.chorus && ['slam', 'pop', 'zoomthrough', 'infomercial', 'drop', 'spin3d'].includes(style) ? 'shatter' : 'style') : exitChoice;
+      const exit = exitChoice === 'auto' ? (shown.chorus && ['slam', 'pop', 'zoomthrough', 'infomercial', 'drop', 'spin3d', 'explosion'].includes(style) ? 'shatter' : 'style') : exitChoice;
       const leaving = rel < 0 && !MULTI_LINE.has(style) && exit !== 'style' && now > line.end;
       const outT = leaving ? Math.min(1, ((now - line.end) * speed) / 0.8) : 0;
       const motion: MotionInput = {
@@ -544,13 +563,25 @@ export class LyricVideo implements Generator {
         viewW: viewW / k,
         viewH: viewH / k,
         rowY: rowY.get(seed),
+        chorus: shown.chorus,
       };
+      // Shatter drop: the drop breaks the sung line apart, then it re-forms.
+      const dropAge = ctx.env.drop > 0.02 ? -3 * Math.log(ctx.env.drop) : 99;
+      const dropBurst = style === 'shatterdrop' && rel === 0 && dropAge < 2;
+      // High-score entry: which letter is spinning right now.
+      let entering = -1;
+      if (style === 'highscore') for (const L of lay.letters) if (L.ch !== ' ' && entering < 0 && lockTime(line, L) > now) entering = L.index;
       // Teletext: the page header, then each row on black cells.
       const ttCol = TELETEXT[((seed % 5) + 5) % 5];
       const hueHits = style === 'screensaver' ? bounce(now, Math.max(0, viewW / k - 6), Math.max(0, viewH / k - 2.5)).hits : 0;
       for (const L of lay.letters) {
         if (L.ch === ' ' && style !== 'teletext') continue;
-        const ch = style === 'ransom' && hash2(seed * 977 + L.index, 3) < 0.45 ? L.ch.toUpperCase() : L.ch;
+        let ch = style === 'ransom' && hash2(seed * 977 + L.index, 3) < 0.45 ? L.ch.toUpperCase() : L.ch;
+        let hsState = 0; // high score: 0 locked, 1 spinning, 2 waiting
+        if (style === 'highscore' && lockTime(line, L) > now) {
+          hsState = L.index === entering ? 1 : 2;
+          ch = hsState === 1 ? String.fromCharCode(65 + ((Math.floor(now * 16) + L.index * 7) % 26)) : '_';
+        }
         const g = atlas.glyphs.get(ch) ?? atlas.glyphs.get('?')!;
         const W = lay.words[L.word];
         const pose: Pose = poseLetter(style, L, W, motion);
@@ -573,6 +604,13 @@ export class LyricVideo implements Generator {
         let face: Rgb;
         let side: Rgb = mix3(stop(2), stop(3), 0.3);
         if (style === 'teletext') face = ttCol;
+        else if (style === 'highscore') face = hsState === 0 ? [1, 0.88, 0.15] : hsState === 1 ? (Math.floor(now * 6) % 2 ? [1, 1, 1] : [1, 0.3, 0.3]) : [0.2, 0.85, 1];
+        else if (material === 'laser') face = mode === 'palette' ? [0.25, 1, 0.35] : mix3(stop(3), [1, 1, 1], 0.2);
+        else if (material === 'neon' && mode === 'palette') {
+          // Neon glows in the look's own colours, alternating tube colours word by word.
+          const c = L.word % 2 ? stop(3) : stop(2);
+          face = [c[0] * 1.5, c[1] * 1.5, c[2] * 1.5];
+        } else if (style === 'jcard' && mode === 'palette') face = [stop(1)[0] * 0.9, stop(1)[1] * 0.9, stop(1)[2] * 0.9];
         else if (style === 'screensaver') face = hsv((hueHits * 0.21) % 1, 0.55, 1);
         else if (material === 'phosphor') face = mode === 'palette' ? [0.35, 1, 0.45] : mix3(stop(4), [1, 1, 1], 0.3);
         else if (mode === 'white') face = [1, 1, 1];
@@ -625,25 +663,83 @@ export class LyricVideo implements Generator {
         }
         const qx = g.x + g.w / 2 - g.advance / 2;
         const qy = g.y + g.h / 2 - atlas.cap / 2;
-        const burn = exit === 'burn' ? outT : 0;
-        const shatter = exit === 'shatter' && outT > 0;
-        const alpha = pose.a * (shatter ? 1 - outT : exit === 'fade' ? 1 - outT : 1);
+        let ot = outT;
+        let shatter = exit === 'shatter' && outT > 0;
+        let alpha = pose.a * (shatter ? 1 - outT : exit === 'fade' ? 1 - outT : 1);
+        if (dropBurst) {
+          if (dropAge < 1.2) {
+            shatter = true;
+            ot = dropAge / 1.2;
+            alpha = pose.a * (1 - ot);
+          } else alpha = pose.a * ((dropAge - 1.2) / 0.8);
+        }
+        // Burn eats the letter (positive); a reveal draws it left to right (negative).
+        const burn = exit === 'burn' ? ot : pose.reveal !== undefined && pose.reveal < 1 ? -Math.max(0.001, pose.reveal) : 0;
         const pieces = shatter ? 4 : 1;
+        // Neon alley: each letter reflected in the wet street below, rippling.
+        if (style === 'neonalley' && !shatter) {
+          const s = this.slot();
+          if (s) {
+            const floorY = blockY - viewH * 0.3;
+            const mm = this.mm.copy(this.m);
+            this.t.makeTranslation(qx0(g), qy0(g, atlas.cap), 0);
+            mm.multiply(this.t);
+            this.t.makeScale(g.w, g.h, 1);
+            mm.multiply(this.t);
+            const e = mm.elements;
+            // Mirror about the floor: y' = 2·floor − y (rows 1 of the matrix), plus a ripple.
+            for (const i of [1, 5, 9]) e[i] = -e[i];
+            e[13] = 2 * floorY - e[13];
+            e[12] += Math.sin(now * 3 + e[13] * 2) * 0.05 * k;
+            s.z = e[14] - 0.01;
+            s.m.set(e);
+            s.uv.set([g.u0, g.v0, g.u1, g.v1]);
+            s.col.set([face[0] * 0.5, face[1] * 0.5, face[2] * 0.5, alpha * 0.35]);
+            s.kind[0] = 0;
+            s.kind[1] = 0;
+            s.fx.set([matIndex, 0, rand, 0]);
+          }
+        }
+        // Laser show: a beam from the projector to each word's first letter.
+        if (style === 'laser' && L.li === 0 && !shatter) {
+          const s = this.slot();
+          if (s) {
+            const tx = pose.x * k;
+            const ty = blockY + pose.y * k;
+            const ox = 0;
+            const oy = -viewH * 0.55;
+            const len = Math.hypot(tx - ox, ty - oy);
+            const ang = Math.atan2(ty - oy, tx - ox);
+            this.mm.makeTranslation((tx + ox) / 2, (ty + oy) / 2, -0.5);
+            this.t.makeRotationZ(ang);
+            this.mm.multiply(this.t);
+            this.t.makeScale(len, 0.02 * k, 1);
+            this.mm.multiply(this.t);
+            s.z = this.mm.elements[14];
+            s.m.set(this.mm.elements);
+            s.uv.set([0, 0, 0, 0]);
+            const flick = 0.12 + 0.12 * ctx.env.kick;
+            s.col.set([face[0] * flick, face[1] * flick, face[2] * flick, flick * alpha]);
+            s.kind[0] = 1;
+            s.kind[1] = 0;
+            s.fx.set([0, 0, rand, 1]);
+          }
+        }
         for (let piece = 0; piece < pieces; piece++) {
           // Shatter: each letter breaks into quarters that fly apart, spin and fall.
           const pu = piece % 2;
           const pv = piece >> 1;
           const du = shatter ? pu - 0.5 : 0;
           const dv = shatter ? pv - 0.5 : 0;
-          const fly = shatter ? outT * (2.5 + 3 * hash2(L.index * 4 + piece, seed)) : 0;
+          const fly = shatter ? ot * (2.5 + 3 * hash2(L.index * 4 + piece, seed)) : 0;
           for (let d = depthLayers; d >= 0; d--) {
             const s = this.slot();
             if (!s) break;
             const mm = this.mm.copy(this.m);
             if (shatter) {
-              this.t.makeTranslation(du * g.w * 0.5 + du * fly, dv * g.h * 0.5 + dv * fly - outT * outT * 4, fly * 0.6);
+              this.t.makeTranslation(du * g.w * 0.5 + du * fly, dv * g.h * 0.5 + dv * fly - ot * ot * 4, fly * 0.6);
               mm.multiply(this.t);
-              this.t.makeRotationFromEuler(this.e.set(outT * 4 * dv, outT * 3 * du, outT * 6 * (hash2(piece, L.index) - 0.5)));
+              this.t.makeRotationFromEuler(this.e.set(ot * 4 * dv, ot * 3 * du, ot * 6 * (hash2(piece, L.index) - 0.5)));
               mm.multiply(this.t);
             }
             this.t.makeTranslation(qx, qy, -d * dz);
