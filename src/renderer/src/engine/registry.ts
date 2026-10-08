@@ -776,6 +776,20 @@ export const GENERATORS: ModuleDef[] = [
     ],
   },
   {
+    kind: 'beatGames',
+    label: 'Beat toons',
+    description: 'Flat cartoon scenes in the style of the 2000s handheld rhythm games, sung by the song: simple round characters with thick outlines wind up before each word and land it exactly when it is sung, bobbing, squashing and looping to the beat. Pot Punch: a karate kid punches every word as it is tossed in. Choir: three singers take turns with the words. Fan Club: an idol sings while the fans clap on 2 and 4.',
+    params: [
+      e('game', 'Scene', 'punch', ['punch', 'choir', 'fans'], 'punch: each word tossed in and punched as it is sung · choir: three singers take turns · fans: an idol sings, the fans clap on 2 and 4'),
+      b('subtitles', 'Line at the bottom', true),
+      e('source', 'Words from', 'lyrics', ['lyrics', 'text']),
+      t('text', 'Text', '', 'your own lines when Words from is text, split by "/"'),
+      i('lineBeats', 'Beats per line (own text)', 8, 1, 32),
+      b('uppercase', 'Uppercase', false),
+      i('lead', 'Lyrics lead (ms)', 0, -500, 1000),
+    ],
+  },
+  {
     kind: 'clipEngine',
     label: 'Clips to the beat',
     description: 'Footage cut to the music: a pool of old films, cartoons, TV or your own clips, cut every few beats to a new clip and moment (twice as fast after the drop), with beat-synced stutters, reverses, scratches and freezes at the ends of bars. Music video mode plays your own video for the song that is on (a file in the videos folder named like "Artist - Title"), in time with the song.',

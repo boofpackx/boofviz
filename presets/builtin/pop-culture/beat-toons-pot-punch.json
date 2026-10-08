@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "name": "Beat Toons: Pot Punch",
+  "category": "Pop Culture",
+  "tags": [
+    "rhythm",
+    "cartoon",
+    "toon",
+    "handheld",
+    "lyrics",
+    "words",
+    "2000s",
+    "cute",
+    "karate",
+    "punch"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#1a2a4a",
+      "#e8d6a8",
+      "#ff7a5a",
+      "#7fd6ff",
+      "#fff2c8"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "game",
+      "name": "Beat games",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "beatGames",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "game": "punch"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [],
+  "description": "A karate kid in a white gi punches the song: every word is tossed in on a pot, bulb, rock or ball one beat ahead and smashed exactly when it is sung, bursting out big. The hero word is a golden barrel and the sky flashes."
+}

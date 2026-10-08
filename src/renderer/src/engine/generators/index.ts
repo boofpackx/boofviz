@@ -29,6 +29,7 @@ import { StepChart } from './StepChart';
 import { HotMetal } from './HotMetal';
 import { Keyframes } from './Keyframes';
 import { Poured } from './Poured';
+import { BeatGames } from './BeatGames';
 import { SketchScreen } from './SketchScreen';
 import { TapeDeck } from './TapeDeck';
 import { Orb } from './Orb';
@@ -100,6 +101,7 @@ const FACTORIES: Record<string, () => Generator> = {
   hotMetal: () => new HotMetal(),
   keyframes: () => new Keyframes(),
   poured: () => new Poured(),
+  beatGames: () => new BeatGames(),
   clipEngine: () => new ClipEngine(),
 };
 

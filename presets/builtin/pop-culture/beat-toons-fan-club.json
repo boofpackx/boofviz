@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "name": "Beat Toons: Fan Club",
+  "category": "Pop Culture",
+  "tags": [
+    "rhythm",
+    "cartoon",
+    "toon",
+    "handheld",
+    "lyrics",
+    "words",
+    "2000s",
+    "cute",
+    "idol",
+    "fans",
+    "clapping"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#2a1240",
+      "#4a1a6a",
+      "#ff6fa8",
+      "#ff9fd0",
+      "#ffffff"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "game",
+      "name": "Beat games",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "beatGames",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "game": "fans"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [],
+  "description": "An idol sways and sings the line in a speech bubble, pigtails swinging, while a row of fans claps on 2 and 4 and jumps with hearts on the hero word."
+}
