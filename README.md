@@ -2,7 +2,7 @@
 
 Real-time audio visualizer and auto-VJ for Windows (macOS second). It listens to anything playing on the computer (Serato, Rekordbox, Traktor, Spotify, YouTube, DAWs) and renders beat-locked visuals to a clean output window for a projector, LED wall or second screen.
 
-> **Status: Phase 6 (Performance layer) complete.** Over 200 built-in looks, synced lyrics from Spotify, archive footage, and clips cut to the beat. See [Roadmap](#roadmap).
+> **Status: Phase 6 (Performance layer) complete.** Over 200 built-in looks, synced lyrics on every look (Off / Looks' own / Everywhere) with four hero lyric looks, archive footage, and clips cut to the beat. See [Roadmap](#roadmap).
 
 ## Run it (Windows)
 
