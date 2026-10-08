@@ -62,6 +62,8 @@ export class ThreeRenderer implements Renderer {
     this.options = options;
     // Text atlases are drawn once, so the bundled faces have to be there first.
     await preloadFonts();
+    // Disposed while the fonts loaded (React dev mounts effects twice): build nothing.
+    if (this.disposed) return;
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: false,
@@ -271,7 +273,12 @@ export class ThreeRenderer implements Renderer {
     this.output.render(this.renderer, null);
   }
 
+  private disposed = false;
+
   dispose(): void {
+    this.disposed = true;
+    // Never initialised (disposed during start-up): nothing to free.
+    if (!this.renderer) return;
     window.clearTimeout(this.warmupTimer);
     this.warmup.dispose();
     this.compositor.dispose();
