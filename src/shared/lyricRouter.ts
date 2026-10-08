@@ -43,7 +43,7 @@ const classic = (id: string, name: string, params: ParamBag): LyricTreatment => 
   params: { kind: 'lyrics', ...params },
 });
 
-export const TREATMENT_FAMILIES = ['Classic', 'Music video', 'Lyric cinema', '90s & Y2K', 'Neo 90s & vintage', 'Brutalist', 'Yours'] as const;
+export const TREATMENT_FAMILIES = ['Classic', 'Music video', 'Lyric cinema', '90s & Y2K', 'Neo 90s & vintage', 'Brutalist', 'Hero', 'Yours'] as const;
 
 export const BUILTIN_TREATMENTS: LyricTreatment[] = [
   classic('karaoke', 'Karaoke sweep', {
@@ -140,6 +140,10 @@ export const BUILTIN_TREATMENTS: LyricTreatment[] = [
     position: 'upper',
     uppercase: false,
   }),
+  // Parts of the hero looks that work over any look.
+  { id: 'steps', name: 'Step lane', family: 'Hero', params: { kind: 'stepChart' } },
+  { id: 'press', name: 'Printed strip', family: 'Hero', params: { kind: 'hotMetal' } },
+  { id: 'tween', name: 'Tweening words', family: 'Hero', params: { kind: 'keyframes' } },
 ];
 
 /** The treatment each theme gets in Everywhere unless you pick another. */
@@ -194,7 +198,7 @@ export interface RouteOptions {
 /** Generators that are only words. */
 const WORD_KINDS = new Set(['lyrics', 'lyricVideo', 'kineticType']);
 /** Looks whose words come from `source` ('lyrics' | 'title' | 'text'). */
-const SOURCE_KINDS = new Set(['lyricVideo', 'kineticType', 'demoParts', 'desktop90', 'neoBrutal', 'neo90', 'prints', 'tapeDeck', 'sketchScreen']);
+const SOURCE_KINDS = new Set(['lyricVideo', 'kineticType', 'demoParts', 'desktop90', 'neoBrutal', 'neo90', 'prints', 'tapeDeck', 'sketchScreen', 'stepChart', 'hotMetal', 'keyframes', 'poured']);
 /** Layouts that never print the sung line. */
 const WORDLESS: Record<string, string[]> = {
   desktop90: ['pet'],

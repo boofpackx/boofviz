@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "name": "Keyframes",
+  "category": "Y2K & Aero",
+  "tags": [
+    "flash",
+    "web cartoon",
+    "vector",
+    "animation",
+    "timeline",
+    "lyrics",
+    "words",
+    "y2k",
+    "2000s"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#1a1a40",
+      "#3a6aff",
+      "#ff7a1a",
+      "#2ad86a",
+      "#ffe14a"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "anim",
+      "name": "Keyframes",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "keyframes",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "variant": "studio"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [],
+  "description": "The vector animation tool of the early-2000s web: every word drops a keyframe on the timeline and tweens onto the stage with onion-skin ghosts and blue handles; the last word shape-tweens into the next line, and choruses play the test movie with a singing cartoon."
+}

@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "name": "Poured",
+  "category": "Brutalist",
+  "tags": [
+    "concrete",
+    "brutalist",
+    "construction",
+    "formwork",
+    "crane",
+    "lyrics",
+    "words",
+    "architecture"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#1a1816",
+      "#5d554b",
+      "#a8a29a",
+      "#e0a21a",
+      "#f2efe8"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "site",
+      "name": "Poured",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "poured",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "variant": "song"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Camera pull-back",
+      "value": 0.67,
+      "targets": [
+        {
+          "path": "layers.0.source.params.pullback",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    }
+  ],
+  "description": "Every line cast in concrete: formwork up on the beat, each word poured from the crane's skip as it is sung, the boards stripped to show board-marked letters, the lines stacking into a tower as the sky runs from dawn to a sodium-lit night."
+}

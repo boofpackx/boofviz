@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "name": "Step Chart: Reverse",
+  "category": "Pop Culture",
+  "tags": [
+    "dance game",
+    "arcade",
+    "rhythm game",
+    "arrows",
+    "lyrics",
+    "words",
+    "90s",
+    "y2k",
+    "reverse"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#05020c",
+      "#3a0630",
+      "#ff3a3a",
+      "#ffb02a",
+      "#fff2c8"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "chart",
+      "name": "Step chart",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "stepChart",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "variant": "reverse",
+          "speed": 1.25
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Scroll speed",
+      "value": 0.33,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stage lights",
+      "value": 0.67,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stage",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    }
+  ],
+  "description": "The reverse modifier: notes fall from the top to the arrows at the bottom, with the danced line beside them."
+}

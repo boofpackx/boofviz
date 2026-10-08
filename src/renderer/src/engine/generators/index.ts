@@ -25,6 +25,10 @@ import { NeoBrutal } from './NeoBrutal';
 import { ClipEngine } from './ClipEngine';
 import { Neo90 } from './Neo90';
 import { Prints } from './Prints';
+import { StepChart } from './StepChart';
+import { HotMetal } from './HotMetal';
+import { Keyframes } from './Keyframes';
+import { Poured } from './Poured';
 import { SketchScreen } from './SketchScreen';
 import { TapeDeck } from './TapeDeck';
 import { Orb } from './Orb';
@@ -92,6 +96,10 @@ const FACTORIES: Record<string, () => Generator> = {
   prints: () => new Prints(),
   tapeDeck: () => new TapeDeck(),
   sketchScreen: () => new SketchScreen(),
+  stepChart: () => new StepChart(),
+  hotMetal: () => new HotMetal(),
+  keyframes: () => new Keyframes(),
+  poured: () => new Poured(),
   clipEngine: () => new ClipEngine(),
 };
 

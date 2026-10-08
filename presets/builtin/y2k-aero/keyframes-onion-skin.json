@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "name": "Keyframes: Onion Skin",
+  "category": "Y2K & Aero",
+  "tags": [
+    "flash",
+    "web cartoon",
+    "vector",
+    "animation",
+    "timeline",
+    "lyrics",
+    "words",
+    "y2k",
+    "2000s",
+    "onion skin"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#1a1a40",
+      "#3a6aff",
+      "#ff7a1a",
+      "#2ad86a",
+      "#ffe14a"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "anim",
+      "name": "Keyframes",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "keyframes",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "variant": "onion",
+          "testMovie": false
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [],
+  "description": "The editing view with onion skinning turned all the way up: every word trails a stack of tinted ghosts of where it has been."
+}

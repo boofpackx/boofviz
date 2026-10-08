@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "name": "Keyframes: Test Movie",
+  "category": "Y2K & Aero",
+  "tags": [
+    "flash",
+    "web cartoon",
+    "vector",
+    "animation",
+    "timeline",
+    "lyrics",
+    "words",
+    "y2k",
+    "2000s",
+    "cartoon",
+    "character"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#2a0a3a",
+      "#ff3a8a",
+      "#2ab8ff",
+      "#9aff2a",
+      "#ffffff"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "anim",
+      "name": "Keyframes",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "keyframes",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "variant": "movie"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [],
+  "description": "The published web cartoon: a vector singer mouthing every letter of the lyrics while big bubbly words tween around it, all on twos."
+}

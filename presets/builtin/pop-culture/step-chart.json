@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "name": "Step Chart",
+  "category": "Pop Culture",
+  "tags": [
+    "dance game",
+    "arcade",
+    "rhythm game",
+    "arrows",
+    "lyrics",
+    "words",
+    "90s",
+    "y2k"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#06041a",
+      "#2a0a5a",
+      "#ff2a8a",
+      "#2ad8ff",
+      "#ffe14a"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "chart",
+      "name": "Step chart",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "stepChart",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "variant": "single"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Scroll speed",
+      "value": 0.33,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stage lights",
+      "value": 0.67,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stage",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    }
+  ],
+  "description": "The arcade dance game, played by the song: every sung word scrolls up its arrow lane and lands on the beat it is sung, coloured by its rhythm, held words as freeze arrows, PERFECT and GREAT, a combo, and the danced words collecting into the line. The chorus brings fever."
+}

@@ -4,8 +4,7 @@ import type { GlobalControls, ParamBag, Scene } from '@shared/types/engine';
 import { createEffect, hdrTarget, type Effect, type FxContext } from '../fx/effects';
 import type { AudioEnv, GenContext, Generator } from '../generators/Generator';
 import { createGenerator } from '../generators';
-import type { Lyrics, LyricsRenderInfo } from '../generators/Lyrics';
-import type { LyricVideo } from '../generators/LyricVideo';
+import type { LyricsRenderInfo } from '../generators/Lyrics';
 import type { PostSpec } from '../lostMedia';
 import { alignedBeat, ModulationEngine } from '../modulation';
 import { defaultParams, generatorDef } from '../registry';
@@ -93,6 +92,8 @@ out vec4 fragColor;
 void main() { fragColor = texture(uInput, vUv); }
 `;
 
+/** Generators that can be drawn as the lyrics over a look. */
+const OVERLAY_KINDS = new Set(['lyrics', 'lyricVideo', 'stepChart', 'hotMetal', 'keyframes']);
 const BLEND_INDEX: Record<string, number> = { normal: 0, add: 1, screen: 2, multiply: 3, overlay: 4, difference: 5, lighten: 6 };
 const SHAPE_INDEX: Record<string, number> = { circle: 0, rect: 1, ring: 2, linear: 3, triangle: 4 };
 
@@ -125,7 +126,7 @@ export class Compositor {
   private trails: Effect | null = null;
   /** Global lyrics overlay: drawn over every look, after the scene's layers and trails. */
   private overlayParams: ParamBag | null = null;
-  private overlayGen: Lyrics | LyricVideo | null = null;
+  private overlayGen: (Generator & { info?: LyricsRenderInfo }) | null = null;
   /** Screen power for CRT effects (1 on, 0 off), set by the renderer from the blackout. */
   power = 1;
   /** Album-cover colours over every look (settings.coverColors). */
@@ -176,9 +177,9 @@ export class Compositor {
 
   /** Lyrics over the look (null: none). Partial params are filled with the generator's defaults. */
   private setOverlay(params: ParamBag | null): void {
-    // kind 'lyricVideo': music-video letters; otherwise the classic karaoke / punch / typewriter lines.
-    const kind = params?.kind === 'lyricVideo' ? 'lyricVideo' : 'lyrics';
-    this.overlayParams = params && { ...defaultParams(generatorDef(kind)), ...params, kind };
+    // kind 'lyricVideo': music-video letters; a hero look drawn as a style; otherwise the classic karaoke / punch / typewriter lines.
+    const kind = OVERLAY_KINDS.has(String(params?.kind)) ? String(params!.kind) : 'lyrics';
+    this.overlayParams = params && { ...defaultParams(generatorDef(kind)), ...params, kind, ...(kind === 'lyrics' || kind === 'lyricVideo' ? {} : { overlay: true }) };
     if (this.overlayGen && this.overlayGen.kind !== kind) {
       this.overlayGen.dispose();
       this.overlayGen = null;
@@ -207,7 +208,7 @@ export class Compositor {
 
   /** What the lyrics overlay showed last frame (null when it is off). */
   get overlayInfo(): LyricsRenderInfo | null {
-    return this.overlayParams && this.overlayGen ? this.overlayGen.info : null;
+    return this.overlayParams && this.overlayGen ? (this.overlayGen.info ?? null) : null;
   }
 
   setScene(scene: Scene): void {
@@ -437,7 +438,7 @@ export class Compositor {
   /** Composite the lyrics overlay (premultiplied over, full opacity, unmasked) onto `base`. */
   private renderOverlay(base: THREE.WebGLRenderTarget, ctx: GenContext, params: ParamBag): THREE.WebGLRenderTarget {
     const r = this.renderer;
-    this.overlayGen ??= createGenerator(params.kind === 'lyricVideo' ? 'lyricVideo' : 'lyrics') as Lyrics | LyricVideo;
+    this.overlayGen ??= createGenerator(String(params.kind));
     ctx.params = params;
     this.overlayGen.update(ctx);
     this.overlayGen.render(r, this.layerA);

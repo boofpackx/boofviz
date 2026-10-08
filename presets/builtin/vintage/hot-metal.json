@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "name": "Hot Metal",
+  "category": "Vintage",
+  "tags": [
+    "letterpress",
+    "hot metal",
+    "typesetting",
+    "print",
+    "ink",
+    "lyrics",
+    "words",
+    "vintage"
+  ],
+  "energy": 2,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#141210",
+      "#3a3530",
+      "#c4321f",
+      "#cf9f45",
+      "#f3ead6"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "press",
+      "name": "Hot metal",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "hotMetal",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "variant": "proof"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Impression",
+      "value": 0.58,
+      "targets": [
+        {
+          "path": "layers.0.source.params.impression",
+          "range": [
+            0.3,
+            1.5
+          ]
+        }
+      ]
+    }
+  ],
+  "description": "Hot-metal typesetting: brass matrices drop into the stick as each word is sung, the line is cast and struck onto cotton paper, the hero word in wood type and choruses in a second colour."
+}

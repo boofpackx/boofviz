@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "name": "Hot Metal: Poster",
+  "category": "Vintage",
+  "tags": [
+    "letterpress",
+    "hot metal",
+    "typesetting",
+    "print",
+    "ink",
+    "lyrics",
+    "words",
+    "vintage",
+    "poster",
+    "wood type"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#141210",
+      "#3a3530",
+      "#c4321f",
+      "#cf9f45",
+      "#f3ead6"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "press",
+      "name": "Hot metal",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "hotMetal",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "variant": "poster",
+          "uppercase": true
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Impression",
+      "value": 0.58,
+      "targets": [
+        {
+          "path": "layers.0.source.params.impression",
+          "range": [
+            0.3,
+            1.5
+          ]
+        }
+      ]
+    }
+  ],
+  "description": "A letterpress gig poster set as the song is sung: small words in a book face, the hero word struck huge in grain-textured wood type, earlier posters pasted underneath."
+}

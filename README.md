@@ -51,7 +51,7 @@ User presets live in `%APPDATA%/BOOFVIZ/presets` (templates in `…/templates`) 
 
 ### Lyrics & Spotify now playing
 
-BOOFVIZ can show the synced lyrics of whatever is playing, either as a look of its own (the **Lyrics** category) or over every look while presets change and shuffle. The audio still comes from System Audio (or any input) as usual; the player only tells BOOFVIZ *which* track is playing and where.
+BOOFVIZ can show the synced lyrics of whatever is playing, in looks built around them (the **Lyrics** category and the hero looks below) or on every look while presets change and shuffle. The audio still comes from System Audio (or any input) as usual; the player only tells BOOFVIZ *which* track is playing and where.
 
 **On Windows there's nothing to set up.** BOOFVIZ follows whatever is playing through Windows (the media session behind the volume flyout): Spotify (Free or Premium), TIDAL, Apple Music, Deezer, or YouTube and SoundCloud in a browser. Spotify is preferred when it's playing. The song, its position, play / pause and the album cover come from there, the Lyrics tab's Prev / Play / Next buttons control the player through Windows (no Premium needed), and browser titles like "Artist - Title (Official Video)" are tidied so lyrics are found. Logging in to Spotify is optional: it gives exact song names and positions, and the steps are below.
 
@@ -62,7 +62,11 @@ To log in to Spotify (optional on Windows, needed on macOS):
 
 1. Create an app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard), add the redirect URI `http://127.0.0.1:43821/callback` (exactly, Spotify rejects `localhost`) and tick **Web API**.
 2. In BOOFVIZ open the **Lyrics** tab (left panel), paste the app's **Client ID** and click **Connect**. Your browser asks you to log in to Spotify once; after that BOOFVIZ remembers the session (the refresh token is encrypted with the OS keychain; without one it is kept in memory only). **Disconnect** deletes it.
-3. Turn on **Show lyrics over every look**, or load a preset from the **Lyrics** category. The lyrics generator (karaoke sweep, punch-in lines or typewriter) can also be added as a layer to any look.
+3. Set **Lyrics mode** to **Everywhere** (Lyrics tab, Perform tab or the **L** key), or load a preset from the **Lyrics** category. The lyrics generators can also be added as a layer to any look.
+
+**Lyrics mode** is one switch with three positions: **Off** (no lyrics anywhere, the looks' own lyric layers included), **Looks' own** (every look as it was made) and **Everywhere** (every look shows lyrics). In Everywhere a look that already shows lyrics stays exactly as it is, a look with its lyrics switched off gets them switched on (a lyric layer you turned off, a text look using its own words), and any other look gets the lyric **style** for its theme on top, so a Brutalist look gets stencil letters and a Real 90s look teletext. Styles live in a gallery on the Lyrics tab, grouped by family: hover a card to try it in the preview (never on the screen), click to apply it to the look's theme, just this look or all looks, and use *Make your own style* to save one. The **Themes** table sets the style per theme, and each look can be set to its theme's style, its own lyrics only, a style of its own or never (from the Lyrics tab or the library's right-click menu). **L** turns lyrics off and back on, **Shift+L** steps through styles, and both are MIDI functions too. Your saved looks are never rewritten.
+
+**Hero lyric looks:** four looks built around new ways of showing lyrics. **Step Chart** (Pop Culture) is the arcade dance game: every sung word is a step note that lands on the arrows as it is sung, coloured by its rhythm. **Hot Metal** (Vintage) typesets each word in brass matrices and strikes the line onto cotton paper, with hero words in wood type. **Keyframes** (Y2K & Aero) is the early-2000s web-animation tool: words drop keyframes and tween onto the stage, and choruses play a cartoon singer who mouths every letter. **Poured** (Brutalist) casts every line in concrete and stacks them into a tower as the sky turns from dawn to night.
 
 How lyrics are found, in order: your own `.lrc` files in the lyrics folder (`%APPDATA%/BOOFVIZ/lyrics`; **Open lyrics folder**, or drop an `.lrc` on the Lyrics tab to attach it to the playing track), then a local cache, then [LRCLIB](https://lrclib.net) (free, community-made synced lyrics). Files in the folder (and its subfolders) are matched by name (`Artist - Title`, `Title - Artist`, `01. Title`, the Spotify track id, or just the title when only one file has it) or by the `[ar:]` / `[ti:]` tags inside them, and a file saved while a song plays (by hand or by another program) is used straight away. With no lyrics, looks show the song's name; with no song, they show no words at all. Titles like "Song - 2011 Remaster" or "Song (feat. X)" are cleaned up for the search. Turn off **Search lyrics online** to stay offline.
 
@@ -91,6 +95,7 @@ Limits and caveats:
 | `B` | Blackout |
 | `C` | Cue mode on/off (looks load into the preview only) |
 | `G` | GO: the cued look goes to the screen on the next bar |
+| `L` / `Shift+L` | Lyrics off / back on · next lyric style for the look's theme |
 | `D` | Toggle the debug HUD (preview only, never in the output) |
 | `H` | Hide UI (preview fills the window) |
 

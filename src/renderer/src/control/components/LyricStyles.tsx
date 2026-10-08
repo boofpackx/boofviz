@@ -59,6 +59,9 @@ function sampleStyle(p: ParamBag): CSSProperties {
     backgroundClip: 'text',
     color: 'transparent',
   });
+  if (p.kind === 'stepChart') return { ...css, font: fontCss('arcade', 15), color: '#ffe25a', textShadow: '0 0 4px #ff5a76' };
+  if (p.kind === 'hotMetal') return { ...css, font: fontCss('garamond', 15), color: '#1b1820', background: '#efe6cf', padding: '0 3px', textTransform: 'none' };
+  if (p.kind === 'keyframes') return { ...css, font: fontCss('rounded', 15), color: '#ff9a3a', WebkitTextStroke: '1px #111', textTransform: 'none' };
   if (mat === 'chrome' || style === 'infomercial') Object.assign(css, clip('linear-gradient(180deg,#fff 0%,#9aa4b4 45%,#3d4452 52%,#e9eef7 100%)'));
   else if (mat === 'holo' || style === 'glitter') Object.assign(css, clip('linear-gradient(100deg,#ff9ad5,#9ee7ff,#c9ffb0,#ffe59a,#d2a8ff)'));
   else if (mat === 'jelly') Object.assign(css, clip('linear-gradient(180deg,#ffb3e1,#ff4fa8)'));

@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "name": "Poured: Hard Sun",
+  "category": "Brutalist",
+  "tags": [
+    "concrete",
+    "brutalist",
+    "construction",
+    "formwork",
+    "crane",
+    "lyrics",
+    "words",
+    "architecture",
+    "day",
+    "sun"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#1a1816",
+      "#5d554b",
+      "#a8a29a",
+      "#e0a21a",
+      "#f2efe8"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "site",
+      "name": "Poured",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "poured",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "variant": "day"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Camera pull-back",
+      "value": 0.67,
+      "targets": [
+        {
+          "path": "layers.0.source.params.pullback",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    }
+  ],
+  "description": "The site at high noon: hard sun on board-marked concrete as every word is poured and the tower climbs."
+}
