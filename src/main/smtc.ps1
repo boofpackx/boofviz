@@ -1,4 +1,4 @@
-# BOOFVIZ: what the Spotify desktop app tells Windows (its media session, SMTC),
+# BOOFVIZ: what the music player (Spotify first) tells Windows (its media session, SMTC),
 # as one JSON line per change on stdout, plus a heartbeat every 2 s.
 # Started by src/main/smtc.ts with Windows PowerShell 5.1:
 #   powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File smtc.ps1 -ParentPid <pid>
@@ -77,6 +77,8 @@ if ($ParentPid -gt 0) {
 $last = ''
 $lastEmit = 0
 $errors = 0
+$cmdTask = $null
+try { $cmdTask = [Console]::In.ReadLineAsync() } catch { $cmdTask = $null }
 $artKey = ''
 $artLoops = 0
 $artDone = $false
@@ -91,10 +93,29 @@ while ($true) {
   $o = [ordered]@{ ok = $true; app = $null; title = ''; artist = ''; album = ''; status = 'closed'; positionMs = $null; startMs = $null; endMs = $null; updatedEpochMs = $null }
   $failed = $false
   try {
-    $session = $null
+    # Spotify first; another player (a browser, TIDAL, Apple Music...) when it is the one playing.
+    $spot = $null
     foreach ($s in $manager.GetSessions()) {
       # -match is case-insensitive: Spotify.exe, or the Store app's SpotifyAB.SpotifyMusic_...!Spotify
-      if ("$($s.SourceAppUserModelId)" -match 'spotify') { $session = $s; break }
+      if ("$($s.SourceAppUserModelId)" -match 'spotify') { $spot = $s; break }
+    }
+    $cur = $null
+    try { $cur = $manager.GetCurrentSession() } catch { }
+    $session = $spot
+    if ($null -ne $cur -and ($null -eq $spot -or ("$($spot.GetPlaybackInfo().PlaybackStatus)" -ne 'Playing' -and "$($cur.GetPlaybackInfo().PlaybackStatus)" -eq 'Playing'))) { $session = $cur }
+    # Playback commands from BOOFVIZ, one per line on stdin.
+    if ($null -ne $cmdTask -and $cmdTask.IsCompleted) {
+      $line = $null
+      try { $line = $cmdTask.Result } catch { }
+      if ($null -eq $line) { $cmdTask = $null } else { $cmdTask = [Console]::In.ReadLineAsync() }
+      if ($null -ne $session -and $null -ne $line) {
+        switch ("$line".Trim()) {
+          'play' { [void]$session.TryPlayAsync() }
+          'pause' { [void]$session.TryPauseAsync() }
+          'next' { [void]$session.TrySkipNextAsync() }
+          'previous' { [void]$session.TrySkipPreviousAsync() }
+        }
+      }
     }
     if ($null -ne $session) {
       $o.app = "$($session.SourceAppUserModelId)"

@@ -69,6 +69,23 @@ export interface LyricsSettings {
   overlay: { enabled: boolean; params: ParamBag };
   /** Text looks set to "Text from: text" show the sung line instead (their own text when there are no lyrics). */
   textLooks: boolean;
+  /** Time the lyrics automatically from how late songs are heard to start (on top of offsetMs). */
+  autoTiming: boolean;
+  /** The last few measured delays (ms the sound started after the player said), newest last. */
+  timing: number[];
+}
+
+/** The median of the measured delays once there are three or more (0 before). */
+export function measuredDelayMs(timing: readonly number[]): number {
+  if (timing.length < 3) return 0;
+  const s = [...timing].sort((a, b) => a - b);
+  const m = s.length >> 1;
+  return Math.round(s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2);
+}
+
+/** The lyrics offset both windows use: the slider, plus the measured delay when automatic timing is on. */
+export function lyricsOffsetMs(l: Pick<LyricsSettings, 'offsetMs' | 'autoTiming' | 'timing'>): number {
+  return l.offsetMs - (l.autoTiming ? measuredDelayMs(l.timing ?? []) : 0);
 }
 
 /** "Make it lost media": ages whatever look is playing (tape, film or early web video). */
@@ -96,6 +113,13 @@ export interface RetroTvSettings {
 }
 
 /** "Neo-brutal flat" over any look: flat loud colours, black outlines, hard offset shadows. */
+/** Looks take their colours from the playing song's album cover. */
+export interface CoverColorsSettings {
+  enabled: boolean;
+  /** 0..1: how much of the cover's colours replace the look's own. */
+  amount: number;
+}
+
 export interface NeoFlatSettings {
   enabled: boolean;
   colours: 'neo' | 'look';
@@ -128,6 +152,7 @@ export interface Settings {
   retroTv: RetroTvSettings;
   neoFlat: NeoFlatSettings;
   midiMap: { mappings: MidiMapping[] };
+  coverColors: CoverColorsSettings;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -154,11 +179,12 @@ export const DEFAULT_SETTINGS: Settings = {
   },
   spotify: { clientId: '' },
   // Overlay params are a partial bag: the lyrics generator's defaults fill the rest.
-  lyrics: { offsetMs: 0, online: true, textLooks: false, overlay: { enabled: false, params: { kind: 'lyricVideo', style: 'auto', mode: 'karaoke', position: 'center', size: 1, backdrop: 0.45 } } },
+  lyrics: { offsetMs: 0, online: true, textLooks: false, autoTiming: true, timing: [], overlay: { enabled: false, params: { kind: 'lyricVideo', style: 'auto', mode: 'karaoke', position: 'center', size: 1, backdrop: 0.45 } } },
   lostMedia: { enabled: false, style: 'vhs', wear: 1, events: 0.3, mood: 0.3, date: 'JUN 14 1994', station: 'CHANNEL 9' },
   retroTv: { enabled: false, set: 'screen', zoom: 0.1, powerFx: true },
   neoFlat: { enabled: false, colours: 'neo', outline: 4, shadow: 12 },
   midiMap: { mappings: [] },
+  coverColors: { enabled: false, amount: 1 },
 };
 
 type DeepPartial<T> = T extends readonly unknown[] ? T : T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;

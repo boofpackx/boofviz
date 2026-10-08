@@ -103,13 +103,20 @@ try {
   await sleep(1000);
   await recordOutput();
 
+  // ---- No login: the song comes from the media session alone ------------------------
+  const pre = await waitFor(control, () => {
+    const s = window.__BOOFVIZ_DEBUG__.nowPlaying();
+    return s.connected && s.source === 'media' && s.trackId ? s : null;
+  });
+  check(pre?.title === 'Paper Lanterns - 2011 Remaster' && pre.player === 'Spotify' && (mock.stats().counts['/v1/me/player/currently-playing'] ?? 0) === 0, `before any login: following Spotify through Windows, no Web API calls (${pre ? `${pre.title} via ${pre.player}` : 'nothing'})`);
+
   // ---- Connect --------------------------------------------------------------------
   await button('Lyrics').click();
   await control.getByPlaceholder('Spotify Client ID').fill('mock-client-id');
   await button('Connect').click();
   const np = await waitFor(control, () => {
     const s = window.__BOOFVIZ_DEBUG__.nowPlaying();
-    return s.connected && s.trackId ? s : null;
+    return s.connected && s.trackId === 'mocktrack1' ? s : null;
   });
   check(np?.trackId === 'mocktrack1' && np.title === 'Paper Lanterns - 2011 Remaster', `connected; now playing the mock track under its Spotify id (${np ? `${np.trackId}: ${np.title}` : 'nothing'})`);
   const lyr = await waitFor(output, () => {
@@ -259,7 +266,7 @@ try {
     const l = window.__BOOFVIZ_DEBUG__.trackLyrics();
     return s.trackId?.startsWith('smtc:') && s.title === 'Paper Lanterns - 2011 Remaster' && l.trackId === s.trackId && !l.loading && l.synced?.length ? { id: s.trackId, source: l.source, lines: l.synced.length } : null;
   }, 8000);
-  check(smtcSong?.source === 'lrclib' && smtcSong.lines > 10, `lyrics found from the media session's title, artist and length (${smtcSong ? `${smtcSong.source}, ${smtcSong.lines} lines` : 'none'})`);
+  check((smtcSong?.source === 'lrclib' || smtcSong?.source === 'cache') && smtcSong.lines > 10, `lyrics found from the media session's title, artist and length (${smtcSong ? `${smtcSong.source}, ${smtcSong.lines} lines` : 'none'})`);
   await sleep(1200);
   const g5 = await positionGap();
   const [la, lb] = await Promise.all([dbg(control, () => window.__BOOFVIZ_DEBUG__.lyricsAt(Date.now() + 100)), dbg(output, () => window.__BOOFVIZ_DEBUG__.lyricsAt(Date.now() + 100))]);
@@ -281,17 +288,19 @@ try {
   const seen = await dbg(output, () => window.__seen);
   const ids = seen.ids.filter((id) => id !== null);
   const expected = ['mocktrack1', 'mocktrack2', 'mocktrack1', limited?.trackId, smtcSong?.id];
-  check(JSON.stringify(ids) === JSON.stringify(expected), `track ids never flip within a song (${ids.join(' → ')})`);
+  // Before the login the song was followed under its media-session id; logging in names it once with Spotify.
+  check(JSON.stringify(ids) === JSON.stringify([pre?.trackId, ...expected]), `track ids never flip within a song (${ids.join(' → ')})`);
   check(JSON.stringify(seen.loads) === JSON.stringify(expected), `one lyrics lookup per song (${seen.loads.length})`);
 
   // ---- Disconnect -----------------------------------------------------------------------
   await button('Disconnect').click();
-  const off = await waitFor(control, () => !window.__BOOFVIZ_DEBUG__.nowPlaying().connected, 5000);
+  // Logged out: no more Web API requests, and the player is still followed through Windows.
+  const off = await waitFor(control, () => window.__BOOFVIZ_DEBUG__.nowPlaying().source === 'media', 5000);
   await sleep(1000);
   const r1 = requests();
   const s1 = smtcReads();
   await sleep(2500);
-  check(!!off && requests() === r1 && smtcReads() === s1, `Disconnect stops polling and the media session reader (${requests() - r1} / ${smtcReads() - s1})`);
+  check(!!off && requests() === r1 && smtcReads() > s1, `Disconnect stops the Web API and keeps following the player through Windows (${requests() - r1} request(s), ${smtcReads() - s1} reads)`);
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(' | ')}` : ''}`);
 } catch (err) {
   check(false, `unexpected error: ${err.stack ?? err}`);

@@ -1,3 +1,4 @@
+import { measuredDelayMs } from '@shared/settings';
 import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { positionAt, SPOTIFY_REDIRECT_URI, type SpotifyCommand } from '@shared/lyrics';
 import { lyricAt } from '@/engine/lyricsFeed';
@@ -34,10 +35,13 @@ function SpotifySection() {
   const commit = (): void => {
     if (draft.trim() !== clientId) update({ spotify: { clientId: draft.trim() } });
   };
-  const status = np.connected ? 'Connected' : np.connecting ? 'Waiting for the browser login…' : 'Not connected';
+  const windows = window.boofviz.platform === 'win32';
+  // Following the player through Windows alone (no login) counts as connected, but isn't a Spotify login.
+  const loggedIn = np.connected && np.source !== 'media';
+  const status = loggedIn ? 'Logged in to Spotify' : np.connecting ? 'Waiting for the browser login…' : np.connected ? `Following ${np.player || 'your player'}` : windows ? 'Waiting for music' : 'Not connected';
 
-  return (
-    <Section title="Spotify" right={<span className={`text-[10px] ${np.connected ? 'text-ok' : 'text-ink-400'}`}>{status}</span>}>
+  const login = (
+    <>
       <p className="text-[11px] leading-snug text-ink-400">
         Create an app at developer.spotify.com/dashboard, add this redirect URI, select Web API, then paste its Client ID here.
       </p>
@@ -60,14 +64,14 @@ function SpotifySection() {
         spellCheck={false}
         placeholder="Spotify Client ID"
         value={draft}
-        disabled={np.connected}
+        disabled={loggedIn}
         onChange={(e) => setDraft(e.target.value)}
         onBlur={commit}
         onKeyDown={(e) => e.key === 'Enter' && commit()}
         className="w-full rounded border border-ink-600 bg-ink-850 px-2 py-1 font-mono text-[11px] text-ink-100 placeholder:text-ink-500 disabled:opacity-50"
       />
       <div className="flex gap-2">
-        {np.connected ? (
+        {loggedIn ? (
           <Button onClick={() => void window.boofviz.spotifyDisconnect()}>Disconnect</Button>
         ) : (
           <Button
@@ -82,6 +86,24 @@ function SpotifySection() {
         )}
       </div>
       {np.error && <p className="text-[11px] leading-snug text-bad">{np.error}</p>}
+    </>
+  );
+
+  return (
+    <Section title="Music" right={<span className={`text-[10px] ${np.connected ? 'text-ok' : 'text-ink-400'}`}>{status}</span>}>
+      {windows && !loggedIn ? (
+        <>
+          <p className="text-[11px] leading-snug text-ink-400">
+            BOOFVIZ follows whatever is playing (Spotify, TIDAL, Apple Music, a browser…) through Windows: no login needed. Song, position, cover and play / pause / skip all work, with Spotify Free too.
+          </p>
+          <details className="text-[11px] text-ink-400">
+            <summary className="cursor-pointer select-none text-ink-300">Optional: log in to Spotify for exact song names and timing</summary>
+            <div className="mt-2 space-y-2">{login}</div>
+          </details>
+        </>
+      ) : (
+        login
+      )}
     </Section>
   );
 }
@@ -105,11 +127,14 @@ function NowPlayingSection() {
               {np.title}
             </div>
             <div className="truncate text-[11px] text-ink-300">{np.artists.join(', ')}</div>
-            <div className="truncate text-[11px] text-ink-400">{np.album}</div>
+            <div className="truncate text-[11px] text-ink-400">
+              {np.album}
+              {np.source === 'media' && np.player ? <span className="text-ink-500">{np.album ? ' · ' : ''}via {np.player}</span> : null}
+            </div>
           </div>
         </div>
       ) : (
-        <p className="text-[11px] text-ink-400">Nothing playing in Spotify.</p>
+        <p className="text-[11px] text-ink-400">Nothing playing.</p>
       )}
       {np.durationMs > 0 && (
         <div className="flex items-center gap-2">
@@ -124,7 +149,7 @@ function NowPlayingSection() {
         <Button className="flex-1" title="Previous track" onClick={() => send('previous')}>
           Prev
         </Button>
-        <Button className="flex-1" title={np.playing ? 'Pause Spotify' : 'Resume Spotify'} onClick={() => send(np.playing ? 'pause' : 'play')}>
+        <Button className="flex-1" title={np.playing ? 'Pause' : 'Resume'} onClick={() => send(np.playing ? 'pause' : 'play')}>
           {np.playing ? 'Pause' : 'Play'}
         </Button>
         <Button className="flex-1" title="Next track" onClick={() => send('next')}>
@@ -197,6 +222,22 @@ function LyricsSection() {
         </Button>
         <span className="ml-1 text-[10px] leading-tight text-ink-400">− = later (more delay)</span>
       </div>
+      <Toggle
+        label="Automatic timing"
+        hint="Measures, at the start of each song, how late it's heard compared with what the player says, and moves the lyrics to match (the offset above fine-tunes on top)"
+        checked={settings.autoTiming}
+        onChange={(autoTiming) => update({ lyrics: { autoTiming } })}
+      />
+      {settings.autoTiming && (
+        <div className="flex items-center gap-2 text-[11px] text-ink-400">
+          <span className="flex-1">
+            {settings.timing.length >= 3
+              ? `Songs are heard ${(Math.abs(measuredDelayMs(settings.timing)) / 1000).toFixed(2)} s ${measuredDelayMs(settings.timing) >= 0 ? 'after' : 'before'} the player says (${settings.timing.length} songs)`
+              : `Measuring: ${settings.timing.length} of 3 songs (each song played from the start counts)`}
+          </span>
+          {settings.timing.length > 0 && <Button onClick={() => update({ lyrics: { timing: [] } })}>Reset</Button>}
+        </div>
+      )}
       <Toggle label="Search lyrics online" hint="Look up synced lyrics on LRCLIB when there's no local .lrc" checked={settings.online} onChange={(online) => update({ lyrics: { online } })} />
       <div
         role="button"

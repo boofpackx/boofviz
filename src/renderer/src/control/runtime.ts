@@ -1,3 +1,4 @@
+import { lyricsOffsetMs } from '@shared/settings';
 import { PORT_MESSAGE_TAG } from '@shared/ipc';
 import { archiveNow } from '@/engine/generators/ArchiveFootage';
 import { AudioEngine } from '@/audio/AudioEngine';
@@ -52,7 +53,7 @@ function overlayLead(): number {
 // Now playing + lyrics from main (registered at load, so main's replay is never missed).
 connectLyricsFeed(window.boofviz, () => useControl.setState({ nowPlaying: lyricsFeed.now, trackLyrics: lyricsFeed.lyrics }));
 useControl.subscribe((s) => {
-  lyricsFeed.offsetMs = s.settings.lyrics.offsetMs;
+  lyricsFeed.offsetMs = lyricsOffsetMs(s.settings.lyrics);
   lyricsFeed.textLooks = s.settings.lyrics.textLooks;
 });
 

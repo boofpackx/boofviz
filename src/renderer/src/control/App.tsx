@@ -17,6 +17,8 @@ import { ContextMenuHost } from './components/ContextMenu';
 import { LyricsPanel } from './components/LyricsPanel';
 import { PerformPanel } from './components/PerformPanel';
 import { startMidiMap } from './midiMap';
+import { addMeasurement, startAutoTiming } from './autoTiming';
+import { lyricsFeed } from '@/engine/lyricsFeed';
 import { Kbd, Segmented } from './components/ui';
 
 function useBootstrap(): void {
@@ -65,6 +67,13 @@ function useBootstrap(): void {
     });
     const stopLauncher = startLauncher();
     void startMidiMap();
+    const stopAutoTiming = startAutoTiming({
+      silent: () => (engine.builder.connected ? engine.builder.frame.silence : null),
+      now: () => Date.now(),
+      song: () => lyricsFeed.now,
+      enabled: () => useControl.getState().settings.lyrics.autoTiming,
+      report: (d) => useControl.getState().update({ lyrics: { timing: addMeasurement(useControl.getState().settings.lyrics.timing, d) } }),
+    });
     const stopSpotifySync = startSpotifyAutoSync();
 
     void (async () => {
@@ -92,6 +101,7 @@ function useBootstrap(): void {
       offLink();
       unsubscribe();
       stopLauncher();
+      stopAutoTiming();
       stopSpotifySync();
       window.clearTimeout(timer);
     };

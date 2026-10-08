@@ -2,7 +2,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { createServer, type ServerResponse } from 'node:http';
 import { EMPTY_NOW_PLAYING, SPOTIFY_REDIRECT_PORT, SPOTIFY_REDIRECT_URI, type NowPlaying, type SpotifyCommand } from '@shared/lyrics';
 import { HybridNowPlaying, SMTC_ID_PREFIX, sameSong, type HybridHost } from './hybrid';
-import type { MediaSessionSource } from './smtc';
+import { playerName, type MediaSessionSource } from './smtc';
 
 /**
  * Spotify Web API client: Authorization Code + PKCE login (no client secret),
@@ -236,13 +236,15 @@ export class SpotifyClient {
     const host: HybridHost = {
       now: () => this.deps.now(),
       state: () => this.state,
-      set: (patch) => this.set(patch),
+      // Without a login the media session alone is the source: say so (and which player).
+      set: (patch) => this.set({ ...patch, ...(this.online() ? { source: 'spotify' as const } : { connected: true, source: 'media' as const }), player: playerName(this.hybrid?.app) }),
       track: (t) => this.applyTrack(t),
       art: (id, images) => this.fetchArt(id, images),
       refine: (t) => this.deps.onRefine?.(t),
       current: () => this.current(),
       limitedUntil: () => this.limitedUntil,
-      polling: (on) => (on ? this.beginPolling(Math.max(0, this.limitedUntil - this.deps.now())) : this.stopPolling()),
+      polling: (on) => (on ? (this.online() ? this.beginPolling(Math.max(0, this.limitedUntil - this.deps.now())) : this.idle()) : this.stopPolling()),
+      online: () => this.online(),
     };
     this.hybrid = deps.media ? new HybridNowPlaying(host, deps.media) : null;
   }
@@ -252,14 +254,31 @@ export class SpotifyClient {
     return this.hybrid?.active ?? false;
   }
 
-  /** Resume a stored session (if any) and start following Spotify. */
+  /** Resume a stored session (if any) and start following Spotify; without one, follow the player through Windows alone. */
   start(): void {
     this.refreshToken = this.deps.tokens.load();
-    if (this.refreshToken && this.deps.clientId().trim()) this.run();
+    if (this.online()) this.run();
+    else this.hybrid?.start();
+  }
+
+  /** Logged in (the Web API can be asked). */
+  private online(): boolean {
+    return !!this.refreshToken && !!this.deps.clientId().trim();
+  }
+
+  /** Nothing playing in any player (media-session-only mode). */
+  private idle(): void {
+    this.applyTrack(null);
+    this.set({ ...EMPTY_NOW_PLAYING });
   }
 
   /** Poll now; the media session (if any) takes over once it shows Spotify. */
   private run(): void {
+    // Just logged in while following the media session alone: name the song again with Spotify (its id, exact timing, lyrics).
+    if (this.state.source === 'media') {
+      this.applyTrack(null);
+      this.set({ ...EMPTY_NOW_PLAYING, connected: true });
+    }
     this.hybrid?.stop();
     this.beginPolling();
     this.hybrid?.start();
@@ -320,6 +339,8 @@ export class SpotifyClient {
     this.deps.tokens.clear();
     this.applyTrack(null);
     this.set({ ...EMPTY_NOW_PLAYING });
+    // Keep following the player through Windows.
+    this.hybrid?.start();
   }
 
   private accept(tok: TokenResponse): void {
@@ -545,13 +566,18 @@ export class SpotifyClient {
 
   /** Play / pause / next / previous. Resolves to an error message, or null. */
   async control(cmd: SpotifyCommand): Promise<string | null> {
-    if (!this.refreshToken) return 'Not connected to Spotify.';
     if (cmd === 'sync') {
       // The audio changed (a seek or a skip in Spotify itself): check now, or soon in hybrid mode.
       if (this.hybrid?.active) this.hybrid.sync();
-      else this.schedule(0);
+      else if (this.refreshToken) this.schedule(0);
       return null;
     }
+    // Through Windows first: works with any player and without Premium; the media session reports the result.
+    if (this.hybrid?.active && this.deps.media?.command?.(cmd)) {
+      if (cmd === 'play' || cmd === 'pause') this.anchorPlay(cmd === 'play');
+      return null;
+    }
+    if (!this.refreshToken) return 'Start playing in your music app first: BOOFVIZ controls it through Windows.';
     const route: Record<Exclude<SpotifyCommand, 'sync'>, ['PUT' | 'POST', string]> = {
       play: ['PUT', '/me/player/play'],
       pause: ['PUT', '/me/player/pause'],
@@ -569,17 +595,19 @@ export class SpotifyClient {
     if (res.status === 404) return 'No active Spotify device. Start playback in Spotify first.';
     if (res.status === 429) return 'Spotify rate limit. Try again in a moment.';
     if (!res.ok) return `Spotify error ${res.status}.`;
-    if (cmd === 'play' || cmd === 'pause') {
-      // Re-anchor the sample so the position freezes / resumes at once in both windows.
-      const now = this.deps.now();
-      const s = this.state;
-      const progressMs = s.playing ? Math.min(s.durationMs || Infinity, s.progressMs + (now - s.sampleEpochMs)) : s.progressMs;
-      this.set({ playing: cmd === 'play', progressMs, sampleEpochMs: now });
-      this.hybrid?.expect(cmd === 'play');
-    }
+    if (cmd === 'play' || cmd === 'pause') this.anchorPlay(cmd === 'play');
     // In hybrid mode the media session reports the result itself.
     if (!this.hybrid?.active) this.schedule(cmd === 'next' || cmd === 'previous' ? 250 : 400);
     return null;
+  }
+
+  /** Our own play / pause: freeze or resume the position at once in both windows (the player confirms later). */
+  private anchorPlay(playing: boolean): void {
+    const now = this.deps.now();
+    const s = this.state;
+    const progressMs = s.playing ? Math.min(s.durationMs || Infinity, s.progressMs + (now - s.sampleEpochMs)) : s.progressMs;
+    this.set({ playing, progressMs, sampleEpochMs: now });
+    this.hybrid?.expect(playing);
   }
 
   dispose(): void {

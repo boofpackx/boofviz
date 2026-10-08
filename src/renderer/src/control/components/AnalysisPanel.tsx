@@ -160,6 +160,7 @@ export function MasterPanel() {
       </Section>
       <LostMediaSection />
       <RetroTvSection />
+      <CoverColorsSection />
       <NeoFlatSection />
       <Section title="Output">
         <Slider label="Render scale" value={scale} min={0.5} max={2} step={0.05} defaultValue={1} format={(v) => `${Math.round(v * 100)}%`} onChange={(v) => update({ output: { renderScale: v } })} />
@@ -250,6 +251,17 @@ function RetroTvSection() {
       >
         Open my videos folder
       </button>
+    </Section>
+  );
+}
+
+function CoverColorsSection() {
+  const cover = useControl((s) => s.settings.coverColors);
+  const update = useControl((s) => s.update);
+  return (
+    <Section title="Album cover colours">
+      <Toggle label="Looks take the song's cover colours" checked={cover.enabled} onChange={(v) => update({ coverColors: { enabled: v } })} hint="Every song recolours whatever look is playing with the main colours of its album cover" />
+      <Slider label="Amount" value={cover.amount} min={0} max={1} defaultValue={1} format={(v) => `${Math.round(v * 100)}%`} onChange={(v) => update({ coverColors: { amount: v, enabled: true } })} />
     </Section>
   );
 }

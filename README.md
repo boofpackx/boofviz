@@ -51,7 +51,14 @@ User presets live in `%APPDATA%/BOOFVIZ/presets` (templates in `…/templates`) 
 
 ### Lyrics & Spotify now playing
 
-BOOFVIZ can show the synced lyrics of whatever is playing in Spotify, either as a look of its own (the **Lyrics** category) or over every look while presets change and shuffle. The audio still comes from System Audio (or any input) as usual; Spotify only tells BOOFVIZ *which* track is playing and where.
+BOOFVIZ can show the synced lyrics of whatever is playing, either as a look of its own (the **Lyrics** category) or over every look while presets change and shuffle. The audio still comes from System Audio (or any input) as usual; the player only tells BOOFVIZ *which* track is playing and where.
+
+**On Windows there's nothing to set up.** BOOFVIZ follows whatever is playing through Windows (the media session behind the volume flyout): Spotify (Free or Premium), TIDAL, Apple Music, Deezer, or YouTube and SoundCloud in a browser. Spotify is preferred when it's playing. The song, its position, play / pause and the album cover come from there, the Lyrics tab's Prev / Play / Next buttons control the player through Windows (no Premium needed), and browser titles like "Artist - Title (Official Video)" are tidied so lyrics are found. Logging in to Spotify is optional: it gives exact song names and positions, and the steps are below.
+
+* **Album cover colours** (Master tab): every look takes the main colours of the playing song's cover, easing over as songs change.
+* **Automatic timing** (Lyrics tab, on by default): at the start of each song played from the top, BOOFVIZ measures how late it is heard against what the player reports and moves the lyrics to match (the median of the last few songs). Speaker or Bluetooth delay after the system mix isn't visible to System Audio capture: use the Offset slider for that.
+
+To log in to Spotify (optional on Windows, needed on macOS):
 
 1. Create an app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard), add the redirect URI `http://127.0.0.1:43821/callback` (exactly, Spotify rejects `localhost`) and tick **Web API**.
 2. In BOOFVIZ open the **Lyrics** tab (left panel), paste the app's **Client ID** and click **Connect**. Your browser asks you to log in to Spotify once; after that BOOFVIZ remembers the session (the refresh token is encrypted with the OS keychain; without one it is kept in memory only). **Disconnect** deletes it.

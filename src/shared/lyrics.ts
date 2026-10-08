@@ -41,6 +41,10 @@ export interface NowPlaying {
   /** Playback position at `sampleEpochMs` (Date.now() clock). */
   progressMs: number;
   sampleEpochMs: number;
+  /** Where the song comes from: the Spotify login, or the Windows media session alone (no login). */
+  source?: 'spotify' | 'media';
+  /** The player followed through Windows ("Spotify", "Chrome", …). */
+  player?: string;
 }
 
 export type LyricsSource = 'file' | 'cache' | 'lrclib' | 'none';

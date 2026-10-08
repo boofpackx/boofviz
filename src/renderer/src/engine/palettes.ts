@@ -80,6 +80,18 @@ export class PaletteRuntime {
   private drops = 0;
   private dropTime = -Infinity;
   private energyIdx = 0;
+  /** Album-cover colours over the look's palette: the cover's palette (easing to a new cover) and how much of it shows. */
+  private cover: Float32Array | null = null;
+  private coverAmount = 0;
+  private readonly coverNow = new Float32Array(15);
+  private coverReady = false;
+  private coverW = 0;
+
+  /** The playing song's cover colours (null: none) over the look's own, `amount` 0..1. */
+  setCover(cover: Float32Array | null, amount: number): void {
+    this.cover = cover;
+    this.coverAmount = Math.min(1, Math.max(0, amount));
+  }
 
   setScene(scene: Scene): void {
     this.scene = scene;
@@ -139,6 +151,17 @@ export class PaletteRuntime {
     const ca = this.colors(a);
     const cb = this.colors(b);
     for (let i = 0; i < 15; i++) out[i] = ca[i] + (cb[i] - ca[i]) * t;
+
+    // A new cover's colours ease in over a second or so; turning them off eases back to the look's own.
+    const k = 1 - Math.exp(-Math.max(0, dt) / 0.6);
+    const target = this.cover;
+    if (target) {
+      if (!this.coverReady) this.coverNow.set(target);
+      else for (let i = 0; i < 15; i++) this.coverNow[i] += (target[i] - this.coverNow[i]) * k;
+      this.coverReady = true;
+    }
+    this.coverW += ((target ? this.coverAmount : 0) - this.coverW) * k;
+    if (this.coverReady && this.coverW > 0.001) for (let i = 0; i < 15; i++) out[i] += (this.coverNow[i] - out[i]) * this.coverW;
 
     const hr = scene.hueRotate;
     let deg = 0;

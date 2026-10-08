@@ -3,6 +3,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { createInterface } from 'node:readline';
 import SMTC_SCRIPT from './smtc.ps1?raw';
+import { cleanVideoName } from '@shared/archive';
+import { matchKey } from '@shared/lyrics';
 
 /**
  * Windows media session (SMTC) reader: what the Spotify desktop app tells
@@ -41,6 +43,56 @@ export interface SmtcSample {
 export interface MediaSessionSource {
   start(onSample: (s: SmtcSample) => void): void;
   stop(): void;
+  /** Ask the player (through Windows) to play, pause or skip; false when it can't be sent. */
+  command?(cmd: MediaCommand): boolean;
+}
+
+export type MediaCommand = 'play' | 'pause' | 'next' | 'previous';
+
+export const isSpotifyApp = (app: string | null | undefined): boolean => !!app && /spotify/i.test(app);
+
+/** A readable name for the player behind a media session ("Spotify", "Chrome", "TIDAL"…). */
+export function playerName(app: string | null | undefined): string {
+  if (!app) return '';
+  const known: Array<[RegExp, string]> = [
+    [/spotify/i, 'Spotify'],
+    [/msedge|edge/i, 'Edge'],
+    [/chrome/i, 'Chrome'],
+    [/firefox/i, 'Firefox'],
+    [/opera/i, 'Opera'],
+    [/brave/i, 'Brave'],
+    [/tidal/i, 'TIDAL'],
+    [/applemusic|appleinc/i, 'Apple Music'],
+    [/itunes/i, 'iTunes'],
+    [/deezer/i, 'Deezer'],
+    [/amazon/i, 'Amazon Music'],
+    [/soundcloud/i, 'SoundCloud'],
+    [/vlc/i, 'VLC'],
+    [/foobar/i, 'foobar2000'],
+    [/zunemusic|media\.player|mediaplayer/i, 'Media Player'],
+  ];
+  for (const [re, name] of known) if (re.test(app)) return name;
+  const base = app.split('!').pop()!.split(/[\\/]/).pop()!.replace(/\.exe$/i, '');
+  return base.length > 24 ? `${base.slice(0, 24)}…` : base;
+}
+
+/**
+ * Browser and video players report "Artist - Title (Official Video)" as the
+ * title and the channel as the artist: split and tidy them so lyrics are found.
+ */
+export function tidyMediaSong(title: string, artist: string): { title: string; artist: string } {
+  let a = artist.replace(/\s*-\s*topic$/i, '').replace(/vevo$/i, '').trim();
+  let t = cleanVideoName(title.replace(/\s+-\s+YouTube$/i, ''));
+  const m = /^(.+?)\s+[-–—]\s+(.+)$/.exec(t);
+  if (m) {
+    const left = matchKey(m[1]);
+    const channel = matchKey(a);
+    if (!a || /official|records|music$|tv$/i.test(a) || (channel && (left.includes(channel) || channel.includes(left)))) {
+      a = m[1].trim();
+      t = m[2].trim();
+    }
+  }
+  return { title: t, artist: a };
 }
 
 /** PlaybackStatus by name, or by number should the enum come through as one. */
@@ -59,11 +111,13 @@ export function parseSmtcSample(raw: unknown, now: number): SmtcSample | null {
   const at = num(o.sampleEpochMs) ?? now;
   if (o.ok !== true) return offlineSample(at);
   const app = str(o.app);
+  // Spotify's own names are exact; other players get their titles tidied.
+  const song = app && !isSpotifyApp(app) ? tidyMediaSong(str(o.title), str(o.artist)) : { title: str(o.title), artist: str(o.artist) };
   return {
     ok: true,
-    app: /spotify/i.test(app) ? app : null,
-    title: str(o.title),
-    artist: str(o.artist),
+    app: app || null,
+    title: song.title,
+    artist: song.artist,
     album: str(o.album),
     status: STATUS[str(o.status).toLowerCase()] ?? 'stopped',
     positionMs: num(o.positionMs),
@@ -121,6 +175,13 @@ export class PowerShellSmtcSource implements MediaSessionSource {
     }, 2000);
   }
 
+  command(cmd: MediaCommand): boolean {
+    const stdin = this.child?.stdin;
+    if (!stdin || stdin.destroyed || !stdin.writable) return false;
+    stdin.write(`${cmd}\n`);
+    return true;
+  }
+
   stop(): void {
     this.emit = null;
     if (this.retry) clearTimeout(this.retry);
@@ -142,7 +203,8 @@ export class PowerShellSmtcSource implements MediaSessionSource {
     const args = ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', this.o.scriptPath, '-ParentPid', String(process.pid)];
     let child: ChildProcess;
     try {
-      child = (this.o.spawn ?? spawn)(powershellExe(), args, { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+      // stdin carries playback commands (play, pause, next, previous) to the reader.
+      child = (this.o.spawn ?? spawn)(powershellExe(), args, { windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
     } catch (err) {
       return this.down(`could not start PowerShell: ${(err as Error).message}`, false);
     }
@@ -217,6 +279,11 @@ export class HttpSmtcSource implements MediaSessionSource {
       if (gen === this.generation) this.timer = setTimeout(() => void tick(), this.deps.intervalMs ?? 500);
     };
     void tick();
+  }
+
+  command(cmd: MediaCommand): boolean {
+    void this.deps.fetch(`${this.url.replace(/\/+$/, '')}/command?cmd=${cmd}`, { method: 'POST' }).catch(() => undefined);
+    return true;
   }
 
   stop(): void {

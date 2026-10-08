@@ -10,6 +10,9 @@ import type { PostSpec } from '../lostMedia';
 import { alignedBeat, ModulationEngine } from '../modulation';
 import { defaultParams, generatorDef } from '../registry';
 import { PaletteRuntime } from '../palettes';
+import { coverPaletteFor } from '../coverPalette';
+import { lyricsFeed } from '../lyricsFeed';
+import type { CoverColorsSettings } from '@shared/settings';
 import { ScenePlan } from '../scenePlan';
 import { FULLSCREEN_VERT } from '../shaders/common';
 import { FullscreenPass } from './fullscreen';
@@ -126,6 +129,8 @@ export class Compositor {
   private sceneHasLyrics = false;
   /** Screen power for CRT effects (1 on, 0 off), set by the renderer from the blackout. */
   power = 1;
+  /** Album-cover colours over every look (settings.coverColors). */
+  coverColors: CoverColorsSettings | undefined;
   /** Global post chain ("make it lost media"): over everything, including the lyrics overlay. */
   private post: PostSpec | null = null;
   private postFx: Array<{ type: string; effect: Effect | null }> = [];
@@ -292,6 +297,8 @@ export class Compositor {
     if (!plan) return this.accA;
 
     plan.resolve(frame, this.mods, globals.reactivity);
+    const np = lyricsFeed.now;
+    this.palette.setCover(this.coverColors?.enabled && np.connected && np.trackId ? coverPaletteFor(np.artDataUrl) : null, this.coverColors?.amount ?? 1);
     const palette = this.palette.update(frame, dt);
     const fxCtx: FxContext = { palette, dt, time, beat, beatsPerBar: frame.beatsPerBar, kick: this.env.kick, frameIndex: this.frameIndex, power: this.power };
     const maskRefs = this.maskRefs;

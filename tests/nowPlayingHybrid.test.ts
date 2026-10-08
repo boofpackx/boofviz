@@ -29,6 +29,11 @@ class FakeSource implements MediaSessionSource {
     this.cb = null;
     this.stops++;
   }
+  commands: string[] = [];
+  command(cmd: string): boolean {
+    this.commands.push(cmd);
+    return true;
+  }
 }
 
 interface FakeTrack {
@@ -43,7 +48,7 @@ const INTERLUDE: FakeTrack = { id: 'def', name: 'Quiet Interlude', artist: 'Nobo
 const asSmtc = (t: FakeTrack, p: Partial<SmtcSample> = {}): Partial<SmtcSample> => ({ title: t.name, artist: t.artist, album: t.album, ...p });
 
 /** A connected client with a fake media session, a fake Web API (progress runs in fake time) and fake timers. */
-async function setup() {
+async function setup(o: { loggedIn?: boolean } = {}) {
   const api = { track: LANTERNS, playing: true, anchor: 42000, at: Date.now(), status: 200, retryAfter: '30' };
   const progress = (): number => Math.min(api.track.durationMs, api.anchor + (api.playing ? Date.now() - api.at : 0));
   const reanchor = (patch: Partial<typeof api>): void => void Object.assign(api, { anchor: progress(), at: Date.now() }, patch);
@@ -63,7 +68,7 @@ async function setup() {
     if (url.pathname.endsWith('.png')) return new Response(new Uint8Array([137, 80, 78, 71]), { headers: { 'Content-Type': 'image/png' } });
     return new Response('not found', { status: 404 });
   }) as typeof fetch;
-  const tokens: TokenStore = { load: () => 'rt', save: () => undefined, clear: () => undefined };
+  const tokens: TokenStore = { load: () => (o.loggedIn === false ? null : 'rt'), save: () => undefined, clear: () => undefined };
   const src = new FakeSource();
   const tracks: Array<string | null> = [];
   const published: NowPlaying[] = [];
@@ -111,6 +116,35 @@ beforeEach(() => {
 });
 afterEach(() => {
   vi.useRealTimers();
+});
+
+describe('no login: following the player through Windows alone', () => {
+  it('publishes the song from the media session with no Spotify login and never calls the Web API', async () => {
+    const h = await setup({ loggedIn: false });
+    expect(h.c.state.connected).toBe(false);
+    h.show(asSmtc(LANTERNS, { startMs: 0, endMs: 201000, positionMs: 5000, updatedEpochMs: Date.now(), art: 'data:image/jpeg;base64,AAAA' }));
+    expect(h.c.state).toMatchObject({ connected: true, source: 'media', player: 'Spotify', title: 'Paper Lanterns', artists: ['The Placeholders'], durationMs: 201000, playing: true, artDataUrl: 'data:image/jpeg;base64,AAAA' });
+    await h.play(60000);
+    expect(h.calls).toHaveLength(0);
+    // Another player, playing: followed the same way (and named).
+    h.show({ app: 'chrome.exe', title: 'Quiet Interlude', artist: 'Nobody In Particular', status: 'playing' });
+    expect(h.c.state).toMatchObject({ title: 'Quiet Interlude', player: 'Chrome', source: 'media' });
+    // Playback through Windows: no Premium, no Web API.
+    expect(await h.c.control('pause')).toBeNull();
+    expect(h.src.commands).toEqual(['pause']);
+    expect(h.calls).toHaveLength(0);
+    h.c.dispose();
+  });
+
+  it('logged in, a player other than Spotify is still never looked up in the Web API', async () => {
+    const h = await hybrid();
+    const before = h.cp();
+    h.show({ app: 'chrome.exe', title: 'Quiet Interlude', artist: 'Nobody In Particular', status: 'playing' });
+    await h.play(HYBRID.driftMs + 5000);
+    expect(h.c.state).toMatchObject({ title: 'Quiet Interlude', player: 'Chrome' });
+    expect(h.cp()).toBe(before);
+    h.c.dispose();
+  });
 });
 
 describe('hybrid now playing: the media session leads', () => {
@@ -377,8 +411,13 @@ describe('hybrid now playing: the media session leads', () => {
     await h.play(1000);
     expect(h.c.state.playing).toBe(true);
     expect(h.cp()).toBe(1);
-    // Next: the media session shows the new song, which costs one call.
+    // Sent through Windows, not the Web API (no Premium needed).
+    expect(h.src.commands).toEqual(['pause', 'play']);
+    expect(h.calls.filter((x) => x.path.startsWith('/v1/me/player/p'))).toHaveLength(0);
+    // Next (through Windows): the player skips, the media session shows the new song, which costs one call.
     expect(await h.c.control('next')).toBeNull();
+    expect(h.src.commands.at(-1)).toBe('next');
+    Object.assign(h.api, { track: INTERLUDE, anchor: 0, at: Date.now(), playing: true });
     h.show(asSmtc(INTERLUDE));
     await h.play(3000);
     expect(h.c.state.trackId).toBe('def');
@@ -486,7 +525,9 @@ describe('hybrid helpers', () => {
     expect(parseSmtcSample({ ...line, art: 'javascript:alert(1)' }, 0)?.art).toBeUndefined();
     expect(parseSmtcSample({ ...line, status: 'Closed' }, 0)?.status).toBe('stopped');
     expect(parseSmtcSample({ ...line, status: '4' }, 0)?.status).toBe('playing');
-    expect(parseSmtcSample({ ...line, app: 'chrome.exe' }, 0)?.app).toBeNull();
+    // Any player is followed; browser titles like "Artist - Title (Official Video)" are split and tidied.
+    expect(parseSmtcSample({ ...line, app: 'chrome.exe', title: 'The Placeholders - Paper Lanterns (Official Video)', artist: 'ThePlaceholdersVEVO' }, 0)).toMatchObject({ app: 'chrome.exe', title: 'Paper Lanterns', artist: 'The Placeholders' });
+    expect(parseSmtcSample({ ...line, app: 'TIDAL.exe', title: 'Night Bus', artist: 'Ann' }, 0)).toMatchObject({ title: 'Night Bus', artist: 'Ann' });
     expect(parseSmtcSample({ ...line, positionMs: 'soon' }, 0)?.positionMs).toBeNull();
     expect(parseSmtcSample({ ok: false, fatal: true, error: 'no WinRT' }, 7)).toMatchObject({ ok: false, app: null, sampleEpochMs: 7 });
     expect(parseSmtcSample('nope', 0)).toBeNull();

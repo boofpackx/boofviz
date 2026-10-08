@@ -205,8 +205,9 @@ export function startMockServices({ port = 43890, host = '127.0.0.1' } = {}) {
       limitedUntil = Date.now() + Number(q.get('s') ?? 0) * 1000;
       return send(res, 200, { limitedUntil });
     }
-    if (path === '/__player') {
-      const action = q.get('action');
+    if (path === '/__player' || (path === '/smtc/command' && req.method === 'POST')) {
+      // Test controls, or a playback command sent to the player through the media session.
+      const action = q.get('action') ?? q.get('cmd');
       if (action === 'pause' || action === 'play') setPlayer({ playing: action === 'play' });
       else if (action === 'seek') Object.assign(player, { anchorProgress: Math.max(0, Number(q.get('ms') ?? 0)), anchorAt: Date.now() });
       else if (action === 'next') Object.assign(player, { index: (player.index + 1) % TRACKS.length, playing: true, anchorProgress: 0, anchorAt: Date.now() });

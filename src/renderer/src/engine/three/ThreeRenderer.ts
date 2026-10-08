@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { LostMediaSettings, NeoFlatSettings, RetroTvSettings } from '@shared/settings';
+import type { LostMediaSettings, CoverColorsSettings, NeoFlatSettings, RetroTvSettings } from '@shared/settings';
 import { globalPost } from '../lostMedia';
 import type { AudioFrame } from '@shared/types/audio';
 import type { ParamBag, Renderer, RendererOptions, RenderContext, RenderStats, Scene } from '@shared/types/engine';
@@ -179,6 +179,12 @@ export class ThreeRenderer implements Renderer {
   setRetroTv(s: RetroTvSettings | undefined): void {
     this.retroTv = s;
     this.applyPost();
+  }
+
+  /** Looks take the album cover's colours (settings.coverColors). */
+  setCoverColors(s: CoverColorsSettings | undefined): void {
+    this.compositor.coverColors = s;
+    this.spare.coverColors = s;
   }
 
   /** "Neo-brutal flat" over every look (settings.neoFlat). */

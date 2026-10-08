@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { matchKey, normalizeTitle, positionAt, type NowPlaying } from '@shared/lyrics';
-import type { MediaSessionSource, SmtcSample } from './smtc';
+import { isSpotifyApp, type MediaSessionSource, type SmtcSample } from './smtc';
 import type { CurrentlyPlaying, SpotifyTrack } from './spotify';
 
 /**
@@ -114,6 +114,8 @@ export interface HybridHost {
   limitedUntil(): number;
   /** Adaptive polling on (fallback) or off (the media session leads). */
   polling(on: boolean): void;
+  /** Logged in to Spotify (Web API checks possible); false: follow the media session alone. */
+  online(): boolean;
 }
 
 type Reason = 'sync' | 'drift' | 'track';
@@ -170,6 +172,16 @@ export class HybridNowPlaying {
     private readonly host: HybridHost,
     private readonly source: MediaSessionSource,
   ) {}
+
+  /** The player followed now (its media session app id). */
+  get app(): string | null {
+    return this.song?.sample.app ?? null;
+  }
+
+  /** No Web API to ask: not logged in, or the player isn't Spotify. */
+  private offline(): boolean {
+    return !this.host.online() || !isSpotifyApp(this.song?.sample.app);
+  }
 
   start(): void {
     if (this.running) return;
@@ -273,8 +285,8 @@ export class HybridNowPlaying {
       this.armDrift();
       return;
     }
-    // Hold the song back until Spotify names it (one id per song, so lyrics load once).
-    if (now < this.host.limitedUntil()) return this.publishSmtc(song);
+    // Hold the song back until Spotify names it (one id per song, so lyrics load once); with nothing to ask, publish it now.
+    if (this.offline() || now < this.host.limitedUntil()) return this.publishSmtc(song);
     this.idTimer = setTimeout(() => {
       if (this.song === song && !song.published) this.publishSmtc(song);
     }, HYBRID.idWaitMs);
@@ -469,6 +481,7 @@ export class HybridNowPlaying {
       return;
     }
     const now = this.host.now();
+    if (this.offline()) return this.onCheck({ kind: 'error', message: '' });
     if (now < this.host.limitedUntil()) return this.request(p.reason);
     this.busy = true;
     this.lastCheck = now;
