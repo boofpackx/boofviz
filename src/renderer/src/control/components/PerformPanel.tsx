@@ -4,7 +4,9 @@ import { useControl } from '../store';
 import { cueGo, setCue } from '../launcher';
 import { describeMapping, MIDI_TARGETS } from '../midiCore';
 import { learn, unmap } from '../midiMap';
-import { Button, Kbd, Section } from './ui';
+import { Button, Kbd, Section , Segmented } from './ui';
+import { LYRICS_MODES, type LyricsMode } from '@shared/lyricRouter';
+import { setLyricsMode, stepTreatment } from '../lyricsMode';
 
 /** A button that is on only while it is held down (strobe, freeze). */
 function HoldButton({ label, on, set }: { label: string; on: boolean; set: (v: boolean) => void }) {
@@ -27,6 +29,7 @@ function Hint({ children }: { children: ReactNode }) {
 
 /** Live performance: cue and GO, live buttons, sets, and MIDI learn. */
 export function PerformPanel() {
+  const lyricsMode = useControl((s) => s.settings.lyrics.mode);
   const cue = useControl((s) => s.cue);
   const liveName = useControl((s) => s.liveName);
   const globals = useControl((s) => s.globals);
@@ -84,6 +87,15 @@ export function PerformPanel() {
           </Button>
         </div>
         <Hint>Freeze holds the last frame on the screen; the preview keeps running.</Hint>
+      </Section>
+
+      <Section title="Lyrics" right={<Kbd>L</Kbd>}>
+        <Segmented<LyricsMode> value={lyricsMode} onChange={setLyricsMode} options={LYRICS_MODES.map((m) => ({ value: m.id, label: m.label }))} />
+        <div className="flex gap-2">
+          <Button onClick={() => stepTreatment(-1)}>◀ Style</Button>
+          <Button onClick={() => stepTreatment(1)}>Style ▶</Button>
+        </div>
+        <Hint>Everywhere gives every look lyrics: its own when it has them, else its theme&apos;s style. Shift+L steps the style.</Hint>
       </Section>
 
       <Section title="Sets">

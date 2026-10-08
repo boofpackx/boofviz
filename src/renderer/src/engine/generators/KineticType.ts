@@ -16,6 +16,14 @@ export const FONT_STACKS: Record<string, string> = {
   mono: `700 {px}px "Cascadia Mono", Consolas, "DejaVu Sans Mono", "Courier New", monospace`,
   serif: `700 {px}px Georgia, "Times New Roman", "DejaVu Serif", serif`,
   marker: `700 {px}px "Segoe Print", "Comic Sans MS", "Bradley Hand", "Chalkboard SE", "Comic Neue", cursive`,
+  // Bundled faces (engine/fonts.ts).
+  rounded: `900 {px}px Rubik, "Segoe UI Black", "Arial Black", sans-serif`,
+  arcade: `400 {px}px "Russo One", "Segoe UI Black", "Arial Black", sans-serif`,
+  garamond: `700 {px}px "EB Garamond", Garamond, Georgia, serif`,
+  book: `400 {px}px "EB Garamond", Garamond, Georgia, serif`,
+  wood: `700 {px}px Oswald, Impact, "Arial Narrow", sans-serif`,
+  pixel: `700 {px}px "Pixelify Sans", "Cascadia Mono", Consolas, monospace`,
+  wide: `900 {px}px Unbounded, "Arial Black", sans-serif`,
 };
 
 export function fontCss(name: string, px: number): string {

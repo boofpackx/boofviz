@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { ThreeRenderer } from '@/engine/three/ThreeRenderer';
 import { RenderLoop } from '@/engine/RenderLoop';
-import { sceneOf } from '@/engine/presetIO';
 import { engine, preview } from '../runtime';
-import { currentScene, useShow } from '../show';
+import { useShow } from '../show';
+import { currentRouted, liveScene } from '../lyricsMode';
 import { useControl } from '../store';
 import { transitionFor } from '../launcher';
 import { DebugHud } from '../hud/DebugHud';
@@ -33,16 +33,23 @@ export function Preview() {
 
     void renderer.init(canvas, { renderScale: 1, isOutput: false }).then(() => {
       if (disposed) return;
-      renderer.setScene(currentScene());
-      renderer.setLyricsOverlay(useControl.getState().settings.lyrics.overlay);
+      // The preview shows the look as the screen gets it, or with a lyric treatment being tried.
+        const scene = (): ReturnType<typeof liveScene> => currentRouted(useControl.getState().lyricTry).scene;
+        renderer.setScene(scene());
       renderer.setLostMedia(useControl.getState().settings.lostMedia);
       renderer.setRetroTv(useControl.getState().settings.retroTv);
       renderer.setNeoFlat(useControl.getState().settings.neoFlat);
       renderer.setCoverColors(useControl.getState().settings.coverColors);
       preview.renderer = renderer;
       const offOverlay = useControl.subscribe((s, prev) => {
-        if (s.settings.lyrics.overlay !== prev.settings.lyrics.overlay) renderer.setLyricsOverlay(s.settings.lyrics.overlay);
-        if (s.settings.lostMedia !== prev.settings.lostMedia) renderer.setLostMedia(s.settings.lostMedia);
+        const a = s.settings.lyrics;
+          const b = prev.settings.lyrics;
+          if (s.lyricTry !== prev.lyricTry || a.mode !== b.mode || a.allLooks !== b.allLooks || a.themes !== b.themes || a.lookChoice !== b.lookChoice || a.custom !== b.custom || a.tune !== b.tune) {
+            renderer.setScene(scene());
+            const q = useShow.getState().queued;
+            if (q) renderer.setScene(liveScene(q.entry.preset, q.entry.id), q.atBeat, transitionFor(q.entry.preset));
+        }
+          if (s.settings.lostMedia !== prev.settings.lostMedia) renderer.setLostMedia(s.settings.lostMedia);
         if (s.settings.retroTv !== prev.settings.retroTv) renderer.setRetroTv(s.settings.retroTv);
         if (s.settings.neoFlat !== prev.settings.neoFlat) renderer.setNeoFlat(s.settings.neoFlat);
         if (s.settings.coverColors !== prev.settings.coverColors) renderer.setCoverColors(s.settings.coverColors);
@@ -51,9 +58,9 @@ export function Preview() {
         // A queued launch going live: the renderer already holds it for its beat.
         const fromQueue = !!prev.queued && !s.queued && prev.queued.entry.id === s.sourceId;
         const newLook = s.sourceId !== prev.sourceId && !fromQueue;
-        if (!fromQueue && (s.doc !== prev.doc || (s.queued !== prev.queued && !s.queued))) renderer.setScene(sceneOf(s.doc), undefined, newLook ? transitionFor(s.doc) : undefined);
+        if (!fromQueue && (s.doc !== prev.doc || (s.queued !== prev.queued && !s.queued))) renderer.setScene(scene(), undefined, newLook ? transitionFor(s.doc) : undefined);
         // A queued launch goes live on its beat in the preview exactly as in the output.
-        if (s.queued && (s.queued !== prev.queued || s.doc !== prev.doc)) renderer.setScene(sceneOf(s.queued.entry.preset), s.queued.atBeat, transitionFor(s.queued.entry.preset));
+        if (s.queued && (s.queued !== prev.queued || s.doc !== prev.doc)) renderer.setScene(liveScene(s.queued.entry.preset, s.queued.entry.id), s.queued.atBeat, transitionFor(s.queued.entry.preset));
       });
       unsubscribe = () => {
         offShow();

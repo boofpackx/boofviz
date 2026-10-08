@@ -12,8 +12,6 @@ export const lyricsFeed = {
   lyrics: { ...EMPTY_LYRICS } as TrackLyrics,
   /** Settings offset (ms, positive = lyrics earlier). */
   offsetMs: 0,
-  /** Settings: text looks with "Text from: text" show lyrics too. */
-  textLooks: false,
   /** Bumped on every track / lyrics change. */
   version: 0,
 };
@@ -77,7 +75,7 @@ export function songTitle(): string {
  * the current one.
  */
 export function liveText(source: TextSource, epochMs: number, leadMs = 150, before = 0, after = 0): LiveText {
-  const kind = source === 'text' && lyricsFeed.textLooks ? 'lyrics' : source;
+  const kind = source;
   const { now } = lyricsFeed;
   if (kind === 'text') return OWN_TEXT;
   const name = songTitle();

@@ -1,7 +1,7 @@
 import { app } from 'electron';
 import { promises as fs, readFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { DEFAULT_SETTINGS, mergeSettings, type Settings, type SettingsPatch } from '@shared/settings';
+import { DEFAULT_SETTINGS, mergeSettings, migrateSettings, type Settings, type SettingsPatch } from '@shared/settings';
 
 /** %APPDATA%/BOOFVIZ on Windows, ~/Library/Application Support/BOOFVIZ on macOS. */
 export function dataDir(): string {
@@ -24,7 +24,7 @@ export class SettingsStore {
   private load(): Settings {
     try {
       const raw = JSON.parse(readFileSync(this.file, 'utf8'));
-      return mergeSettings(DEFAULT_SETTINGS, raw);
+      return mergeSettings(DEFAULT_SETTINGS, migrateSettings(raw));
     } catch {
       return structuredClone(DEFAULT_SETTINGS);
     }

@@ -3,6 +3,7 @@ import { engine } from './runtime';
 import { useShow } from './show';
 import { useControl } from './store';
 import { cueGo, favoriteEntries, launchQuantized, setCue, shuffleNow, stepPool, stepPreset, toggleAuto } from './launcher';
+import { stepTreatment, toggleLyrics } from './lyricsMode';
 import { controlKey, describeMapping, interpret, matches, parseMidi, targetById, type MidiEffect, type MidiMsg } from './midiCore';
 
 /**
@@ -73,6 +74,13 @@ function run(target: string, fx: MidiEffect): void {
       break;
     case 'cancel':
       if (press) show.cancelQueued();
+      break;
+    case 'lyricsMode':
+      if (press) toggleLyrics();
+      break;
+    case 'lyricsNext':
+    case 'lyricsPrev':
+      if (press) stepTreatment(target === 'lyricsNext' ? 1 : -1);
       break;
     case 'blackout':
       if (press) st.setGlobals({ blackout: !st.globals.blackout });

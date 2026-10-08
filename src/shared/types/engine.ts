@@ -116,6 +116,8 @@ export interface Scene {
   camera?: CameraSpec;
   /** The preset category this look came from (lets lyric styles adapt). */
   category?: string;
+/** Lyrics drawn over this look (set by the lyric router, never saved in a preset). */
+  lyricOverlay?: ParamBag | null;
 }
 
 // ---------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { sceneOf } from '@/engine/presetIO';
+import { liveScene, stepTreatment, toggleLyrics } from './lyricsMode';
 import { engine, initEngine } from './runtime';
 import { useControl } from './store';
 import { useShow } from './show';
@@ -37,13 +37,14 @@ function useBootstrap(): void {
     let timer = 0;
     const pushQueued = (): void => {
       const q = useShow.getState().queued;
-      if (q) api.sendOutputCommand({ scene: sceneOf(q.entry.preset), applyAtBeat: q.atBeat, transition: transitionFor(q.entry.preset) });
+      if (q) api.sendOutputCommand({ scene: liveScene(q.entry.preset, q.entry.id), applyAtBeat: q.atBeat, transition: transitionFor(q.entry.preset) });
     };
     // `look`: a new look (blend it in); `send: false` when the output already holds it (a queued launch going live).
     const pushScene = (look = false, send = true): void => {
       pending = false;
       const { doc, sourceId, dirty } = useShow.getState();
-      if (send && !useControl.getState().cue) api.sendOutputCommand(look ? { scene: sceneOf(doc), transition: transitionFor(doc) } : { scene: sceneOf(doc) });
+      const scene = liveScene(doc, sourceId);
+      if (send && !useControl.getState().cue) api.sendOutputCommand(look ? { scene, transition: transitionFor(doc) } : { scene });
       pushQueued();
       api.writeSession(JSON.stringify({ doc, sourceId, dirty }));
     };
@@ -51,7 +52,7 @@ function useBootstrap(): void {
       if (s.queued !== prev.queued) {
         // Newly queued launch: hand it to the output now so it switches on the same beat.
         if (s.queued) pushQueued();
-        else if (s.doc === prev.doc && !useControl.getState().cue) api.sendOutputCommand({ scene: sceneOf(s.doc) });
+        else if (s.doc === prev.doc && !useControl.getState().cue) api.sendOutputCommand({ scene: liveScene(s.doc, s.sourceId) });
       }
       if (s.doc === prev.doc && s.sourceId === prev.sourceId && s.dirty === prev.dirty) return;
       if (s.sourceId !== prev.sourceId) {
@@ -64,6 +65,12 @@ function useBootstrap(): void {
       if (pending) return;
       pending = true;
       timer = window.setTimeout(pushScene, 33);
+    });
+    // Lyrics mode, themes or per-look choices changed: the screen re-routes the look it shows (no transition).
+    const offLyrics = useControl.subscribe((s, prev) => {
+      const a = s.settings.lyrics;
+      const b = prev.settings.lyrics;
+      if (a.mode !== b.mode || a.allLooks !== b.allLooks || a.themes !== b.themes || a.lookChoice !== b.lookChoice || a.custom !== b.custom || a.tune !== b.tune) pushScene();
     });
     const stopLauncher = startLauncher();
     void startMidiMap();
@@ -100,6 +107,7 @@ function useBootstrap(): void {
       offOutput();
       offLink();
       unsubscribe();
+      offLyrics();
       stopLauncher();
       stopAutoTiming();
       stopSpotifySync();
@@ -195,6 +203,10 @@ function useShortcuts(): void {
           break;
         case 'g':
           if (s.cue) cueGo();
+          break;
+        case 'l':
+          if (e.shiftKey) stepTreatment(1);
+          else toggleLyrics();
           break;
         case '[':
           engine.tempo({ cmd: 'nudge', beats: -1 / 16 });
@@ -300,6 +312,9 @@ export function App() {
           </span>
           <span>
             <Kbd>B</Kbd> blackout
+          </span>
+          <span>
+            <Kbd>L</Kbd> lyrics
           </span>
           <span>
             <Kbd>D</Kbd> HUD

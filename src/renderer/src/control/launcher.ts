@@ -2,7 +2,7 @@ import type { AudioFrame } from '@shared/types/audio';
 import type { LaunchQuantize, PresetPool, TransitionType } from '@shared/settings';
 import type { Preset } from '@shared/types/engine';
 import { BUILTIN_PRESETS, type PresetEntry } from '@/engine/library';
-import { sceneOf } from '@/engine/presetIO';
+import { liveScene } from './lyricsMode';
 import { engine } from './runtime';
 import { libraryEntries, useShow } from './show';
 import { useControl } from './store';
@@ -47,9 +47,10 @@ export function launchQuantized(entry: PresetEntry, q?: LaunchQuantize): void {
 /** GO: the look in the preview goes to the screen on the next boundary, with its transition. */
 export function cueGo(): void {
   const st = useControl.getState();
-  const { doc } = useShow.getState();
+  const { doc , sourceId } = useShow.getState();
   const at = engine.builder.connected ? nextBoundary(engine.builder.frame, st.settings.library.quantize) : undefined;
-  window.boofviz.sendOutputCommand(at === undefined ? { scene: sceneOf(doc), transition: transitionFor(doc) } : { scene: sceneOf(doc), applyAtBeat: at, transition: transitionFor(doc) });
+  const scene = liveScene(doc, sourceId);
+  window.boofviz.sendOutputCommand(at === undefined ? { scene, transition: transitionFor(doc) } : { scene, applyAtBeat: at, transition: transitionFor(doc) });
   st.set({ liveName: doc.name });
   useShow.getState().notify(`GO → ${doc.name}`);
 }

@@ -5,6 +5,8 @@ import { useControl } from '../store';
 import { PLAYLISTS } from '../autopilot';
 import { createPool, deletePool, launchQuantized, notePlayed, renamePool, toggleFavorite, togglePoolMember } from '../launcher';
 import { contextMenu } from './ContextMenu';
+import { routed, setLookChoice } from '../lyricsMode';
+import { describeRoute } from '@shared/lyricRouter';
 import { Swatch } from './Inspector';
 import { Button, Segmented } from './ui';
 
@@ -41,6 +43,7 @@ export function Library() {
   const queuedId = useShow((s) => s.queued?.entry.id);
   const dirty = useShow((s) => s.dirty);
   const favorites = useControl((s) => s.settings.library.favorites);
+  const lyricsL = useControl((s) => s.settings.lyrics);
   const pools = useControl((s) => s.settings.library.pools);
   const update = useControl((s) => s.update);
   const [renaming, setRenaming] = useState<string | null>(null);
@@ -184,6 +187,16 @@ export function Library() {
                       { label: favorites.includes(e.id) ? 'Remove from favorites' : 'Add to favorites', onSelect: () => toggleFavorite(e.id) },
                       ...pools.map((pl) => ({ label: pl.ids.includes(e.id) ? `Remove from pool "${pl.name}"` : `Add to pool "${pl.name}"`, onSelect: () => togglePoolMember(pl.id, e.id) })),
                       { label: 'New pool with this look', onSelect: () => setRenaming(createPool(e.id).id) },
+                      ...(
+                        [
+                          ['theme', 'Lyrics (Everywhere): theme style'],
+                          ['own', 'Lyrics (Everywhere): its own only'],
+                          ['never', 'Lyrics (Everywhere): never'],
+                        ] as const
+                      ).map(([v, label]) => ({
+                        label: `${(lyricsL.lookChoice[e.id] ?? 'theme') === v ? '✓ ' : ''}${label}`,
+                        onSelect: () => setLookChoice(e.id, v),
+                      })),
                       { label: 'Delete', disabled: e.source !== 'user', hint: e.source !== 'user' ? 'built-in' : '', onSelect: () => setConfirm(e.id) },
                     ])}
                     title={p.description}
@@ -209,6 +222,7 @@ export function Library() {
                         {active && dirty && <span className="text-warn"> •</span>}
                       </span>
                       {fav && favSlot <= 9 && <span className="font-mono text-[9px] text-warn">{favSlot}</span>}
+                      <LyricBadge entry={e} />
                       {queued && <span className="rounded bg-accent-2/20 px-1 text-[9px] font-semibold text-accent-2">NEXT</span>}
                       {e.source === 'user' && <span className="rounded bg-accent-2/20 px-1 text-[9px] font-semibold text-accent-2">USER</span>}
                       <span className="flex gap-0.5" title={`Energy ${p.energy}/5`}>
@@ -254,5 +268,25 @@ export function Library() {
         </Button>
       </div>
     </div>
+  );
+}
+/** The look's lyric state in the current lyrics mode: its own (♪), switched on (♪+), a style added (♪*), none (blank). */
+function LyricBadge({ entry }: { entry: PresetEntry }) {
+  const l = useControl((s) => s.settings.lyrics);
+  const r = routed(entry.preset, entry.id, l);
+  const mark = {
+    own: '♪',
+    'switched-on': '♪+',
+    themed: '♪*',
+    chosen: '♪*',
+    never: '',
+    off: '',
+    none: '',
+  }[r.result];
+  if (!mark) return null;
+  return (
+    <span className="font-mono text-[9px] text-ink-300" title={`Lyrics: ${describeRoute(r, l.custom)}`}>
+      {mark}
+    </span>
   );
 }

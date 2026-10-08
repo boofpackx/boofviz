@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { LostMediaSettings, CoverColorsSettings, NeoFlatSettings, RetroTvSettings } from '@shared/settings';
 import { globalPost } from '../lostMedia';
 import type { AudioFrame } from '@shared/types/audio';
-import type { ParamBag, Renderer, RendererOptions, RenderContext, RenderStats, Scene } from '@shared/types/engine';
+import type { Renderer, RendererOptions, RenderContext, RenderStats, Scene } from '@shared/types/engine';
 import type { LyricsRenderInfo } from '../generators/Lyrics';
 import { OUTPUT_FRAG, OUTPUT_VERT } from '../shaders/output';
 import { TRANSITION_FRAG, TRANSITION_INDEX, TRANSITION_VERT } from '../shaders/transition';
@@ -10,6 +10,7 @@ import { hdrTarget } from '../fx/effects';
 import { Compositor } from './Compositor';
 import { FullscreenPass } from './fullscreen';
 import { ShaderWarmup } from './warmup';
+import { preloadFonts } from '../fonts';
 
 const MAX_DIM = 8192;
 
@@ -59,6 +60,8 @@ export class ThreeRenderer implements Renderer {
 
   async init(canvas: HTMLCanvasElement, options: RendererOptions): Promise<void> {
     this.options = options;
+    // Text atlases are drawn once, so the bundled faces have to be there first.
+    await preloadFonts();
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: false,
@@ -164,11 +167,6 @@ export class ThreeRenderer implements Renderer {
   }
 
   /** Lyrics over every look (settings.lyrics.overlay). */
-  setLyricsOverlay(overlay: { enabled: boolean; params: ParamBag } | null): void {
-    this.compositor.setOverlay(overlay?.enabled ? overlay.params : null);
-    this.spare.setOverlay(overlay?.enabled ? overlay.params : null);
-  }
-
   /** "Make it lost media" over every look (settings.lostMedia). */
   setLostMedia(s: LostMediaSettings | undefined): void {
     this.lostMedia = s;

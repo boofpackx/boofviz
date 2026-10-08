@@ -6,6 +6,7 @@ import type { ThreeRenderer } from '@/engine/three/ThreeRenderer';
 import { connectLyricsFeed, lyricAt, lyricsFeed } from '@/engine/lyricsFeed';
 import { libraryEntries, useShow } from './show';
 import { useControl } from './store';
+import { currentRouted } from './lyricsMode';
 
 /** Process-wide singletons for the control window (outside React's lifecycle). */
 export const engine = new AudioEngine();
@@ -46,7 +47,7 @@ export function liveValue(layerId: string, path: string): number | undefined {
 };
 
 function overlayLead(): number {
-  const lead = useControl.getState().settings.lyrics.overlay.params.lead;
+  const lead = currentRouted().scene.lyricOverlay?.lead;
   return typeof lead === 'number' ? lead : 150;
 }
 
@@ -54,7 +55,6 @@ function overlayLead(): number {
 connectLyricsFeed(window.boofviz, () => useControl.setState({ nowPlaying: lyricsFeed.now, trackLyrics: lyricsFeed.lyrics }));
 useControl.subscribe((s) => {
   lyricsFeed.offsetMs = lyricsOffsetMs(s.settings.lyrics);
-  lyricsFeed.textLooks = s.settings.lyrics.textLooks;
 });
 
 let ready = false;

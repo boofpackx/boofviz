@@ -490,14 +490,11 @@ describe('text looks', () => {
   };
   beforeEach(() => {
     lyricsFeed.offsetMs = 0;
-    lyricsFeed.textLooks = false;
-  });
+    });
 
   it("keeps the look's own text only for text looks, and shows nothing when nothing plays", () => {
     play(2000);
     expect(liveText('text', 0, 0).kind).toBe('text');
-    lyricsFeed.textLooks = true;
-    expect(liveText('text', 0, 0).kind).toBe('lyrics');
     setNowPlaying({ ...EMPTY_NOW_PLAYING });
     // No placeholder words: lyrics and title looks go blank.
     expect(liveText('lyrics', 0, 0).lines).toEqual([]);

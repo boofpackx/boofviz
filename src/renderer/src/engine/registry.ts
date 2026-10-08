@@ -5,6 +5,9 @@
  */
 import type { ModSource, ParamBag, ParamSpec } from '@shared/types/engine';
 
+/** The font names in FONT_STACKS (generators/KineticType.ts). */
+const FONTS = ['heavy', 'condensed', 'mono', 'serif', 'marker', 'rounded', 'arcade', 'garamond', 'book', 'wood', 'pixel', 'wide'];
+
 export interface ModuleDef {
   kind: string;
   label: string;
@@ -199,7 +202,7 @@ export const GENERATORS: ModuleDef[] = [
       t('text', 'Text', '', 'your own words when Text from is text; separate words with spaces or "/"'),
       e('source', 'Text from', 'lyrics', ['lyrics', 'title', 'text'], 'lyrics: the line being sung, else the song name, else nothing · title: song and artist · text: your own words'),
       e('mode', 'Mode', 'stack', ['stack', 'punch', 'words', 'marquee', 'bounce', 'crawl'], 'bounce: screensaver logo · crawl: lines split by "/" scroll into the distance'),
-      e('font', 'Font', 'heavy', ['heavy', 'condensed', 'mono', 'serif', 'marker']),
+      e('font', 'Font', 'heavy', FONTS),
       i('rows', 'Rows', 5, 1, 12),
       f('speed', 'Speed', 1, -4, 4, 0.01, 'text widths per 4 beats'),
       f('size', 'Size', 0.8, 0.2, 1.5),
@@ -225,7 +228,7 @@ export const GENERATORS: ModuleDef[] = [
       e('source', 'Words from', 'lyrics', ['lyrics', 'title', 'text'], 'lyrics: the sung line, else the song name, else nothing · text: your own words below'),
       t('text', 'Text', '', 'your own lines when Words from is text, separated by "/"'),
       i('lineBeats', 'Beats per line', 8, 1, 32, 'how long each of your own lines stays up'),
-      e('font', 'Font', 'heavy', ['heavy', 'condensed', 'mono', 'serif', 'marker']),
+      e('font', 'Font', 'heavy', FONTS),
       f('size', 'Size', 1, 0.3, 2.5),
       e('position', 'Position', 'center', ['center', 'lower', 'upper']),
       f('depth', 'Depth', 0.5, 0, 1, 0.01, 'extruded 3D thickness'),
@@ -246,7 +249,7 @@ export const GENERATORS: ModuleDef[] = [
     description: 'Synced lyrics of the track playing now: a karaoke sweep, lines that punch in on the beat, or a typewriter with a blinking cursor.',
     params: [
       e('mode', 'Mode', 'karaoke', ['karaoke', 'punch', 'typewriter'], 'karaoke: fill sweeps across the line · punch: each line slams in · typewriter: characters type out'),
-      e('font', 'Font', 'heavy', ['heavy', 'condensed', 'mono', 'serif', 'marker']),
+      e('font', 'Font', 'heavy', FONTS),
       f('size', 'Size', 0.8, 0.3, 1.6),
       e('position', 'Position', 'lower', ['center', 'lower', 'upper']),
       f('punch', 'Kick punch', 0.3, 0, 1),
@@ -652,7 +655,7 @@ export const GENERATORS: ModuleDef[] = [
     params: [
       e('scene', 'Surface', 'holo', ['holo', 'stereogram', 'lenticular', 'lava', 'stars']),
       e('words', 'Words', 'line', ['line', 'hero', 'off']),
-      e('font', 'Font', 'heavy', ['heavy', 'condensed', 'serif', 'mono', 'marker']),
+      e('font', 'Font', 'heavy', FONTS),
       f('react', 'Music reaction', 1, 0, 2),
       b('lamp', 'Lava: lamp (off = wax wall)', true),
       f('melt', 'Melt', 0.5, 0, 1),

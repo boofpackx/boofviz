@@ -126,7 +126,6 @@ export class Compositor {
   /** Global lyrics overlay: drawn over every look, after the scene's layers and trails. */
   private overlayParams: ParamBag | null = null;
   private overlayGen: Lyrics | LyricVideo | null = null;
-  private sceneHasLyrics = false;
   /** Screen power for CRT effects (1 on, 0 off), set by the renderer from the blackout. */
   power = 1;
   /** Album-cover colours over every look (settings.coverColors). */
@@ -175,8 +174,8 @@ export class Compositor {
     return this.plan?.live ?? null;
   }
 
-  /** Lyrics over every look (null: off). Partial params are filled with the generator's defaults. */
-  setOverlay(params: ParamBag | null): void {
+  /** Lyrics over the look (null: none). Partial params are filled with the generator's defaults. */
+  private setOverlay(params: ParamBag | null): void {
     // kind 'lyricVideo': music-video letters; otherwise the classic karaoke / punch / typewriter lines.
     const kind = params?.kind === 'lyricVideo' ? 'lyricVideo' : 'lyrics';
     this.overlayParams = params && { ...defaultParams(generatorDef(kind)), ...params, kind };
@@ -208,15 +207,13 @@ export class Compositor {
 
   /** What the lyrics overlay showed last frame (null when it is off). */
   get overlayInfo(): LyricsRenderInfo | null {
-    return this.overlayParams && this.overlayGen && !this.sceneHasLyrics ? this.overlayGen.info : null;
+    return this.overlayParams && this.overlayGen ? this.overlayGen.info : null;
   }
 
   setScene(scene: Scene): void {
     this.plan = new ScenePlan(scene);
-    // A look that already shows lyrics doesn't get a second copy from the overlay.
-    this.sceneHasLyrics = scene.layers.some(
-      (l) => l.enabled && (l.source.kind === 'lyrics' || l.source.kind === 'lyricVideo' || (l.source.kind === 'broadcast' && !!l.source.params.captions && l.source.params.captions !== 'off' && Number(l.source.params.lyrics ?? 1) >= 0.5)),
-    );
+    // The lyric router decides the overlay, so a look never shows its lyrics twice.
+    this.setOverlay(scene.lyricOverlay ?? null);
     this.palette.setScene(this.plan.scene);
     this.maskRefs = new Set(this.plan.scene.layers.filter((l) => l.enabled && l.mask?.type === 'luma' && l.mask.layer !== undefined).map((l) => l.mask!.layer!));
     this.mods.retain(this.plan.modKeys);
@@ -381,7 +378,7 @@ export class Compositor {
       }
       out = res;
     }
-    if (this.overlayParams && !this.sceneHasLyrics) out = this.renderOverlay(out, ctx, this.overlayParams);
+    if (this.overlayParams) out = this.renderOverlay(out, ctx, this.overlayParams);
     if (this.post) out = this.renderPost(out, ctx, fxCtx, this.post);
     return out;
   }

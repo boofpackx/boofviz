@@ -1,3 +1,4 @@
+import { showsWords } from '@shared/lyricRouter';
 import type { LibrarySettings, ShufflePool } from '@shared/settings';
 import type { PresetEntry } from '@/engine/library';
 
@@ -22,11 +23,8 @@ export interface PickContext {
   plays?: Record<string, number>;
 }
 
-const WORD_KINDS = new Set(['lyrics', 'lyricVideo', 'kineticType', 'platinumType']);
-/** Generators that show the sung line when their source is lyrics. */
-const LYRIC_SOURCE_KINDS = new Set(['desktop90', 'neoBrutal', 'neo90', 'prints', 'tapeDeck', 'sketchScreen']);
 const hasWords = (e: PresetEntry): boolean =>
-  e.preset.layers.some((l) => l.enabled && (WORD_KINDS.has(l.source.kind) || (LYRIC_SOURCE_KINDS.has(l.source.kind) && l.source.params.source !== 'text' && !['pet', 'numbers', 'eq', 'data', 'stickers'].includes(String(l.source.params.mode))) || (l.source.kind === 'broadcast' && !!l.source.params.captions && l.source.params.captions !== 'off')));
+  showsWords(e.preset);
 const tagged = (e: PresetEntry, tags: string[]): boolean => e.preset.tags.some((t) => tags.includes(t));
 
 /** Premade playlists: rules, not fixed lists, so new presets join automatically. */

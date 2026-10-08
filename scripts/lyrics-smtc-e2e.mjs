@@ -132,7 +132,7 @@ try {
   const n0 = requests();
   const reads0 = smtcReads();
   const t0 = Date.now();
-  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { enabled: true, params: { kind: 'lyrics' } } } }));
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { mode: 'everywhere', allLooks: 'karaoke' } }));
   await waitFor(output, () => window.__BOOFVIZ_DEBUG__.lyricsOverlay(), 8000);
   let same = 0;
   let worstPos = 0;

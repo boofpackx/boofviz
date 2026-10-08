@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { DisplayInfo, LinkState, OutputStatus } from '@shared/ipc';
 import { EMPTY_LYRICS, EMPTY_NOW_PLAYING, type NowPlaying, type TrackLyrics } from '@shared/lyrics';
 import { DEFAULT_SETTINGS, mergeSettings, type Settings, type SettingsPatch } from '@shared/settings';
-import { DEFAULT_GLOBALS, type GlobalControls } from '@shared/types/engine';
+import { DEFAULT_GLOBALS, type GlobalControls, type ParamBag } from '@shared/types/engine';
 import type { EngineStatus, InputDevice } from '@/audio/AudioEngine';
 
 export interface MidiStatus {
@@ -39,6 +39,8 @@ interface ControlState {
   midiLearn: string | null;
   /** The last MIDI message seen (shown in the Perform tab). */
   midiSeen: string;
+  /** A lyric treatment being tried in the preview (hovered in the gallery), never on the screen. */
+  lyricTry: ParamBag | null;
 
   hydrate(s: Settings): void;
   update(patch: SettingsPatch): void;
@@ -66,6 +68,8 @@ export const useControl = create<ControlState>((set, get) => ({
   liveName: '',
   midiLearn: null,
   midiSeen: '',
+
+  lyricTry: null,
 
   hydrate: (s) => set({ settings: s, loaded: true, hud: s.ui.showHud, globals: { ...s.globals, blackout: false, freeze: false, strobe: false } }),
   update: (patch) => {

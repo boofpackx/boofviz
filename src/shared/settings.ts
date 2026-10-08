@@ -1,5 +1,6 @@
 import { DEFAULT_ANALYSIS_SETTINGS, type AnalysisSettings } from './types/audio';
 import { DEFAULT_GLOBALS, type GlobalControls, type ParamBag } from './types/engine';
+import type { LyricTreatment, LyricsMode } from './lyricRouter';
 
 export type InputKind = 'loopback' | 'device' | 'file';
 
@@ -65,10 +66,20 @@ export interface LyricsSettings {
   offsetMs: number;
   /** Look lyrics up on LRCLIB when there's no local .lrc or cache entry. */
   online: boolean;
-  /** Lyrics drawn over every look (on top of the scene, not one of its layers). */
-  overlay: { enabled: boolean; params: ParamBag };
-  /** Text looks set to "Text from: text" show the sung line instead (their own text when there are no lyrics). */
-  textLooks: boolean;
+  /** Off: no lyrics anywhere · own: each look as made · everywhere: every look shows lyrics (see lyricRouter). */
+  mode: LyricsMode;
+  /** The mode L brings back after Off. */
+  lastMode: Exclude<LyricsMode, 'off'>;
+  /** One treatment for every look in Everywhere ('' : by theme). */
+  allLooks: string;
+  /** Theme (preset category) → treatment id; missing or '': the built-in default. */
+  themes: Record<string, string>;
+  /** Look id → 'theme' | 'own' | 'never' | a treatment id (Everywhere only). */
+  lookChoice: Record<string, string>;
+  /** Treatments you saved. */
+  custom: LyricTreatment[];
+  /** Over every added treatment: a size multiplier and a position ('auto': the treatment's own). */
+  tune: { size: number; position: 'auto' | 'center' | 'lower' | 'upper' };
   /** Time the lyrics automatically from how late songs are heard to start (on top of offsetMs). */
   autoTiming: boolean;
   /** The last few measured delays (ms the sound started after the player said), newest last. */
@@ -178,8 +189,11 @@ export const DEFAULT_SETTINGS: Settings = {
     transition: { type: 'crossfade', beats: 2 },
   },
   spotify: { clientId: '' },
-  // Overlay params are a partial bag: the lyrics generator's defaults fill the rest.
-  lyrics: { offsetMs: 0, online: true, textLooks: false, autoTiming: true, timing: [], overlay: { enabled: false, params: { kind: 'lyricVideo', style: 'auto', mode: 'karaoke', position: 'center', size: 1, backdrop: 0.45 } } },
+  lyrics: { offsetMs: 0, online: true, autoTiming: true, timing: [], mode: 'own',
+    lastMode: 'everywhere',
+    allLooks: '',
+    themes: { }, lookChoice: { },
+    custom: [], tune: { size: 1, position: 'auto' } },
   lostMedia: { enabled: false, style: 'vhs', wear: 1, events: 0.3, mood: 0.3, date: 'JUN 14 1994', station: 'CHANNEL 9' },
   retroTv: { enabled: false, set: 'screen', zoom: 0.1, powerFx: true },
   neoFlat: { enabled: false, colours: 'neo', outline: 4, shadow: 12 },
@@ -192,6 +206,35 @@ export type SettingsPatch = DeepPartial<Settings>;
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v) && !ArrayBuffer.isView(v);
+}
+
+/**
+ * Bring a settings file from an older version up to date (before it is merged
+ * with the defaults). The old "lyrics over every look" switch becomes the
+ * Everywhere mode; a style picked there becomes a saved treatment for all looks.
+ */
+export function migrateSettings(raw: unknown): unknown {
+  if (!isPlainObject(raw) || !isPlainObject(raw.lyrics)) return raw;
+  const l = { ...raw.lyrics };
+  if (l.mode === undefined && isPlainObject(l.overlay)) {
+    const o = l.overlay as { enabled?: boolean; params?: ParamBag };
+    l.mode = o.enabled ? 'everywhere' : 'own';
+    const p = o.params ?? {};
+    const picked = p.kind === 'lyrics' || (p.style !== undefined && p.style !== 'auto');
+    if (picked) {
+      const mine: LyricTreatment = {
+        id: 'yours-1',
+        name: 'Your style',
+        family: 'Yours',
+        params: { ...p, kind: p.kind === 'lyrics' ? 'lyrics' : 'lyricVideo' },
+      };
+      l.custom = [mine];
+      l.allLooks = mine.id;
+    }
+  }
+  delete l.overlay;
+  delete l.textLooks;
+  return { ...raw, lyrics: l };
 }
 
 /** Deep-merge `patch` into `base`, returning a new object. Arrays are replaced. */

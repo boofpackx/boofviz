@@ -37,16 +37,12 @@ let renderer: ThreeRenderer | null = null;
   trackLyrics: () => lyricsFeed.lyrics,
 };
 
-let lyricsSettings: Settings['lyrics'] | null = null;
 const overlayLead = (): number => {
-  const lead = lyricsSettings?.overlay.params.lead;
+  const lead = scene?.lyricOverlay?.lead;
   return typeof lead === 'number' ? lead : 150;
 };
 const applyLyricsSettings = (s: Settings): void => {
-  lyricsSettings = s.lyrics;
   lyricsFeed.offsetMs = lyricsOffsetMs(s.lyrics);
-  lyricsFeed.textLooks = s.lyrics.textLooks;
-  renderer?.setLyricsOverlay(s.lyrics.overlay);
   renderer?.setLostMedia(s.lostMedia);
   renderer?.setRetroTv(s.retroTv);
   renderer?.setNeoFlat(s.neoFlat);

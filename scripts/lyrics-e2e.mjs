@@ -92,9 +92,9 @@ try {
   check(outLyr === lyr?.lines, `output window received the same lyrics (${outLyr} lines)`);
 
   // ---- Overlay: same line in preview and output -------------------------------
-  // The classic line overlay first (new installs default to music-video lyrics, checked further down).
-  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { params: { kind: 'lyrics' } } } }));
-  await control.getByRole('button', { name: /Show lyrics over every look/ }).click();
+  // The classic line style first, for every look (music-video styles are checked further down).
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { allLooks: 'karaoke' } }));
+  await control.getByRole('button', { name: 'Everywhere', exact: true }).first().click();
   const on = await waitFor(output, () => window.__BOOFVIZ_DEBUG__.lyricsOverlay(), 8000);
   check(!!on, 'overlay is on in the output window');
   check(!!(await dbg(control, () => window.__BOOFVIZ_DEBUG__.lyricsOverlay())), 'overlay is on in the preview');
@@ -124,24 +124,33 @@ try {
   await output.screenshot({ path: join(outDir, 'lyrics.png') });
   await control.screenshot({ path: join(outDir, 'lyrics-control.png') });
 
-  // ---- Text looks sing along ------------------------------------------------------
-  await control.getByRole('button', { name: /Show lyrics over every look/ }).click();
-  check((await dbg(output, () => window.__BOOFVIZ_DEBUG__.liveText('text'))).kind === 'text', 'text looks keep their own words by default');
-  await control.getByRole('button', { name: /Put lyrics into text looks/ }).click();
+  // ---- A look with its own lyrics keeps them (no second copy); Off hides them -------
   await dbg(control, () => window.__BOOFVIZ_DEBUG__.load('builtin:space-crawl'));
   await sleep(2500);
-  const sung = await dbg(output, () => ({ live: window.__BOOFVIZ_DEBUG__.liveText('text'), at: window.__BOOFVIZ_DEBUG__.lyricsAt(Date.now()) }));
-  const singing = sung.live.kind === 'lyrics' && sung.live.lines[sung.live.current] === (sung.at.text || '♪');
-  check(singing, `text looks show the line being sung ("${sung.live.lines[sung.live.current] ?? ''}", ${sung.live.lines.length} lines in the crawl window)`);
+  const crawl = () => {
+    const sc = window.__BOOFVIZ_DEBUG__.scene();
+    const kt = sc?.layers.find((l) => l.source.kind === 'kineticType');
+    return { on: !!kt?.enabled,
+      src: kt?.source.params.source,
+      overlay: !!sc?.lyricOverlay,
+      live: window.__BOOFVIZ_DEBUG__.liveText('lyrics'), at: window.__BOOFVIZ_DEBUG__.lyricsAt(Date.now()) };
+  };
+  const sung = await dbg(output, crawl);
+  const singing = sung.on && sung.src === 'lyrics' && !sung.overlay && sung.live.lines[sung.live.current] === (sung.at.text || '♪');
+  check(singing, `a look with its own lyrics keeps them in Everywhere, with no overlay ("${sung.live.lines[sung.live.current] ?? ''}")`);
   await output.screenshot({ path: join(outDir, 'lyrics-crawl.png') });
-  await control.getByRole('button', { name: /Put lyrics into text looks/ }).click();
-  await control.getByRole('button', { name: /Show lyrics over every look/ }).click();
-  await waitFor(output, () => window.__BOOFVIZ_DEBUG__.lyricsOverlay(), 8000);
+  await control.getByRole('button', { name: 'Off', exact: true }).first().click();
+  await sleep(800);
+  const hushed = await dbg(output, crawl);
+  check(!hushed.on && !hushed.overlay, 'Off hides the look’s own lyrics too');
+  await control.getByRole('button', { name: 'Everywhere', exact: true }).first().click();
+  await sleep(800);
 
   // ---- Music-video lyrics over a look -------------------------------------------
   await dbg(control, () => window.__BOOFVIZ_DEBUG__.load('builtin:twist-cube'));
   for (const style of ['drop', 'slam', 'shuffle', 'zoomthrough', 'stack', 'orbit3d']) {
-    await dbg(control, (st) => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { params: { kind: 'lyricVideo', style: st } } } }), style);
+    const id = { zoomthrough: 'zoom', orbit3d: 'orbit' }[style] ?? style;
+    await dbg(control, (t) => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { allLooks: t } }), id);
     await sleep(1800);
     await output.screenshot({ path: join(outDir, `lyrics-video-${style}.png`) });
   }
@@ -151,11 +160,11 @@ try {
   check(!!va && !!vb && Math.abs(va.index - vb.index) <= 1, `preview and output agree on the music-video line (${va?.index} / ${vb?.index})`);
   // Lyric Cinema styles with the real synced lines (the mock song repeats lines, so it has a chorus).
   for (const style of ['credits', 'teletext', 'infomercial', 'ransom']) {
-    await dbg(control, (st) => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { params: { kind: 'lyricVideo', style: st } } } }), style);
+    await dbg(control, (t) => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { allLooks: t } }), style);
     await sleep(1800);
     await output.screenshot({ path: join(outDir, `lyrics-cinema-${style}.png`) });
   }
-  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { enabled: false, params: { kind: 'lyrics' } } } }));
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { mode: 'own', allLooks: 'karaoke' } }));
   // ---- The song as TV: the music channel with the real album art -------------------
   await dbg(control, () => window.__BOOFVIZ_DEBUG__.load('builtin:retro-tv-music-channel-96'));
   await sleep(2500);
@@ -165,7 +174,7 @@ try {
   await output.screenshot({ path: join(outDir, 'lyrics-album-art-tv.png') });
   // Back to a look without its own captions, so the overlay checks below see the overlay.
   await dbg(control, () => window.__BOOFVIZ_DEBUG__.load('builtin:twist-cube'));
-  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { overlay: { enabled: true } } }));
+  await dbg(control, () => window.__BOOFVIZ_DEBUG__.updateSettings({ lyrics: { mode: 'everywhere' } }));
   await sleep(600);
 
   // ---- Pause freezes the position ---------------------------------------------
