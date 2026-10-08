@@ -1,7 +1,7 @@
 {
   "name": "boofviz",
   "productName": "BOOFVIZ",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Real-time audio visualizer and auto-VJ",
   "author": "BOOFVIZ",
   "main": "./out/main/index.js",
