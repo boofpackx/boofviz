@@ -3,7 +3,9 @@
 Four new lyric looks, each with its own mechanics and a new way of putting the
 words on screen, built to a quality bar above everything in the library today,
 and checked by a grading lab (automatic measurements plus a panel of grader
-agents) before they ship.
+agents) before they ship. Alongside them, one lyrics switch that does the right
+thing for every look, and lyric settings that are easy to find, browse and
+control.
 
 All four are original work: likeness of the era and the reference, never its
 names, logos, characters or artwork. Words on screen follow the house rule: the
@@ -211,22 +213,129 @@ Ransom Note.
 
 ---
 
-## 4. Build order
+## 4. Lyrics mode: one switch, the right lyrics on every look
+
+### How it works today, and what's wrong
+- "Show lyrics over every look" puts one lyric style on top of everything. It
+  skips looks with a lyric layer, but not looks whose words come from inside
+  the look (Tape Deck's display, Neo 90s, the photo prints, Sketch Screen,
+  neo-brutal, the 90s desktop, text looks set to lyrics), so those can get the
+  lyrics twice.
+- A second switch, "Put lyrics into text looks", does part of the same job.
+- "Auto" picks a style by the look's category, but nothing else (material,
+  colour, position), and it can't be changed per theme or per look.
+
+### The new switch: Off / Looks' own / Everywhere
+One control with three positions, on the Lyrics tab, the Perform tab, the **L**
+key and a MIDI function:
+
+| Mode | What you see |
+|---|---|
+| **Off** | No words anywhere, the looks' own lyric layers included (for instrumental sets, or gigs without a lyrics licence). Nothing else about the looks changes. |
+| **Looks' own** (default) | Each look exactly as it was made: lyrics where it has them, none where it doesn't. |
+| **Everywhere** | Every look shows lyrics, choosing per look with the rules below. |
+
+### Everywhere: the rules, per look, in order
+1. **Your choice for this look wins.** Each look can be set to *Theme default*,
+   *Its own only*, a *specific treatment*, or *Never*. Set it from the
+   library (right-click) or the Layers tab. It's saved per look, your
+   favourites included, without changing the built-in presets.
+2. **A look that already shows words stays exactly as it is.** That covers
+   lyric layers and every look that puts words on screen itself (Tape Deck, Neo
+   90s, the prints, Sketch Screen, neo-brutal, the desktop, captions, kinetic
+   type), so there's never a second copy.
+3. **A look with lyrics switched off gets its own lyrics switched on.** That
+   covers a lyric layer you turned off in a saved look, and text looks that
+   use their own words: they sing the lyrics instead. This replaces the "Put
+   lyrics into text looks" switch.
+4. **Otherwise the look gets the treatment for its theme**, from the theme table
+   below, so a Brutalist look gets stencil lyrics and a Real 90s look teletext.
+
+Switching back to *Looks' own* or *Off* undoes everything Everywhere added or
+turned on. Your saved looks are never rewritten.
+
+**Built as:** one small, pure "lyric router" that takes a look, the mode, your
+per-look choices and the theme table, and returns which layers to show, hide
+or add. Both windows use it, so preview and output always agree. A test runs it
+over every built-in look: in Everywhere each look has exactly one source of
+words; in Off, none.
+
+---
+
+## 5. Lyric settings: organised, easy to browse and control
+
+### Treatments instead of loose dropdowns
+A **treatment** is a named bundle of everything that makes a lyric style: the
+style, material, font, colour, position, size, how lines leave and the glow. It
+replaces the dozen separate dropdowns. Built-in treatments come in families, and
+you can save your own (for example "My Pink Karaoke") from the fine-tune
+controls.
+
+| Family | Examples |
+|---|---|
+| Classic | Karaoke sweep, punch-in lines, typewriter |
+| Music video | Drop, slam, pop, flip, orbit, glitch, jelly, glitter |
+| Lyric cinema | Highway, credits, infomercial, teletext, laser, explosion |
+| 90s & Y2K | Screensaver, high score, neon alley, J-card, chrome |
+| Neo 90s & vintage | Holo, melt, glitter, ransom note |
+| Brutalist | Stencil, mimeograph, rub-down, Swiss grid |
+| Hero (new) | The parts of the four new looks that work on top of any look: Step Chart's lane at the side, Keyframes' morphing words, Hot Metal's printed strip |
+
+### Finding and choosing
+- **Gallery, not lists:** treatments show as cards with small live previews of
+  the line being sung right now, grouped by family, with search, a star for
+  favourites, and "Surprise me".
+- **Try before applying:** hovering or arrowing onto a card shows it in the main
+  preview (never on the screen); Enter or click applies it. Arrow keys move
+  through the gallery and Tab moves between families.
+- **Fine-tune folded away:** each treatment's detailed controls sit under
+  *Fine-tune*, with *Save as treatment* and *Reset*.
+
+### The Lyrics tab, reorganised
+Short sections with a jump bar at the top:
+1. **Mode:** the three-way switch, plus a status line for the look playing now
+   ("own lyrics", "themed: Teletext", "none", "never").
+2. **Treatment:** the gallery.
+3. **Themes:** the theme table, one row per category, each with its treatment.
+   Change any row from the gallery, or reset to the defaults.
+4. **This look:** the per-look choice for the look playing now.
+5. **Timing:** offset and automatic timing.
+6. **Sources:** the lyrics folder, online search and the cache.
+7. **Music:** the player you're following, and the optional Spotify login.
+
+### Live control
+- **L** toggles Off and your last mode; **Shift+L** steps through the
+  treatments of the current look's theme.
+- MIDI functions: *Lyrics mode*, *Next / previous treatment*.
+- Library cards show a small badge for each look's lyric state.
+
+### Graded too
+The lab also checks Everywhere: for every theme it captures three looks with
+their themed treatment. Graders check that the treatment suits the look and
+stays readable over busy backgrounds; the measurements check readability on
+every built-in look.
+
+---
+
+## 6. Build order
 
 | Step | What | Done when |
 |---|---|---|
 | 0 | Foundations F1–F5 | Fonts and atlases build, the test song plays through the mock services, captures run. |
-| 1 | Grading lab and calibration on three existing looks | Graders agree within ±1 point on repeat runs; baseline scores recorded. |
-| 2 | **Step Chart** (2D, timing-heavy: proves the lab fast) | Passes the bar. |
-| 3 | **Hot Metal** | Passes the bar. |
-| 4 | **Keyframes** | Passes the bar. |
-| 5 | **Poured** (3D, the heaviest) | Passes the bar. |
-| 6 | Presets (2–3 variants each), your review of the demo videos, release | Released. |
+| 1 | **Lyrics mode and lyric settings** (the router, the three-way switch, treatments, gallery, theme table, per-look choices, the reorganised tab) | Router test passes on every look; your saved looks keep their lyrics. |
+| 2 | Grading lab and calibration on three existing looks, plus the Everywhere check | Graders agree within ±1 point on repeat runs; baseline scores recorded. |
+| 3 | **Step Chart** (2D, timing-heavy: proves the lab fast) | Passes the bar. |
+| 4 | **Hot Metal** | Passes the bar. |
+| 5 | **Keyframes** | Passes the bar. |
+| 6 | **Poured** (3D, the heaviest) | Passes the bar. |
+| 7 | Presets (2–3 variants each), hero treatments added to the gallery, your review of the demo videos, release | Released. |
 
 Optional afterwards: a **remaster pass**. Run the cheap measurements over the
 whole library, then grade the lowest 20 looks and rebuild them to the new bar.
 
-## 5. Decisions for you
+## 7. Decisions for you
 1. **The four picks:** Keyframes, Step Chart, Poured and Hot Metal, or swap any for a
    bench look.
 2. **Grading:** full (best results) or lean (about a third of the cost).
+3. **Off:** should it also hide the lyrics built into looks (as planned), or
+   only the lyrics that Everywhere adds?
