@@ -70,11 +70,11 @@ export class Poured extends CanvasLook {
     const g = c.getContext('2d')!;
     const plank = c.height / 5;
     for (let i = 0; i < 5; i++) {
-      const v = 168 + (h01(`p${i}`) - 0.5) * 26;
+      const v = 172 + (h01(`p${i}`) - 0.5) * 12;
       g.fillStyle = rgb([v, v - 2, v - 6]);
       g.fillRect(0, i * plank, 512, plank);
       for (let k = 0; k < 40; k++) {
-        g.strokeStyle = `rgba(80,74,66,${0.05 + h01(`g${i}${k}`) * 0.08})`;
+        g.strokeStyle = `rgba(80,74,66,${0.03 + h01(`g${i}${k}`) * 0.04})`;
         g.lineWidth = 0.8;
         const y = i * plank + h01(`y${i}${k}`) * plank;
         g.beginPath();
@@ -82,12 +82,12 @@ export class Poured extends CanvasLook {
         g.bezierCurveTo(200, y + 1.5, 300, y - 1.5, 512, y + (h01(`e${i}${k}`) - 0.5) * 2);
         g.stroke();
       }
-      g.fillStyle = 'rgba(60,56,50,0.35)';
+      g.fillStyle = 'rgba(60,56,50,0.22)';
       g.fillRect(0, i * plank, 512, 1);
     }
     // Aggregate speckle.
     for (let k = 0; k < 1400; k++) {
-      g.fillStyle = `rgba(${h01(`s${k}`) > 0.5 ? '230,226,218' : '70,66,60'},${0.12 + h01(`a${k}`) * 0.18})`;
+      g.fillStyle = `rgba(${h01(`s${k}`) > 0.5 ? '230,226,218' : '70,66,60'},${0.06 + h01(`a${k}`) * 0.1})`;
       g.fillRect(h01(`sx${k}`) * 512, h01(`sy${k}`) * c.height, 1.2, 1.2);
     }
     this.board = c;
@@ -95,8 +95,8 @@ export class Poured extends CanvasLook {
   }
 
   /** A line of concrete letters, rendered once: extruded sides, board-marked faces, tie-holes. Wraps to `maxW`. */
-  private slab(line: StreamLine, px: number, maxW: number, blue: boolean): Slab {
-    const key = `${line.index}|${line.text}|${px}|${Math.round(maxW)}|${blue ? 1 : 0}`;
+  private slab(line: StreamLine, px: number, maxW: number, blue: boolean, flat = false): Slab {
+    const key = `${line.index}|${line.text}|${px}|${Math.round(maxW)}|${blue ? 1 : 0}|${flat ? 1 : 0}`;
     const hit = this.slabs.get(key);
     if (hit) return hit;
     const font = fontCss('wide', px);
@@ -141,20 +141,16 @@ export class Poured extends CanvasLook {
       g.font = font;
       g.textBaseline = 'alphabetic';
       if (blue) {
-        g.strokeStyle = 'rgba(220,235,255,0.35)';
-        g.lineWidth = 1;
-        line.words.forEach((w, i) => g.strokeText(w.text, words[i].x0 + depth, base(i) + depth));
         g.strokeStyle = 'rgba(235,245,255,0.95)';
-        g.lineWidth = Math.max(1.5, px * 0.025);
+        g.lineWidth = Math.max(2, px * 0.025);
         line.words.forEach((w, i) => g.strokeText(w.text, words[i].x0, base(i)));
         return c;
       }
-      // Sides: the letters extruded down and right, shaded darker with depth.
-      for (let d = depth; d >= 1; d--) {
-        const v = wet ? 70 + (1 - d / depth) * 16 : 92 + (1 - d / depth) * 36;
-        g.fillStyle = rgb([v, v - 2, v - 5]);
-        line.words.forEach((w, i) => g.fillText(w.text, words[i].x0 + d, base(i) + d));
-      }
+      // A hard shadow behind the letters, and a thin dark foot for their thickness.
+      g.fillStyle = 'rgba(0,0,0,0.42)';
+      line.words.forEach((w, i) => g.fillText(w.text, words[i].x0 + depth * 0.75, base(i) + depth * 0.75));
+      g.fillStyle = wet ? '#3c3d41' : '#5e5b56';
+      line.words.forEach((w, i) => g.fillText(w.text, words[i].x0 + Math.max(1, depth * 0.18), base(i) + Math.max(1, depth * 0.18)));
       // The face on its own canvas, so texture and tie-holes stay inside the letters.
       const f = document.createElement('canvas');
       f.width = cw;
@@ -164,15 +160,24 @@ export class Poured extends CanvasLook {
       fg.textBaseline = 'alphabetic';
       if (wet) {
         const wetG = fg.createLinearGradient(0, 0, 0, ch);
-        wetG.addColorStop(0, '#8d8e92');
-        wetG.addColorStop(1, '#55565b');
+        wetG.addColorStop(0, '#6c6d72');
+        wetG.addColorStop(1, '#45464b');
         fg.fillStyle = wetG;
-      } else {
+      } else if (flat) fg.fillStyle = '#c4c1bb';
+      else {
         const pat = fg.createPattern(this.boardTexture(px), 'repeat')!;
         pat.setTransform(new DOMMatrix().translate(0, pad));
         fg.fillStyle = pat;
       }
-      line.words.forEach((w, i) => fg.fillText(w.text, words[i].x0, base(i)));
+      line.words.forEach((w, i) => {
+        // On the tower the hero word is painted safety yellow, like a stencilled site sign.
+        if (flat && !wet && i === line.hero) {
+          fg.save();
+          fg.fillStyle = '#f2c400';
+          fg.fillText(w.text, words[i].x0, base(i));
+          fg.restore();
+        } else fg.fillText(w.text, words[i].x0, base(i));
+      });
       fg.globalCompositeOperation = 'source-atop';
       if (wet) {
         // A wet sheen across the top of each row.
@@ -187,8 +192,14 @@ export class Poured extends CanvasLook {
       } else {
         // Tie-holes in rows, a lit top edge, a darker foot.
         const step = px * 0.4;
+        // Aggregate speckle.
+        for (let k = 0; k < (cw * ch) / 90; k++) {
+          fg.fillStyle = h01(`ag${k}`) > 0.5 ? 'rgba(235,232,226,0.35)' : 'rgba(60,57,52,0.3)';
+          fg.fillRect(h01(`agx${k}`) * cw, h01(`agy${k}`) * ch, 1.3, 1.3);
+        }
         rows.forEach((r) => {
           const top = words[r[0]].top;
+          if (flat) return;
           for (let ty = top + step * 0.6; ty < top + px * 0.95; ty += step) {
             for (let tx = fx + step * 0.5; tx < fx + textW; tx += step) {
               fg.fillStyle = 'rgba(38,36,34,0.85)';
@@ -198,14 +209,18 @@ export class Poured extends CanvasLook {
             }
           }
           const lit = fg.createLinearGradient(0, top, 0, top + px);
-          lit.addColorStop(0, 'rgba(255,250,240,0.28)');
-          lit.addColorStop(0.25, 'rgba(255,250,240,0)');
-          lit.addColorStop(1, 'rgba(0,0,0,0.2)');
+          lit.addColorStop(0, 'rgba(255,250,240,0.12)');
+          lit.addColorStop(0.3, 'rgba(255,250,240,0)');
+          lit.addColorStop(1, 'rgba(0,0,0,0.12)');
           fg.fillStyle = lit;
           fg.fillRect(0, top, cw, px);
         });
       }
       g.drawImage(f, 0, 0);
+      g.strokeStyle = 'rgba(30,28,26,0.6)';
+      g.lineWidth = Math.max(1, px * 0.02);
+      g.lineJoin = 'round';
+      line.words.forEach((w, i) => g.strokeText(w.text, words[i].x0, base(i)));
       return c;
     };
     const slab: Slab = { canvas: make(false), wet: make(true), words, face: { x: fx, y: pad, w: textW, h: lh * rows.length }, px };
@@ -253,12 +268,15 @@ export class Poured extends CanvasLook {
         const a = Math.PI * (1 - Math.min(1, tod / 0.85));
         const sunX = W * (0.5 + Math.cos(a) * 0.42);
         const sunY = H * (0.75 - Math.sin(a) * 0.6);
-        const sun = g.createRadialGradient(sunX, sunY, 0, sunX, sunY, H * 0.25);
-        sun.addColorStop(0, `rgba(255,250,230,${0.95 * (1 - night)})`);
-        sun.addColorStop(0.12, `rgba(255,240,200,${0.6 * (1 - night)})`);
-        sun.addColorStop(1, 'rgba(255,240,200,0)');
-        g.fillStyle = sun;
-        g.fillRect(0, 0, W, H);
+        const halo = g.createRadialGradient(sunX, sunY, H * 0.035, sunX, sunY, H * 0.12);
+        halo.addColorStop(0, `rgba(255,244,214,${0.35 * (1 - night)})`);
+        halo.addColorStop(1, 'rgba(255,244,214,0)');
+        g.fillStyle = halo;
+        g.fillRect(sunX - H * 0.12, sunY - H * 0.12, H * 0.24, H * 0.24);
+        g.fillStyle = `rgba(255,250,236,${1 - night})`;
+        g.beginPath();
+        g.arc(sunX, sunY, H * 0.035, 0, Math.PI * 2);
+        g.fill();
       }
       if (night > 0) {
         const glow = g.createRadialGradient(W * 0.5, H * 1.1, 0, W * 0.5, H * 1.1, H * 0.9);
@@ -278,34 +296,52 @@ export class Poured extends CanvasLook {
     const zoom = 1 - 0.25 * frac * num(p.pullback, 1);
     const castPx = Math.round(H * 0.092 * zoom * (casting?.chorus && s.synced ? 1.22 : 1));
     const castW = W * 0.86;
-    const towerPx = Math.round(H * 0.05 * zoom);
+    const towerPx = Math.round(H * 0.075 * zoom);
     const castTop = H * 0.16;
     const castSlab = casting ? this.slab(casting, castPx, castW, blue) : null;
     const finished = s.lines.filter((l) => l !== casting && l.end <= s.now + 0.001 && (!casting || l.index < casting.index));
     let y = castTop + (castSlab ? castSlab.canvas.height : H * 0.2) + H * 0.03;
-    for (let k = finished.length - 1; k >= 0; k--) {
-      const l = finished[k];
-      const sl = this.slab(l, towerPx, W * 2, blue);
+    const stack = finished.slice(-4);
+    for (let k = stack.length - 1; k >= 0; k--) {
+      const l = stack[k];
+      const age = stack.length - 1 - k;
+      const sl = this.slab(l, towerPx, W * 2, blue, true);
       const kx = Math.min(1, (W * 0.84) / sl.canvas.width);
       const w = sl.canvas.width * kx;
       const h = sl.canvas.height * kx;
       const x = (W - w) / 2;
       // The line just finished is craned down from where it was cast.
       const since = casting ? s.now - casting.start : 9;
-      if (k === finished.length - 1 && since >= -0.2 && since < 0.6) {
+      g.globalAlpha = 1 - age * 0.18;
+      if (k === stack.length - 1 && since >= -0.2 && since < 0.6) {
         const big = this.slab(l, castPx, castW, blue);
         const t = ease((since + 0.2) / 0.8);
         const bx = (W - big.canvas.width) / 2;
         g.drawImage(big.canvas, bx + (x - bx) * t, castTop + (y - castTop) * t, big.canvas.width + (w - big.canvas.width) * t, big.canvas.height + (h - big.canvas.height) * t);
       } else {
-        // Plinth under a chorus line.
-        if (l.chorus && s.synced && !blue) {
-          g.fillStyle = 'rgba(128,124,118,1)';
-          g.fillRect(x - h * 0.15, y + h * 0.82, w + h * 0.3, h * 0.22);
+        // Each finished line is a floor of the tower: a dark concrete beam, the words in light relief.
+        if (!blue) {
+          const beam = g.createLinearGradient(0, y, 0, y + h);
+          beam.addColorStop(0, '#5a5650');
+          beam.addColorStop(1, '#3e3b37');
+          g.fillStyle = beam;
+          g.fillRect(W * 0.06, y, W * 0.88, h * 0.96);
+          g.fillStyle = 'rgba(255,250,240,0.18)';
+          g.fillRect(W * 0.06, y, W * 0.88, Math.max(1, h * 0.04));
+          // A chorus floor juts out on a plinth.
+          if (l.chorus && s.synced) {
+            g.fillStyle = '#6e6a63';
+            g.fillRect(W * 0.04, y + h * 0.82, W * 0.92, h * 0.16);
+          }
         }
         g.drawImage(sl.canvas, x, y, w, h);
-        if (night > 0 && !blue) this.windows(g, sl, x, y, kx, night, l.index, drop);
+        if (night > 0 && !blue) {
+          g.fillStyle = `rgba(8,8,16,${0.55 * night})`;
+          g.fillRect(x, y, w, h);
+          this.windows(g, sl, x, y, kx, night, l.index, drop);
+        }
       }
+      g.globalAlpha = 1;
       y += h * 0.98;
       if (y > H * 1.1) break;
     }
@@ -324,8 +360,8 @@ export class Poured extends CanvasLook {
         g.fillRect(-sx - 10, y, W + 20, H - y + 20);
       }
     }
-    if (casting && castSlab) this.cast(g, W, castTop, casting, castSlab, s, ctx, blue, night);
-    this.crane(g, W, H, castTop, casting, castSlab, s, blue, night);
+    if (casting && castSlab) this.cast(g, W, castTop, casting, castSlab, s, ctx, blue, night, () => this.crane(g, W, H, castTop, casting, castSlab, s, blue, night));
+    else this.crane(g, W, H, castTop, casting, castSlab, s, blue, night);
     g.restore();
 
     // The drop kicks up dust.
@@ -358,7 +394,7 @@ export class Poured extends CanvasLook {
   }
 
   /** Formwork up on the beat, concrete poured word by word, boards stripped at the end. */
-  private cast(g: CanvasRenderingContext2D, W: number, top: number, line: StreamLine, sl: Slab, s: WordStream, ctx: GenContext, blue: boolean, night: number): void {
+  private cast(g: CanvasRenderingContext2D, W: number, top: number, line: StreamLine, sl: Slab, s: WordStream, ctx: GenContext, blue: boolean, night: number, crane: () => void): void {
     const px = sl.px;
     const x = (W - sl.canvas.width) / 2;
     const y = top;
@@ -383,8 +419,9 @@ export class Poured extends CanvasLook {
         g.setLineDash([]);
       } else {
         const ply = g.createLinearGradient(0, fy, 0, fy + fh);
-        ply.addColorStop(0, '#d8b583');
-        ply.addColorStop(1, '#b98f58');
+        const dim = 1 - 0.55 * night;
+        ply.addColorStop(0, rgb([232 * dim, 204 * dim, 156 * dim]));
+        ply.addColorStop(1, rgb([206 * dim, 168 * dim, 112 * dim]));
         g.fillStyle = ply;
         g.fillRect(fx - px * 0.3, fy - px * 0.15, fw + px * 0.6, fh + px * 0.3);
         g.fillStyle = 'rgba(120,80,40,0.25)';
@@ -398,10 +435,12 @@ export class Poured extends CanvasLook {
       }
       g.restore();
     }
+    // The crane and its skip sit behind the concrete: the stream runs down into the form.
+    crane();
     // Concrete pours into each word as it is sung, rippling on the kick.
     for (let i = 0; i < line.words.length; i++) {
       const w = line.words[i];
-      const fill = ease((s.now - w.t) / 0.55);
+      const fill = ease((s.now - w.t) / Math.max(0.6, Math.min(1.2, w.end - w.t)));
       if (fill <= 0) continue;
       const box = sl.words[i];
       const level = (box.bottom - box.top) * fill;
@@ -463,6 +502,17 @@ export class Poured extends CanvasLook {
       }
       g.restore();
     }
+    // At night a floodlight washes the form.
+    if (night > 0 && !blue) {
+      const cone = g.createRadialGradient(fx + fw / 2, fy - px * 1.5, px * 0.3, fx + fw / 2, fy + fh * 0.4, fw * 0.75);
+      cone.addColorStop(0, `rgba(255,236,190,${0.32 * night})`);
+      cone.addColorStop(1, 'rgba(255,236,190,0)');
+      g.save();
+      g.globalCompositeOperation = 'screen';
+      g.fillStyle = cone;
+      g.fillRect(fx - px * 2, fy - px * 2.5, fw + px * 4, fh + px * 4);
+      g.restore();
+    }
     // Blueprint: a dimension line under the line.
     if (blue) {
       g.strokeStyle = 'rgba(235,245,255,0.8)';
@@ -472,10 +522,6 @@ export class Poured extends CanvasLook {
       g.beginPath();
       g.moveTo(fx, dy);
       g.lineTo(fx + fw, dy);
-      g.moveTo(fx, dy - 6);
-      g.lineTo(fx, dy + 6);
-      g.moveTo(fx + fw, dy - 6);
-      g.lineTo(fx + fw, dy + 6);
       g.stroke();
       g.font = fontCss('mono', Math.round(px * 0.18));
       g.textAlign = 'center';
@@ -486,7 +532,7 @@ export class Poured extends CanvasLook {
 
   /** A tower crane: lattice mast, jib over the line, the skip pouring into the word being sung. */
   private crane(g: CanvasRenderingContext2D, W: number, H: number, top: number, line: StreamLine | null, sl: Slab | null, s: WordStream, blue: boolean, night: number): void {
-    const mastX = W * 0.9;
+    const mastX = W * 0.955;
     const jibY = top - H * 0.16;
     const col = blue ? 'rgba(235,245,255,0.85)' : night > 0.5 ? '#2a2420' : '#e0a21a';
     g.strokeStyle = col;
@@ -552,7 +598,7 @@ export class Poured extends CanvasLook {
     if (blue) g.stroke();
     // Concrete stream while the word fills.
     const pour = s.now - cur.t;
-    if (pour > -0.05 && pour < 0.55 && !blue) {
+    if (pour > -0.05 && pour < Math.max(0.6, Math.min(1.2, cur.end - cur.t)) && !blue) {
       g.fillStyle = 'rgba(80,80,84,0.9)';
       g.fillRect(hx - px * 0.05, hy + px * 0.45, px * 0.1, top + span.bottom - hy - px * 0.5);
     }

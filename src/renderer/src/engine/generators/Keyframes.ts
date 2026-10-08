@@ -1,6 +1,7 @@
 import type { GenContext } from './Generator';
 import { CanvasLook, paletteCss } from './CanvasLook';
 import { fontCss } from './KineticType';
+import { songTitle } from '../lyricsFeed';
 import { wordHash, wordStream, type StreamLine, type StreamWord, type WordStream } from '../wordStream';
 
 /**
@@ -32,7 +33,6 @@ interface Placed {
 
 export class Keyframes extends CanvasLook {
   readonly kind = 'keyframes';
-  private morphCanvas: HTMLCanvasElement | null = null;
 
   protected draw(g: CanvasRenderingContext2D, W: number, H: number, ctx: GenContext): void {
     const p = ctx.params;
@@ -56,12 +56,12 @@ export class Keyframes extends CanvasLook {
     g.fillStyle = UI.work;
     g.fillRect(0, 0, W, H);
     const u = H / 100;
-    // Menu strip, tools on the left, the timeline on top, properties below.
-    const menuH = 3.2 * u;
-    const tlH = 21 * u;
-    const toolsW = 5.2 * u;
-    const propH = 9 * u;
-    this.panel(g, 0, 0, W, menuH);
+    // Title bar, tools on the left, the timeline on top, properties below.
+    const menuH = 4.6 * u;
+    const tlH = 25 * u;
+    const toolsW = 7 * u;
+    const propH = 11 * u;
+    this.titleBar(g, W, menuH, u);
     this.timeline(g, toolsW, menuH, W - toolsW, tlH, s, ctx);
     this.tools(g, 0, menuH, toolsW, H - menuH, u);
     this.panel(g, toolsW, H - propH, W - toolsW, propH);
@@ -91,15 +91,47 @@ export class Keyframes extends CanvasLook {
     g.restore();
   }
 
+  /** A bevelled grey panel: light top-left edges, two shades of shadow bottom-right. */
   private panel(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
     g.fillStyle = UI.panel;
     g.fillRect(x, y, w, h);
-    g.fillStyle = '#f4f2ee';
+    g.fillStyle = '#ffffff';
     g.fillRect(x, y, w, 1);
     g.fillRect(x, y, 1, h);
-    g.fillStyle = UI.line;
+    g.fillStyle = '#e9e7e3';
+    g.fillRect(x + 1, y + 1, w - 2, 1);
+    g.fillRect(x + 1, y + 1, 1, h - 2);
+    g.fillStyle = '#808080';
+    g.fillRect(x + 1, y + h - 2, w - 2, 1);
+    g.fillRect(x + w - 2, y + 1, 1, h - 2);
+    g.fillStyle = '#404040';
     g.fillRect(x, y + h - 1, w, 1);
     g.fillRect(x + w - 1, y, 1, h);
+  }
+
+  /** The window's title bar: the playing song as the movie's name. */
+  private titleBar(g: CanvasRenderingContext2D, W: number, h: number, u: number): void {
+    const bar = g.createLinearGradient(0, 0, W, 0);
+    bar.addColorStop(0, '#0a246a');
+    bar.addColorStop(1, '#a6caf0');
+    g.fillStyle = bar;
+    g.fillRect(0, 0, W, h);
+    const title = songTitle();
+    g.font = fontCss('heavy', Math.round(h * 0.5));
+    g.fillStyle = '#ffffff';
+    g.textAlign = 'left';
+    g.textBaseline = 'middle';
+    // A little document icon (a keyframe dot on a page), then the movie's name.
+    g.fillStyle = '#ffffff';
+    g.fillRect(u * 1.2, h * 0.18, h * 0.5, h * 0.64);
+    g.fillStyle = '#111111';
+    g.beginPath();
+    g.arc(u * 1.2 + h * 0.25, h * 0.5, h * 0.12, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = '#ffffff';
+    if (title) g.fillText(`${title}.fla`, u * 1.2 + h * 0.8, h * 0.52, W * 0.7);
+    // Window buttons.
+    for (let i = 0; i < 3; i++) this.panel(g, W - (i + 1) * h * 0.95 - u * 0.4, h * 0.14, h * 0.85, h * 0.72);
   }
 
   private tools(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, u: number): void {
@@ -369,7 +401,7 @@ export class Keyframes extends CanvasLook {
       rows[rows.length - 1].push({ w: wd, x: cx, y: 0, width: ww });
       cx += ww + space;
     }
-    const lh = px * 1.15;
+    const lh = px * 1.22;
     const top = y + h * 0.5 - ((rows.length - 1) * lh) / 2;
     const out: Placed[] = [];
     rows.forEach((row, r) => {
@@ -427,8 +459,15 @@ export class Keyframes extends CanvasLook {
       return { x: a.x + (pl.x - a.x) * k, y: a.y + (pl.y - a.y) * k, k };
     };
     let selected: Placed | null = null;
+    const morphing = !!next && s.now > morphFrom;
+    const clearOld = morphing ? Math.min(1, (s.now - morphFrom) / Math.max(0.15, (morphTo - morphFrom) * 0.4)) : 0;
     for (const pl of placed) {
       if (s.now < pl.w.t - 0.3) continue;
+      // While the last word morphs, the rest of the line clears away.
+      if (clearOld > 0 && !pl.w.last) {
+        if (clearOld >= 1) continue;
+        g.globalAlpha = 1 - clearOld;
+      }
       const fill = paletteCss(pal, 2 + (pl.w.i % 3), clear ? 0.45 : 0.05);
       const tweening = s.now < pl.w.t + 0.08;
       // Onion skin: where the word was a few frames ago, tinted.
@@ -437,15 +476,14 @@ export class Keyframes extends CanvasLook {
           const tt = s.now - k / TWOS;
           if (tt < pl.w.t - 0.3) continue;
           const o = at(pl, tt);
-          this.bubbly(g, pl.w.text, o.x, o.y, px, k % 2 ? '#7fb2ff' : '#7fe08a', 0.08 + 0.22 * (1 - k / (onion + 1)), '#5a7ab0');
+          this.bubbly(g, pl.w.text, o.x, o.y, px, k % 2 ? '#7fb2ff' : '#7fe08a', (0.2 + 0.3 * (1 - k / (onion + 1))) * (onion > 3 ? 0.55 : 1), '#2f4f8a');
         }
       }
       // The last word shape-tweens into the next line's first word.
       if (pl.w.last && next && s.now > morphFrom) {
         const k = Math.min(1, (s.now - morphFrom) / Math.max(0.2, morphTo - morphFrom));
-        if (!clear) this.morph(g, pl, next.words[0]?.text ?? '', x, y, w, h, px, k, fill);
-        else {
-          // On a clear canvas: the word squashes into the next one.
+        {
+          // The shape tween: the word squashes and its outline swaps into the next one.
           g.save();
           g.translate(pl.x + pl.width / 2, pl.y);
           g.scale(1 - 0.5 * k, 1 + 0.25 * k);
@@ -454,14 +492,19 @@ export class Keyframes extends CanvasLook {
           const to = next.words[0]?.text ?? '';
           g.font = fontCss('rounded', px);
           const tw = g.measureText(to).width;
-          this.bubbly(g, to, pl.x + pl.width / 2 - tw / 2, pl.y, px, paletteCss(pal, 2, 0.05), k);
+          this.bubbly(g, to, pl.x + pl.width / 2 - tw / 2, pl.y, px, paletteCss(pal, 2, clear ? 0.45 : 0.05), k);
+          if (!clear) selected = { ...pl, x: pl.x + pl.width / 2 - Math.max(tw, pl.width) / 2, width: Math.max(tw, pl.width) };
         }
         continue;
       }
       const o = at(pl, s.now);
       this.bubbly(g, pl.w.text, o.x, o.y, px, fill);
-      if (tweening && !clear) selected = { ...pl, x: o.x, y: o.y };
+      g.globalAlpha = 1;
+      // The latest word stays selected until the next one starts moving.
+      if (!clear && s.now >= pl.w.t - 0.3) selected = { ...pl, x: o.x, y: o.y };
+      void tweening;
     }
+    g.globalAlpha = 1;
     // The selected symbol: blue box, handles, the registration point; the cursor drags it.
     if (selected) {
       const bx = selected.x - px * 0.12;
@@ -515,44 +558,6 @@ export class Keyframes extends CanvasLook {
     g.restore();
   }
 
-  /** A shape tween: the two words blurred together and cut back to a hard edge (the gooey morph of a raw fill). */
-  private morph(g: CanvasRenderingContext2D, pl: Placed, to: string, x: number, y: number, w: number, h: number, px: number, k: number, fill: string): void {
-    const c = (this.morphCanvas ??= document.createElement('canvas'));
-    const cw = Math.ceil(w);
-    const ch = Math.ceil(h);
-    if (c.width !== cw || c.height !== ch) {
-      c.width = cw;
-      c.height = ch;
-    }
-    const m = c.getContext('2d')!;
-    m.setTransform(1, 0, 0, 1, 0, 0);
-    m.filter = 'none';
-    m.fillStyle = '#fff';
-    m.fillRect(0, 0, cw, ch);
-    m.font = fontCss('rounded', px);
-    m.textBaseline = 'middle';
-    m.textAlign = 'left';
-    const blur = Math.round(px * 0.12 * Math.sin(k * Math.PI) + 1);
-    m.filter = `blur(${blur}px)`;
-    m.fillStyle = '#000';
-    const toW = m.measureText(to).width;
-    const tx = (w - toW) / 2;
-    const ty = h * 0.5;
-    m.globalAlpha = 1 - k;
-    m.fillText(pl.w.text, pl.x - x, pl.y - y);
-    m.globalAlpha = k;
-    m.fillText(to, tx + (pl.x - x - tx) * (1 - k) * 0.3, ty + (pl.y - y - ty) * (1 - k) * 0.3);
-    m.globalAlpha = 1;
-    m.filter = 'none';
-    // Threshold the blur back to a crisp edge, tinted with the fill.
-    g.save();
-    g.filter = 'contrast(18)';
-    g.globalCompositeOperation = 'multiply';
-    g.drawImage(c, x, y);
-    g.restore();
-    void fill;
-  }
-
   // ---------------------------------------------------------------- test movie
 
   private testMovie(g: CanvasRenderingContext2D, W: number, H: number, s: WordStream, line: StreamLine | null, ctx: GenContext, always: boolean): void {
@@ -584,12 +589,14 @@ export class Keyframes extends CanvasLook {
     bg.addColorStop(1, paletteCss(pal, 1, -0.1));
     g.fillStyle = bg;
     g.fillRect(0, 0, W, H);
-    const cx = W * 0.3;
-    const cy = H * 0.42;
+    const cx = W * 0.27;
+    const cy = H * 0.36;
     g.save();
     g.translate(cx, cy);
-    g.rotate(Math.floor(ctx.frame.beat) * 0.12);
-    g.fillStyle = paletteCss(pal, 3, 0.2, 0.35);
+    // The chorus spins the rays faster, in another colour.
+    const loud = !!line?.chorus;
+    g.rotate(Math.floor(ctx.frame.beat) * (loud ? 0.3 : 0.12));
+    g.fillStyle = paletteCss(pal, loud ? 4 : 3, 0.2, loud ? 0.5 : 0.35);
     for (let i = 0; i < 12; i++) {
       g.beginPath();
       g.moveTo(0, 0);
@@ -601,26 +608,35 @@ export class Keyframes extends CanvasLook {
     // The singer.
     const words = line?.words ?? [];
     const cur = [...words].reverse().find((wd) => wd.t <= s.now && s.now < wd.end + 0.05);
-    this.singer(g, cx, cy, H * 0.25, t2, ctx, cur, s.now);
+    this.singer(g, cx, cy, H * 0.22, ctx, cur, t2, loud);
     // Big bubbly words tweening round the singer (on twos).
     if (!line) return;
-    const px = Math.round(H * 0.12);
-    const sung = words.filter((wd) => wd.t <= t2 + 0.02);
-    const shown = sung.slice(-4);
-    shown.forEach((wd, k) => {
+    // The whole line on screen: outlines first (inked), filled as each word is sung (painted), the current word bigger.
+    const px = Math.round(H * 0.105);
+    const placed = this.layout(g, words, W * 0.5, H * 0.08, W * 0.47, H * 0.84, px);
+    const cur2 = [...words].reverse().find((wd) => wd.t <= t2 + 0.02);
+    for (const pl of placed) {
+      const wd = pl.w;
       const age = t2 - wd.t;
-      const pop = back(age / 0.25);
-      const ang = -0.12 + (h01(wd.text + wd.i) - 0.5) * 0.25;
-      const bx = W * 0.56 + (k % 2) * W * 0.06;
-      const by = H * (0.22 + k * 0.19);
+      const isCur = wd === cur2;
+      const pop = age >= 0 ? 0.6 + 0.4 * back(age / 0.25) : 1;
+      const k = isCur ? 1.18 : 1;
+      const wobble = (h01(wd.text + wd.i) - 0.5) * 0.12;
       g.save();
-      g.translate(bx, by);
-      g.rotate(ang);
-      g.scale(pop, pop);
-      const isNew = k === shown.length - 1;
-      this.bubbly(g, wd.text, 0, 0, Math.round(px * (isNew ? 1.15 : 0.9)), paletteCss(pal, 2 + (wd.i % 3), isNew ? 0.1 : 0.35), isNew ? 1 : 0.85);
+      g.translate(pl.x + pl.width / 2, pl.y);
+      g.rotate(wobble);
+      g.scale(pop * k, pop * k);
+      if (age < 0) {
+        g.font = fontCss('rounded', px);
+        g.textAlign = 'left';
+        g.textBaseline = 'middle';
+        g.lineJoin = 'round';
+        g.lineWidth = Math.max(2, px * 0.05);
+        g.strokeStyle = 'rgba(17,17,17,0.7)';
+        g.strokeText(wd.text, -pl.width / 2, 0);
+      } else this.bubbly(g, wd.text, -pl.width / 2, 0, px, paletteCss(pal, 2 + (wd.i % 3), isCur ? 0.1 : 0.3));
       g.restore();
-    });
+    }
   }
 
   /** Mouth shape for a letter: open vowels, round vowels, closed lips, teeth on lip, tongue, rest. */
@@ -639,35 +655,89 @@ export class Keyframes extends CanvasLook {
     return 'rest';
   }
 
-  private singer(g: CanvasRenderingContext2D, x: number, y: number, r: number, t2: number, ctx: GenContext, word: StreamWord | undefined, now: number): void {
+  private singer(g: CanvasRenderingContext2D, x: number, y: number, r: number, ctx: GenContext, word: StreamWord | undefined, now: number, chorus = false): void {
     const pal = ctx.palette;
     const beat = ctx.frame.beat;
     const bob = Math.abs(Math.sin(Math.floor(beat * 2) * 0.5 * Math.PI)) * r * 0.05;
-    const lw = Math.max(3, r * 0.045);
+    const lw = Math.max(3, r * 0.05);
+    const thin = lw * 0.65;
     g.lineJoin = 'round';
     g.lineCap = 'round';
     g.strokeStyle = '#111';
-    g.lineWidth = lw;
-    // Body and arms (arms swap pose on the beat).
+    const up = Math.floor(beat) % 2 === 0;
+    // Legs and shoes, stepping on the beat.
+    const hipY = y + r * 1.72 - bob;
+    g.lineWidth = lw * 2.2;
+    g.beginPath();
+    g.moveTo(x - r * 0.25, hipY);
+    g.lineTo(x - r * 0.3 - (up ? r * 0.08 : 0), hipY + r * 0.42);
+    g.moveTo(x + r * 0.25, hipY);
+    g.lineTo(x + r * 0.3 + (up ? 0 : r * 0.08), hipY + r * 0.42);
+    g.stroke();
+    g.fillStyle = '#1b1b1b';
+    for (const sx of [-1, 1]) {
+      g.beginPath();
+      g.ellipse(x + sx * r * 0.36 + (sx < 0 ? (up ? -r * 0.08 : 0) : up ? 0 : r * 0.08), hipY + r * 0.48, r * 0.2, r * 0.09, 0, 0, Math.PI * 2);
+      g.fill();
+    }
+    // Body: a shirt with a stripe.
+    g.lineWidth = lw * 1.25;
     g.fillStyle = paletteCss(pal, 1, 0.25);
     g.beginPath();
-    g.roundRect(x - r * 0.55, y + r * 0.62 - bob, r * 1.1, r * 1.2, r * 0.35);
+    g.roundRect(x - r * 0.55, y + r * 0.6 - bob, r * 1.1, r * 1.2, r * 0.35);
     g.fill();
+    g.save();
+    g.clip();
+    g.fillStyle = paletteCss(pal, 4, 0.2);
+    g.fillRect(x - r * 0.6, y + r * 1.02 - bob, r * 1.2, r * 0.16);
+    g.restore();
     g.stroke();
-    const up = Math.floor(beat) % 2 === 0;
-    g.beginPath();
-    g.moveTo(x - r * 0.5, y + r * 0.85 - bob);
-    g.lineTo(x - r * 0.95, y + (up ? r * 0.3 : r * 1.25) - bob);
-    g.moveTo(x + r * 0.5, y + r * 0.85 - bob);
-    g.lineTo(x + r * 1.0, y + (up ? r * 1.2 : r * 0.35) - bob);
-    g.stroke();
+    // Arms with an elbow and round hands, swapping pose on the beat.
+    g.lineWidth = lw * 1.1;
+    const arm = (sx: number, raised: boolean): void => {
+      const sxp = x + sx * r * 0.5;
+      const syp = y + r * 0.85 - bob;
+      const ex = sxp + sx * r * 0.32;
+      const ey = syp + (raised ? -r * 0.12 : r * 0.28);
+      const hx = ex + sx * (raised ? r * 0.1 : r * 0.2);
+      const hy = ey + (raised ? -r * 0.4 : r * 0.22);
+      g.beginPath();
+      g.moveTo(sxp, syp);
+      g.lineTo(ex, ey);
+      g.lineTo(hx, hy);
+      g.stroke();
+      g.fillStyle = '#ffe2c4';
+      g.beginPath();
+      g.arc(hx, hy, r * 0.1, 0, Math.PI * 2);
+      g.fill();
+      g.lineWidth = thin;
+      g.stroke();
+      g.lineWidth = lw * 1.1;
+    };
+    // Both arms up through the chorus.
+    arm(-1, chorus || up);
+    arm(1, chorus || !up);
     // Head.
+    g.lineWidth = lw * 1.3;
     g.fillStyle = '#ffe2c4';
     g.beginPath();
     g.ellipse(x, y - bob, r * 0.72, r * 0.66, 0, 0, Math.PI * 2);
     g.fill();
     g.stroke();
+    // Cheeks and a nose.
+    g.fillStyle = 'rgba(255,120,140,0.35)';
+    for (const sx of [-1, 1]) {
+      g.beginPath();
+      g.ellipse(x + sx * r * 0.42, y + r * 0.2 - bob, r * 0.1, r * 0.06, 0, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.lineWidth = thin;
+    g.beginPath();
+    g.moveTo(x + r * 0.02, y + r * 0.04 - bob);
+    g.quadraticCurveTo(x + r * 0.12, y + r * 0.14 - bob, x - r * 0.01, y + r * 0.17 - bob);
+    g.stroke();
     // Hair spikes.
+    g.lineWidth = lw * 1.2;
     g.fillStyle = paletteCss(pal, 0, 0.1);
     g.beginPath();
     g.moveTo(x - r * 0.7, y - r * 0.2 - bob);
@@ -679,8 +749,9 @@ export class Keyframes extends CanvasLook {
     g.closePath();
     g.fill();
     g.stroke();
-    // Eyes (blink now and then, on twos).
-    const blink = Math.floor(t2 * 2) % 9 === 0;
+    // Eyes: a blink every couple of seconds.
+    const blink = now % 2.5 < 0.12;
+    g.lineWidth = thin * 1.2;
     for (const sx of [-1, 1]) {
       const ex = x + sx * r * 0.26;
       const ey = y - r * 0.08 - bob;
@@ -694,8 +765,13 @@ export class Keyframes extends CanvasLook {
         g.beginPath();
         g.arc(ex + r * 0.04, ey + r * 0.03, r * 0.07, 0, Math.PI * 2);
         g.fill();
+        g.fillStyle = '#fff';
+        g.beginPath();
+        g.arc(ex + r * 0.06, ey, r * 0.022, 0, Math.PI * 2);
+        g.fill();
       }
     }
+    g.lineWidth = lw;
     // Mouth from the letter being sung.
     const v = this.viseme(word, now);
     const mx = x;

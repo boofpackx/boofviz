@@ -2,6 +2,7 @@ import type { GenContext } from './Generator';
 import { CanvasLook } from './CanvasLook';
 import { fontCss } from './KineticType';
 import { num } from './ShaderGenerator';
+import { songTitle } from '../lyricsFeed';
 import { wordHash, wordStream, type StreamLine, type WordStream } from '../wordStream';
 
 /**
@@ -64,11 +65,12 @@ export class HotMetal extends CanvasLook {
     w.height = 256;
     const wg = w.getContext('2d')!;
     // Paper-coloured streaks: where the grain held no ink.
-    for (let y = 0; y < 256; y += 3) {
+    for (let y = 0; y < 256; y += 2 + Math.round(h01('sp', y) * 3)) {
       wg.strokeStyle = `rgba(243,234,214,${0.12 + 0.3 * h01('g', y)})`;
       wg.lineWidth = 1 + h01('w', y) * 1.5;
       wg.beginPath();
-      for (let x = 0; x <= 256; x += 8) wg.lineTo(x, y + Math.sin(x * 0.03 + y * 0.11) * 3 + Math.sin(x * 0.007 + y) * 4);
+      // Periodic across the tile, so the grain never shows a seam.
+      for (let x = 0; x <= 256; x += 4) wg.lineTo(x, y + Math.sin((x / 256) * Math.PI * 2 * 2 + y * 0.11) * 3 + Math.sin((x / 256) * Math.PI * 2 + y * 0.37) * 4);
       wg.stroke();
     }
     this.grain = this.g.createPattern(w, 'repeat');
@@ -229,11 +231,23 @@ export class HotMetal extends CanvasLook {
       }
     }
     g.restore();
+    // The line fades into the machine at the ends of the stick (no hard clip).
+    for (const [ex, dir] of [
+      [W * 0.07 - mw * 0.2, 1],
+      [W * 0.07 + avail + mw * 0.2, -1],
+    ] as const) {
+      const fade = g.createLinearGradient(ex, 0, ex + dir * mw * 1.2, 0);
+      fade.addColorStop(0, 'rgba(34,32,28,1)');
+      fade.addColorStop(1, 'rgba(34,32,28,0)');
+      g.fillStyle = fade;
+      g.fillRect(Math.min(ex, ex + dir * mw * 1.2), baseY - mh * 1.6, mw * 1.2, mh * 1.6);
+    }
     // The cast slug: lead with the letters raised and mirrored, glowing as it sets.
     if (hot > 0) {
       g.save();
       g.globalAlpha = Math.min(1, hot * 1.5);
-      const slugY = baseY + sh + mh * 0.15;
+      // The slug stays inside the machine, whatever the stick's height.
+      const slugY = Math.min(baseY + sh + mh * 0.15, H - mh * 0.5 - 2);
       const lead = g.createLinearGradient(0, slugY, 0, slugY + mh * 0.5);
       lead.addColorStop(0, '#b9bcc2');
       lead.addColorStop(1, '#6a6e76');
@@ -246,12 +260,18 @@ export class HotMetal extends CanvasLook {
       g.fillText(line.text, 0, 0, avail * 0.96);
       g.restore();
       g.fillStyle = `rgba(255,120,30,${0.35 * (1 - hot) + 0.1})`;
-      g.fillRect(W * 0.07, baseY + sh + mh * 0.15, avail, mh * 0.5);
+      g.fillRect(W * 0.07, Math.min(baseY + sh + mh * 0.15, H - mh * 0.5 - 2), avail, mh * 0.5);
     }
   }
 
   /** One brass matrix: bevelled, with the letter engraved (right-reading, as the moulds are read). */
   private matrix(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, ch: string, px: number, hot: number): void {
+    // The ears at the top that hang the matrix in the magazine, and its edge thickness.
+    g.fillStyle = '#9a6d26';
+    g.fillRect(x - w * 0.06, y + h * 0.04, w * 0.14, h * 0.1);
+    g.fillRect(x + w * 0.92, y + h * 0.04, w * 0.14, h * 0.1);
+    g.fillStyle = '#6b4714';
+    g.fillRect(x + w, y + h * 0.06, Math.max(1.5, w * 0.06), h * 0.94);
     const brass = g.createLinearGradient(x, y, x + w, y + h);
     brass.addColorStop(0, '#f6dc8c');
     brass.addColorStop(0.45, '#cf9f45');
@@ -352,7 +372,7 @@ export class HotMetal extends CanvasLook {
     const space = px * 0.28;
     const total = widths.reduce((a, b) => a + b, 0) + space * (words.length - 1);
     const k = Math.min(1, maxW / Math.max(1, total));
-    let cx = x;
+    let cx = x + (maxW - total * k) / 2;
     words.forEach((w, i) => {
       const isHero = i === hero;
       const f = isHero ? fontCss('wood', Math.round(px * 1.15 * k)) : fontCss('garamond', Math.round(px * 0.72 * k));
@@ -361,64 +381,102 @@ export class HotMetal extends CanvasLook {
     });
   }
 
-  /** Newsroom: the struck line as the headline, earlier lines as columns. */
+  /** Newsroom: the song's name as the nameplate, the struck line as the headline, earlier lines in columns with a pull-quote. */
   private newspaper(g: CanvasRenderingContext2D, W: number, H: number, top: number, printed: Printed[], s: WordStream): void {
     const mx = W * 0.07;
     const sy = top + H * 0.03;
     const sw = W - mx * 2;
-    const sh = H - sy;
+    const sh = H - sy - H * 0.03;
+    g.save();
+    g.shadowColor = 'rgba(0,0,0,0.6)';
+    g.shadowBlur = H * 0.03;
+    g.shadowOffsetY = H * 0.008;
     g.drawImage(this.paper!, 0, 0, W, H, mx, sy, sw, sh);
+    g.restore();
     g.save();
     g.beginPath();
     g.rect(mx, sy, sw, sh);
     g.clip();
+    const pad = sw * 0.035;
+    const inner = sw - pad * 2;
+    let y = sy + sh * 0.03;
+    g.textBaseline = 'alphabetic';
+    // Nameplate: the playing song, between rules.
+    const name = songTitle();
+    const np = Math.round(sh * 0.075);
     g.fillStyle = INK;
-    g.fillRect(mx + sw * 0.03, sy + sh * 0.035, sw * 0.94, Math.max(2, H * 0.004));
+    g.fillRect(mx + pad, y, inner, Math.max(2, H * 0.003));
+    if (name) {
+      g.textAlign = 'center';
+      this.ink(g, name.toUpperCase(), mx + sw / 2, y + np * 1.08, fontCss('garamond', np), INK, 0.8, `np${name}`, false, inner);
+      y += np * 1.32;
+    } else y += sh * 0.02;
+    g.fillStyle = INK;
+    g.fillRect(mx + pad, y, inner, Math.max(1, H * 0.0015));
+    g.fillRect(mx + pad, y + Math.max(3, H * 0.004), inner, Math.max(2, H * 0.003));
+    y += sh * 0.02;
     const latest = printed[printed.length - 1];
     if (latest) {
-      const hp = Math.round(sh * 0.17);
+      // Headline, fitted to the width, centred.
       const fresh = Math.min(1, (s.now - latest.at) / 0.12);
-      g.textBaseline = 'alphabetic';
-      g.textAlign = 'left';
-      this.ink(g, latest.line.text, mx + sw * 0.04, sy + sh * 0.06 + hp, fontCss('wood', hp), latest.line.chorus ? RED : INK, 0.6 + 0.5 * fresh, `h${latest.line.index}`, false, sw * 0.92);
+      g.font = fontCss('wood', 100);
+      const hk = Math.min((inner * 0.98) / Math.max(1, g.measureText(latest.line.text).width), (sh * 0.2) / 100);
+      const hp = Math.round(100 * hk);
+      g.textAlign = 'center';
+      this.ink(g, latest.line.text, mx + sw / 2, y + hp * 0.98, fontCss('wood', hp), latest.line.chorus ? RED : INK, 0.6 + 0.5 * fresh, `h${latest.line.index}`, false, inner);
+      y += hp * 1.18;
       g.fillStyle = INK;
-      g.fillRect(mx + sw * 0.03, sy + sh * 0.1 + hp, sw * 0.94, Math.max(1, H * 0.002));
-      // Earlier lines, newest first, flowing down three columns of body text.
-      const cols = 3;
-      const cw = (sw * 0.92) / cols;
-      const bp = Math.round(sh * 0.05);
-      const font = fontCss('book', bp);
-      g.font = font;
-      const y0 = sy + sh * 0.16 + hp + bp;
-      const bottom = sy + sh * 0.95;
-      let c = 0;
-      let y = y0;
-      const put = (text: string, seed: string): boolean => {
-        if (y > bottom) {
-          c++;
-          y = y0;
-        }
-        if (c >= cols) return false;
-        this.ink(g, text, mx + sw * 0.04 + c * cw, y, font, INK, 0.7, seed);
-        y += bp * 1.3;
-        return true;
-      };
+      g.fillRect(mx + pad, y, inner, Math.max(1, H * 0.0015));
+      y += sh * 0.035;
+      // Two columns: earlier lines as body text, and a pull-quote of the hero word.
+      const gap = inner * 0.05;
+      const cw = (inner - gap) / 2;
+      const bp = Math.round(sh * 0.052);
+      const body = fontCss('book', bp);
+      const bottom = sy + sh - sh * 0.04;
+      g.textAlign = 'left';
+      g.font = body;
+      let by = y + bp;
+      const colX = mx + pad;
       for (const pr of printed.slice(0, -1).reverse()) {
         let row = '';
-        let ok = true;
+        let full = false;
         for (const w of pr.line.text.split(/\s+/)) {
           const next = row ? `${row} ${w}` : w;
-          if (row && g.measureText(next).width > cw * 0.9) {
-            ok = put(row, `c${pr.line.index}${row}`);
+          if (row && g.measureText(next).width > cw) {
+            if (by > bottom) {
+              full = true;
+              break;
+            }
+            this.ink(g, row, colX, by, body, INK, 0.7, `c${pr.line.index}${row}`);
+            by += bp * 1.28;
             row = w;
           } else row = next;
-          if (!ok) break;
         }
-        if (!ok || !put(row, `c${pr.line.index}e`)) break;
-        y += bp * 0.5;
+        if (full || by > bottom) break;
+        this.ink(g, row, colX, by, body, INK, 0.7, `c${pr.line.index}e`);
+        by += bp * 1.75;
       }
-      g.fillStyle = 'rgba(27,24,32,0.5)';
-      for (let k = 1; k < cols; k++) g.fillRect(mx + sw * 0.04 + k * cw - cw * 0.05, sy + sh * 0.14 + hp, 1, sh * 0.8);
+      // The rule between the columns.
+      g.fillStyle = 'rgba(27,24,32,0.55)';
+      g.fillRect(colX + cw + gap / 2, y, 1, bottom - y);
+      // Pull-quote: the line's hero word, big, between rules.
+      const qx = colX + cw + gap;
+      const words = latest.line.text.split(/\s+/).filter(Boolean);
+      const hero = words[latest.line.hero >= 0 && latest.line.hero < words.length ? latest.line.hero : words.length - 1] ?? '';
+      if (hero) {
+        const qp = Math.round(sh * 0.13);
+        g.font = fontCss('garamond', qp);
+        const qk = Math.min(1, (cw * 0.9) / Math.max(1, g.measureText(`“${hero}”`).width));
+        const qs = Math.round(qp * qk);
+        g.fillStyle = INK;
+        g.fillRect(qx, y + sh * 0.01, cw, Math.max(2, H * 0.003));
+        g.textAlign = 'center';
+        this.ink(g, `“${hero}”`, qx + cw / 2, y + sh * 0.03 + qs, fontCss('garamond', qs), latest.line.chorus ? RED : INK, 0.85, `q${latest.line.index}`, false, cw);
+        g.fillStyle = INK;
+        g.fillRect(qx, y + sh * 0.05 + qs * 1.15, cw, Math.max(2, H * 0.003));
+        g.textAlign = 'left';
+      }
     }
     g.restore();
   }
@@ -521,10 +579,13 @@ export class HotMetal extends CanvasLook {
 
   /** A blind impression: the type pressed into the paper without ink (the words still to come). */
   private blind(g: CanvasRenderingContext2D, text: string, x: number, y: number): void {
-    g.fillStyle = 'rgba(255,255,250,0.5)';
-    g.fillText(text, x + 1.2, y + 1.6);
-    g.fillStyle = 'rgba(70,55,30,0.16)';
-    g.fillText(text, x - 0.8, y - 1);
+    // The paper pressed down without ink: a lit lower edge, a shadowed upper edge, a darker floor.
+    g.fillStyle = 'rgba(255,255,250,0.85)';
+    g.fillText(text, x + 1.6, y + 2.2);
+    g.fillStyle = 'rgba(70,52,28,0.42)';
+    g.fillText(text, x - 1.2, y - 1.4);
+    g.fillStyle = 'rgba(150,128,96,0.32)';
+    g.fillText(text, x, y);
   }
 
   private rowWidth(g: CanvasRenderingContext2D, ws: string[], font: string): number {

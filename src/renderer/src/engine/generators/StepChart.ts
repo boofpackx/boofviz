@@ -70,7 +70,7 @@ export class StepChart extends CanvasLook {
       if (lane === prevLane) lane = (lane + 1 + (wordHash(w.text + '*') % (lanes - 1))) % lanes;
       prevLane = lane;
       const held = w.end - w.t;
-      out.push({ lane, t: w.t, end: w.end, word: w.text, rhythm: rhythmOf(s.beatAt(w.t)), freeze: held > Math.max(0.6, spb * 1.4) });
+      out.push({ lane, t: w.t, end: w.end, word: w.text, rhythm: rhythmOf(s.beatAt(w.t)), freeze: held > Math.max(0.5, spb * 1.1) });
     }
     // Steps on the beat where nothing is sung (or the whole song when it has no timed lyrics).
     const b0 = Math.ceil(s.beatAt(s.now) - 1);
@@ -137,40 +137,45 @@ export class StepChart extends CanvasLook {
         g.stroke();
       }
       g.restore();
-      // Floor grid rushing toward you.
-      const horizon = H * 0.66;
-      g.save();
-      g.beginPath();
-      g.rect(0, horizon, W, H - horizon);
-      g.clip();
-      g.fillStyle = 'rgba(0,0,0,0.35)';
+      // A lit dance floor in perspective: tiles flash in patterns on the beat.
+      const horizon = H * 0.64;
+      g.fillStyle = 'rgba(0,0,0,0.55)';
       g.fillRect(0, horizon, W, H - horizon);
-      g.strokeStyle = paletteCss(pal, 3, 0.25, 0.55 + 0.35 * kick);
-      g.lineWidth = Math.max(1, H * 0.003);
-      for (let i = 0; i < 9; i++) {
-        const z = (i + (beat % 1)) / 9;
-        const y = horizon + (H - horizon) * z * z;
-        g.beginPath();
-        g.moveTo(0, y);
-        g.lineTo(W, y);
-        g.stroke();
+      const rowsN = 6;
+      const colsN = 10;
+      const bi = Math.floor(beat);
+      const flash = Math.max(0, 1 - bph * 2.2);
+      for (let r = 0; r < rowsN; r++) {
+        const z0 = r / rowsN;
+        const z1 = (r + 1) / rowsN;
+        const y0 = horizon + (H - horizon) * z0 * z0;
+        const y1 = horizon + (H - horizon) * z1 * z1;
+        for (let c = 0; c < colsN; c++) {
+          const xAt = (cc: number, z: number): number => W / 2 + (cc - colsN / 2) * (W * 0.035 + W * 0.13 * z);
+          const lit = (r + c + bi) % 3 === 0 || (fever && (c + bi) % 2 === r % 2);
+          const hue = (c * 37 + r * 53 + bi * 90) % 5;
+          g.fillStyle = lit ? paletteCss(pal, 1 + (hue % 4), 0.15 + 0.35 * flash, 0.85) : 'rgba(18,16,34,0.85)';
+          g.beginPath();
+          g.moveTo(xAt(c, z0) + 1, y0 + 1);
+          g.lineTo(xAt(c + 1, z0) - 1, y0 + 1);
+          g.lineTo(xAt(c + 1, z1) - 1, y1 - 1);
+          g.lineTo(xAt(c, z1) + 1, y1 - 1);
+          g.closePath();
+          g.fill();
+        }
       }
-      for (let i = -12; i <= 12; i++) {
-        g.beginPath();
-        g.moveTo(W / 2 + i * W * 0.02, horizon);
-        g.lineTo(W / 2 + i * W * 0.16, H);
-        g.stroke();
-      }
-      g.restore();
+      // The floor's front edge catches the light.
+      g.fillStyle = paletteCss(pal, 4, 0.4, 0.5 + 0.4 * kick);
+      g.fillRect(0, horizon - 1, W, Math.max(2, H * 0.004));
     }
 
     // ---- The playfield ----
     const lanes = double ? 8 : 4;
-    const lane = overlay ? H * 0.082 : Math.min(H * 0.118, (W * (double ? 0.8 : 0.42)) / lanes);
+    const lane = overlay ? H * 0.082 : Math.min(H * 0.15, (W * (double ? 0.84 : 0.46)) / lanes);
     const fieldW = lane * lanes + (double ? lane * 0.4 : 0);
     const fx = double ? (W - fieldW) / 2 : overlay ? W * 0.95 - fieldW : W * 0.28 - fieldW / 2;
     const laneX = (i: number): number => fx + lane * (i + 0.5) + (double && i >= 4 ? lane * 0.4 : 0);
-    const recY = reverse ? H * 0.84 : H * 0.16;
+    const recY = reverse ? H * 0.84 : double ? H * 0.32 : H * 0.16;
     const dir = reverse ? -1 : 1;
     const speed = num(p.speed, 1) * (fever ? 1.35 : 1);
     const pxPerBeat = H * 0.19 * speed;
@@ -178,11 +183,23 @@ export class StepChart extends CanvasLook {
     // Lane backing so the notes read over a loud stage.
     g.fillStyle = overlay ? 'rgba(4,4,14,0.4)' : 'rgba(4,4,14,0.55)';
     g.fillRect(fx - lane * 0.12, 0, fieldW + lane * 0.24, overlay ? H * 0.74 : H);
+    // Fever: the lane edges glow in rainbow light.
+    if (fever) {
+      const edge = g.createLinearGradient(0, 0, 0, H);
+      for (let k = 0; k <= 5; k++) edge.addColorStop(k / 5, hsl(this.bgHue * 5 + k * 60, 100, 60));
+      g.save();
+      g.shadowColor = hsl(this.bgHue * 5, 100, 60);
+      g.shadowBlur = lane * 0.3;
+      g.fillStyle = edge;
+      g.fillRect(fx - lane * 0.14, 0, Math.max(3, lane * 0.04), overlay ? H * 0.74 : H);
+      g.fillRect(fx + fieldW + lane * 0.1, 0, Math.max(3, lane * 0.04), overlay ? H * 0.74 : H);
+      g.restore();
+    }
     g.fillStyle = 'rgba(255,255,255,0.05)';
     for (let i = 1; i < lanes; i++) g.fillRect(fx + lane * i + (double && i >= 4 ? lane * 0.4 : 0) - 0.5, 0, 1, overlay ? H * 0.74 : H);
 
     // Dance gauge across the top of the playfield.
-    const gaugeY = reverse ? H * 0.95 : overlay ? -H : H * 0.045;
+    const gaugeY = reverse ? H * 0.95 : overlay || double ? -H : H * 0.045;
     const fill = hasSong ? Math.min(1, 0.35 + ctx.env.energy * 0.75) : 0.2;
     g.fillStyle = 'rgba(0,0,0,0.7)';
     g.fillRect(fx, gaugeY - H * 0.014, fieldW, H * 0.028);
@@ -281,6 +298,17 @@ export class StepChart extends CanvasLook {
       grad.addColorStop(1, lo);
       g.fillStyle = n.word ? grad : 'rgba(210,214,230,0.55)';
       g.fill();
+      if (n.word) {
+        // A gloss across the top of the arrow.
+        g.save();
+        g.clip();
+        g.fillStyle = 'rgba(255,255,255,0.32)';
+        g.beginPath();
+        g.ellipse(0, -0.26, 0.42, 0.2, 0, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
+        arrowPath(g);
+      }
       g.lineJoin = 'round';
       g.lineWidth = 0.08;
       g.strokeStyle = '#0a0a16';
@@ -312,8 +340,7 @@ export class StepChart extends CanvasLook {
         g.stroke();
         g.setLineDash([]);
       }
-      const a = Math.min(1, Math.max(0, ((yAt(n.t) - recY) * dir) / (lane * 0.5)));
-      g.globalAlpha = 0.35 + 0.65 * a;
+      g.globalAlpha = 1;
       g.lineWidth = tagPx * 0.22;
       g.strokeStyle = '#05050d';
       g.strokeText(n.word, x, ty);
@@ -342,7 +369,7 @@ export class StepChart extends CanvasLook {
     const last = [...words].reverse().find((w) => w.t <= s.now);
     const jy = reverse ? H * 0.38 : H * 0.48;
     const jx = double ? W / 2 : fx + fieldW / 2;
-    if (last && s.now - last.t < 0.75) {
+    if (last && s.now - last.t < 0.8) {
       const age = s.now - last.t;
       const r = rhythmOf(s.beatAt(last.t), 0.08);
       const perfect = r === 4 || r === 8 || r === 16;
@@ -351,7 +378,7 @@ export class StepChart extends CanvasLook {
       g.translate(jx, jy);
       g.transform(1, 0, -0.18, 1, 0, 0);
       g.scale(pop, pop);
-      g.globalAlpha = age > 0.5 ? 1 - (age - 0.5) / 0.25 : 1;
+      g.globalAlpha = age > 0.4 ? Math.max(0, 1 - (age - 0.4) / 0.4) : 1;
       const jp = Math.round(lane * 0.62);
       g.font = fontCss('arcade', jp);
       g.textAlign = 'center';
@@ -410,8 +437,9 @@ export class StepChart extends CanvasLook {
     }
 
     // ---- The words you've danced, collecting into the line ----
-    if (line && s.synced) this.collected(g, W, H, s, under, fever);
-    else if (hasSong) this.banner(g, W, H, s.lines[0].text, under);
+    const place = overlay ? 'bottom' : double ? 'top' : 'side';
+    if (line && s.synced) this.collected(g, W, H, s, place, fever);
+    else if (hasSong) this.banner(g, W, H, s.lines[0].text, place);
   }
 
   /** Words sung so far in the song (the combo never breaks: you never miss a word). */
@@ -421,16 +449,17 @@ export class StepChart extends CanvasLook {
     return n + s.before;
   }
 
-  private collected(g: CanvasRenderingContext2D, W: number, H: number, s: WordStream, double: boolean, fever: boolean): void {
+  private collected(g: CanvasRenderingContext2D, W: number, H: number, s: WordStream, place: 'side' | 'top' | 'bottom', fever: boolean): void {
     const line = s.lines[s.current];
-    const x0 = double ? W * 0.1 : W * 0.58;
-    const maxW = double ? W * 0.8 : W * 0.38;
-    const px = Math.round(H * (double ? 0.05 : 0.062));
+    const side = place === 'side';
+    const x0 = side ? W * 0.58 : W * 0.08;
+    const maxW = side ? W * 0.38 : W * 0.84;
+    const px = Math.round(H * (side ? 0.064 : 0.056));
     g.font = fontCss('arcade', px);
     g.textAlign = 'left';
     g.textBaseline = 'alphabetic';
-    // Lay the line out in rows, then show the words sung so far.
-    const rows: Array<Array<{ w: StreamWord; x: number }>> = [[]];
+    // Lay the line out in centred rows.
+    const rows: Array<Array<{ w: StreamWord; x: number; width: number }>> = [[]];
     let x = 0;
     const space = px * 0.32;
     for (const w of line.words) {
@@ -439,52 +468,73 @@ export class StepChart extends CanvasLook {
         rows.push([]);
         x = 0;
       }
-      rows[rows.length - 1].push({ w, x });
+      rows[rows.length - 1].push({ w, x, width: ww });
       x += ww + space;
     }
-    const lh = px * 1.18;
-    const y0 = double ? H * 0.93 - (rows.length - 1) * lh : H * 0.5 - ((rows.length - 1) * lh) / 2;
-    // The previous line, small and dim, above.
+    const lh = px * 1.22;
+    const rowW = (r: (typeof rows)[number]): number => (r.length ? r[r.length - 1].x + r[r.length - 1].width : 0);
+    const widest = Math.max(...rows.map(rowW));
+    const y0 = place === 'top' ? H * 0.1 : place === 'bottom' ? H * 0.9 - (rows.length - 1) * lh : H * 0.5 - ((rows.length - 1) * lh) / 2;
+    const ox = (r: (typeof rows)[number]): number => (side ? x0 : x0 + (maxW - rowW(r)) / 2);
+    // A dark plate behind the line so it reads over a loud stage.
+    const plateX = side ? x0 - px * 0.45 : x0 + (maxW - widest) / 2 - px * 0.45;
+    g.fillStyle = 'rgba(5,5,14,0.72)';
+    g.beginPath();
+    g.roundRect(plateX, y0 - px * 1.05, widest + px * 0.9, rows.length * lh + px * 0.45, px * 0.25);
+    g.fill();
+    // The previous line, small, above the plate.
     const prev = s.lines[s.current - 1];
-    if (prev && !double) {
-      g.font = fontCss('arcade', Math.round(px * 0.5));
-      g.fillStyle = 'rgba(255,255,255,0.4)';
-      g.fillText(prev.text, x0, y0 - lh * 1.1, maxW);
+    if (prev && side) {
+      g.font = fontCss('arcade', Math.round(px * 0.48));
+      g.fillStyle = 'rgba(5,5,14,0.6)';
+      const pw = Math.min(maxW, g.measureText(prev.text).width);
+      g.fillRect(x0 - px * 0.3, y0 - px * 1.85, pw + px * 0.6, px * 0.66);
+      g.fillStyle = 'rgba(255,255,255,0.75)';
+      g.fillText(prev.text, x0, y0 - px * 1.35, maxW);
       g.font = fontCss('arcade', px);
     }
+    const current = [...line.words].reverse().find((w) => w.t <= s.now);
     g.lineJoin = 'round';
     rows.forEach((row, r) => {
-      for (const { w, x: wx } of row) {
+      const rx = ox(row);
+      for (const { w, x: wx, width: ww } of row) {
         const age = s.now - w.t;
+        const bx = rx + wx;
+        const by = y0 + r * lh;
         if (age < 0) {
-          g.fillStyle = 'rgba(255,255,255,0.12)';
-          g.fillText(w.text, x0 + wx, y0 + r * lh);
+          g.fillStyle = 'rgba(255,255,255,0.22)';
+          g.fillText(w.text, bx, by);
           continue;
         }
+        const isCur = w === current;
         const pop = age < 0.12 ? 1 + (1 - age / 0.12) * 0.12 : 1;
         g.save();
-        const ww = g.measureText(w.text).width;
-        g.translate(x0 + wx + ww / 2, y0 + r * lh - px * 0.35);
+        g.translate(bx + ww / 2, by - px * 0.35);
         g.scale(pop, pop);
         g.lineWidth = px * 0.16;
         g.strokeStyle = '#0a0a16';
         g.strokeText(w.text, -ww / 2, px * 0.35);
         const hue = (wordHash(w.text) % 360) + (fever ? s.now * 120 : 0);
-        g.fillStyle = age < 0.25 ? '#ffffff' : fever ? hsl(hue, 100, 70) : '#ffffff';
+        g.fillStyle = w.i === line.hero ? '#ffd23f' : fever && !isCur ? hsl(hue, 100, 72) : '#ffffff';
         g.fillText(w.text, -ww / 2, px * 0.35);
         g.restore();
+        // The word being sung: underlined in its rhythm colour.
+        if (isCur) {
+          g.fillStyle = RHYTHM_COLOR[rhythmOf(s.beatAt(w.t))][0];
+          g.fillRect(bx, by + px * 0.14, ww, Math.max(3, px * 0.09));
+        }
       }
     });
   }
 
   /** No timed lyrics: the song's name on a banner, like the song wheel. */
-  private banner(g: CanvasRenderingContext2D, W: number, H: number, title: string, double: boolean): void {
+  private banner(g: CanvasRenderingContext2D, W: number, H: number, title: string, place: 'side' | 'top' | 'bottom'): void {
     const px = Math.round(H * 0.05);
     g.font = fontCss('arcade', px);
     const tw = Math.min(W * 0.36, g.measureText(title).width);
-    const x = double ? W / 2 - tw / 2 : W * 0.6;
-    const y = double ? H * 0.9 : H * 0.5;
-    g.fillStyle = 'rgba(5,5,16,0.7)';
+    const x = place === 'side' ? W * 0.6 : W / 2 - tw / 2;
+    const y = place === 'top' ? H * 0.12 : place === 'bottom' ? H * 0.9 : H * 0.5;
+    g.fillStyle = 'rgba(5,5,16,0.75)';
     g.beginPath();
     g.roundRect(x - px * 0.6, y - px * 0.95, tw + px * 1.2, px * 1.5, px * 0.3);
     g.fill();
