@@ -118,6 +118,7 @@ try {
   check((await dbg(() => window.__BOOFVIZ_DEBUG__.show().queued?.entry.id)) === 'builtin:arcade-maze', 'key 2 queues favorite #2');
   await control.keyboard.press('Escape');
   check((await dbg(() => window.__BOOFVIZ_DEBUG__.show().queued)) === null, 'Esc cancels the queued launch');
+  await dbg(() => window.__BOOFVIZ_DEBUG__.updateSettings({ library: { shufflePool: 'favorites' } }));
   await control.keyboard.press('s');
   const shuffled = await dbg(() => window.__BOOFVIZ_DEBUG__.show().queued?.entry.id);
   check(favs.includes(shuffled), `S shuffles from the favorites (${shuffled})`);

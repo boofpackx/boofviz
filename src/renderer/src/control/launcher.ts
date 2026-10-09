@@ -190,8 +190,8 @@ function setPools(pools: PresetPool[]): void {
 export function createPool(withId?: string): PresetPool {
   const pools = useControl.getState().settings.library.pools;
   let n = pools.length + 1;
-  while (pools.some((p) => p.name === `Pool ${n}`)) n++;
-  const pool: PresetPool = { id: Math.random().toString(36).slice(2, 9), name: `Pool ${n}`, ids: withId ? [withId] : [] };
+  while (pools.some((p) => p.name === `Playlist ${n}`)) n++;
+  const pool: PresetPool = { id: Math.random().toString(36).slice(2, 9), name: `Playlist ${n}`, ids: withId ? [withId] : [] };
   setPools([...pools, pool]);
   return pool;
 }
@@ -207,7 +207,7 @@ export function renamePool(poolId: string, name: string): void {
 export function deletePool(poolId: string): void {
   const st = useControl.getState();
   setPools(st.settings.library.pools.filter((p) => p.id !== poolId));
-  if (st.settings.library.shufflePool === `pool:${poolId}`) st.update({ library: { shufflePool: 'favorites' } });
+  if (st.settings.library.shufflePool === `pool:${poolId}`) st.update({ library: { shufflePool: 'all' } });
 }
 
 // ---- Auto-play -----------------------------------------------------------------

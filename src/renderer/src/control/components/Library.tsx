@@ -45,7 +45,25 @@ export function Library() {
   const favorites = useControl((s) => s.settings.library.favorites);
   const lyricsL = useControl((s) => s.settings.lyrics);
   const pools = useControl((s) => s.settings.library.pools);
+  const [filterH, setFilterHState] = useState<number | null>(() => {
+    try {
+      const v = Number(localStorage.getItem('boofviz.libraryFilterH'));
+      return v > 0 ? v : null;
+    } catch {
+      return null;
+    }
+  });
+  const setFilterH = (v: number | null): void => {
+    setFilterHState(v);
+    try {
+      if (v === null) localStorage.removeItem('boofviz.libraryFilterH');
+      else localStorage.setItem('boofviz.libraryFilterH', String(Math.round(v)));
+    } catch {
+      // Storage unavailable: the size lasts for this session.
+    }
+  };
   const update = useControl((s) => s.update);
+  const activePlaylist = category.startsWith('pool:') ? pools.find((x) => `pool:${x.id}` === category) : undefined;
   const [renaming, setRenaming] = useState<string | null>(null);
   const { deleteUser, importFiles } = useShow.getState();
   const load = (e: PresetEntry): void => {
@@ -72,7 +90,7 @@ export function Library() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="space-y-2 border-b border-ink-700/70 p-3">
+      <div className="space-y-2 overflow-y-auto p-3" style={{ height: filterH ?? undefined, flexShrink: 0 }}>
         <Segmented
           value={tab}
           onChange={setTab}
@@ -125,12 +143,12 @@ export function Library() {
                 <button
                   key={p.id}
                   type="button"
-                  title="Pool for shuffle and auto-play (right-click to rename, delete or shuffle from it)"
+                  title="Your playlist (right-click to rename, delete or shuffle from it)"
                   onClick={() => setCategory(`pool:${p.id}`)}
                   onContextMenu={contextMenu(() => [
-                    { label: 'Shuffle and auto-play from this pool', onSelect: () => update({ library: { shufflePool: `pool:${p.id}` } }) },
+                    { label: 'Shuffle and auto-play from this playlist', onSelect: () => update({ library: { shufflePool: `pool:${p.id}` } }) },
                     { label: 'Rename', onSelect: () => setRenaming(p.id) },
-                    { label: 'Delete pool', onSelect: () => deletePool(p.id) },
+                    { label: 'Delete playlist', onSelect: () => deletePool(p.id) },
                   ])}
                   className={`rounded-full border px-2 py-0.5 text-[10px] ${category === `pool:${p.id}` ? 'border-accent-2 bg-accent-2/15 text-ink-100' : 'border-ink-600 text-ink-400 hover:text-ink-200'}`}
                 >
@@ -141,7 +159,7 @@ export function Library() {
           {tab === 'presets' && (
             <button
               type="button"
-              title="New pool for shuffle and auto-play"
+              title="New playlist of your own: right-click any look to add it"
               onClick={() => {
                 const p = createPool();
                 setCategory(`pool:${p.id}`);
@@ -149,7 +167,7 @@ export function Library() {
               }}
               className="rounded-full border border-dashed border-ink-600 px-2 py-0.5 text-[10px] text-ink-500 hover:text-ink-200"
             >
-              + Pool
+              + Playlist
             </button>
           )}
         </div>
@@ -162,8 +180,40 @@ export function Library() {
         </div>
       </div>
 
+      {/* Drag to raise or lower the line between the filters and the looks. */}
+      <div
+        role="separator"
+        aria-orientation="horizontal"
+        title="Drag to make the look list taller or shorter (double-click to reset)"
+        onDoubleClick={() => setFilterH(null)}
+        onPointerDown={(ev) => {
+          const top = (ev.currentTarget.previousElementSibling as HTMLElement).getBoundingClientRect().top;
+          const max = (ev.currentTarget.parentElement as HTMLElement).getBoundingClientRect().height - 80;
+          const move = (e: PointerEvent): void => setFilterH(Math.max(40, Math.min(max, e.clientY - top)));
+          const up = (): void => {
+            window.removeEventListener('pointermove', move);
+            window.removeEventListener('pointerup', up);
+          };
+          window.addEventListener('pointermove', move);
+          window.addEventListener('pointerup', up);
+        }}
+        className="group flex h-2 shrink-0 cursor-row-resize items-center justify-center border-y border-ink-700/70 bg-ink-850 hover:bg-ink-700"
+      >
+        <div className="h-0.5 w-8 rounded bg-ink-500 group-hover:bg-ink-300" />
+      </div>
+      {activePlaylist && (
+        <div className="flex items-center gap-2 border-b border-ink-700/70 px-3 py-1.5 text-[11px] text-ink-300">
+          <span className="min-w-0 flex-1 truncate">
+            {activePlaylist.name} · {activePlaylist.ids.length} look{activePlaylist.ids.length === 1 ? '' : 's'}
+          </span>
+          <Button tone="accent" onClick={() => update({ library: { shufflePool: `pool:${activePlaylist.id}` } })} title="Shuffle and auto-play only this playlist">
+            ▶ Play this playlist
+          </Button>
+        </div>
+      )}
+      {activePlaylist && activePlaylist.ids.length === 0 && <p className="px-3 py-2 text-[11px] text-ink-400">Empty playlist: right-click any look (in All) → Add to playlist.</p>}
       <div className="min-h-0 flex-1 overflow-y-auto p-2">
-        {entries.length === 0 && <p className="p-3 text-center text-ink-400">Nothing matches.</p>}
+        {entries.length === 0 && !activePlaylist && <p className="p-3 text-center text-ink-400">Nothing matches.</p>}
         {[...groups.entries()].map(([cat, list]) => (
           <div key={cat} className="mb-3">
             <div className="px-1 pb-1 text-[10px] font-semibold tracking-[0.14em] text-ink-400 uppercase">{cat}</div>
@@ -185,8 +235,8 @@ export function Library() {
                       { label: 'Load', onSelect: () => load(e) },
                       { label: 'Load now (skip quantize)', onSelect: () => launchQuantized(e, 'now') },
                       { label: favorites.includes(e.id) ? 'Remove from favorites' : 'Add to favorites', onSelect: () => toggleFavorite(e.id) },
-                      ...pools.map((pl) => ({ label: pl.ids.includes(e.id) ? `Remove from pool "${pl.name}"` : `Add to pool "${pl.name}"`, onSelect: () => togglePoolMember(pl.id, e.id) })),
-                      { label: 'New pool with this look', onSelect: () => setRenaming(createPool(e.id).id) },
+                      ...pools.map((pl) => ({ label: pl.ids.includes(e.id) ? `Remove from playlist "${pl.name}"` : `Add to playlist "${pl.name}"`, onSelect: () => togglePoolMember(pl.id, e.id) })),
+                      { label: 'New playlist with this look', onSelect: () => setRenaming(createPool(e.id).id) },
                       ...(
                         [
                           ['theme', 'Lyrics (Everywhere): theme style'],
