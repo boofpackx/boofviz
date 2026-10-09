@@ -184,7 +184,7 @@ export const DEFAULT_SETTINGS: Settings = {
     energyMatch: true,
     order: 'random',
     noRepeat: 4,
-    shufflePool: 'favorites',
+    shufflePool: 'all',
     pools: [],
     transition: { type: 'crossfade', beats: 2 },
   },
@@ -213,8 +213,12 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
  * with the defaults). The old "lyrics over every look" switch becomes the
  * Everywhere mode; a style picked there becomes a saved treatment for all looks.
  */
-export function migrateSettings(raw: unknown): unknown {
-  if (!isPlainObject(raw) || !isPlainObject(raw.lyrics)) return raw;
+export function migrateSettings(input: unknown): unknown {
+  if (!isPlainObject(input)) return input;
+  let raw: Record<string, unknown> = input;
+  // Shuffle used to default to the favourites, so a handful of looks kept coming round: move to all looks once.
+  if (isPlainObject(raw.library) && raw.library.shufflePool === 'favorites' && !raw.library.shuffleAllOnce) raw = { ...raw, library: { ...raw.library, shufflePool: 'all', shuffleAllOnce: true } };
+  if (!isPlainObject(raw.lyrics)) return raw;
   const l = { ...raw.lyrics };
   if (l.mode === undefined && isPlainObject(l.overlay)) {
     const o = l.overlay as { enabled?: boolean; params?: ParamBag };
