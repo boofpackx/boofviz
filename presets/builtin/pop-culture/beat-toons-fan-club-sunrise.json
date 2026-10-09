@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "name": "Beat Toons: Fan Club (Pink)",
+  "category": "Pop Culture",
+  "tags": [
+    "rhythm",
+    "cartoon",
+    "toon",
+    "lyrics",
+    "words",
+    "cute",
+    "idol",
+    "fans"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#3a0a2a",
+      "#7a1a4a",
+      "#ffb03a",
+      "#9fe0ff",
+      "#ffffff"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "game",
+      "name": "Beat games",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "beatGames",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "game": "fans"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [],
+  "description": "The idol's show in a hot-pink hall."
+}

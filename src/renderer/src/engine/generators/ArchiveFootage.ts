@@ -23,7 +23,7 @@ const FILLER: Array<{ scene: string; variant: number; title: string }> = [
 ];
 
 /** Channel numbers for surfing (the collections a set of old channels would have carried). */
-export const CHANNEL_NUMBERS: Record<string, number> = { cartoons: 3, classictv: 4, commercials: 5, ephemeral: 7, newsreels: 9, space: 11, government: 13, homemovies: 22, custom: 30, myvideos: 99 };
+export const CHANNEL_NUMBERS: Record<string, number> = { cartoons: 3, classictv: 4, commercials: 5, ephemeral: 7, newsreels: 9, space: 11, government: 13, homemovies: 22, films: 24, scifi: 27, silent: 32, travel: 36, sports: 41, dance: 45, custom: 30 };
 
 const DECADES: Record<string, [number, number]> = { '30s': [1930, 1939], '40s': [1940, 1949], '50s': [1950, 1959], '60s': [1960, 1969], '70s': [1970, 1979], '80s': [1980, 1989], '90s': [1990, 1999], '00s': [2000, 2002] };
 
@@ -37,7 +37,11 @@ export function channelList(v: unknown): string[] {
 /** Which collection a slot plays: one collection, or a channel picked per slot (never the same twice running). */
 export function collectionFor(p: Record<string, unknown>, slot: number): string {
   const list = channelList(p.channels);
-  if (!list.length) return String(p.collection ?? 'ephemeral');
+  if (!list.length) {
+    // Found footage is archive footage: an old saved look set to your own videos plays home movies instead.
+    const c = String(p.collection ?? 'ephemeral');
+    return c === 'myvideos' ? 'homemovies' : c;
+  }
   const pick = (s: number): number => Math.floor(hash2(s, 4441) * list.length);
   let i = pick(slot);
   if (list.length > 1 && i === pick(slot - 1)) i = (i + 1) % list.length;

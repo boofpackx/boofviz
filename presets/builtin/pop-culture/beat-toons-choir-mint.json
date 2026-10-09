@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "name": "Beat Toons: Choir (Mint)",
+  "category": "Pop Culture",
+  "tags": [
+    "rhythm",
+    "cartoon",
+    "toon",
+    "lyrics",
+    "words",
+    "cute",
+    "choir"
+  ],
+  "energy": 3,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#10302a",
+      "#3aa58a",
+      "#ff8fb1",
+      "#8fe8c8",
+      "#ffffff"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "game",
+      "name": "Beat games",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "beatGames",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "game": "choir"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [],
+  "description": "The three singers on mint-green stripes."
+}

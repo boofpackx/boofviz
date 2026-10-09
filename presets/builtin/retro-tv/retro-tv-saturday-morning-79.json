@@ -36,7 +36,7 @@
         "kind": "archiveFootage",
         "params": {
           "collection": "ephemeral",
-          "channels": "cartoons,commercials,cartoons,classictv",
+          "channels": "cartoons,commercials,cartoons,classictv,scifi,silent",
           "decade": "any",
           "search": "",
           "yearFrom": 1930,

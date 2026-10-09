@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "name": "Beat Toons: Pot Punch (Sunset)",
+  "category": "Pop Culture",
+  "tags": [
+    "rhythm",
+    "cartoon",
+    "toon",
+    "lyrics",
+    "words",
+    "cute",
+    "karate",
+    "sunset"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#2a1020",
+      "#e8b98a",
+      "#ff5a3a",
+      "#ff9a5a",
+      "#ffe0a8"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "game",
+      "name": "Beat games",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "beatGames",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "game": "punch"
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [],
+  "description": "The karate kid punching the words at sunset: an orange sky and a warm floor."
+}

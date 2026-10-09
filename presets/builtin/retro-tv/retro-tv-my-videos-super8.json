@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "name": "My Videos on Super 8",
+  "name": "Home Movies on Super 8",
   "category": "Retro TV",
   "tags": [
     "retro tv",
@@ -30,13 +30,13 @@
   "layers": [
     {
       "id": "footage",
-      "name": "My videos",
+      "name": "Home movies",
       "enabled": true,
       "source": {
         "type": "generator",
         "kind": "archiveFootage",
         "params": {
-          "collection": "myvideos",
+          "collection": "homemovies",
           "channels": "",
           "decade": "any",
           "search": "",

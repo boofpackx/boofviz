@@ -22,6 +22,12 @@ export const ARCHIVE_COLLECTIONS: ArchiveCollection[] = [
   { id: 'space', label: 'Space age', query: '(collection:prelinger OR collection:fedflix) AND (subject:space OR subject:rocket OR subject:nasa OR title:space)', rights: 'mostly public domain' },
   { id: 'homemovies', label: 'Home movies', query: 'collection:prelinger AND (subject:"home movies" OR title:"home movie")', rights: 'mostly public domain' },
   { id: 'commercials', label: 'TV commercials', query: 'collection:classic_tv_commercials', rights: 'check rights' },
+  { id: 'films', label: 'Old feature films', query: 'collection:feature_films', rights: 'mostly public domain' },
+  { id: 'scifi', label: 'Sci-fi & monster movies', query: 'collection:feature_films AND (subject:"science fiction" OR subject:horror OR subject:monster)', rights: 'mostly public domain' },
+  { id: 'silent', label: 'Silent films', query: '(collection:feature_films OR collection:silent_films) AND subject:silent', rights: 'public domain' },
+  { id: 'travel', label: 'Travelogues', query: 'collection:prelinger AND (subject:travel OR subject:travelogue OR subject:tourism)', rights: 'mostly public domain' },
+  { id: 'sports', label: 'Sports & stunts', query: '(collection:prelinger OR collection:universal_newsreels) AND (subject:sports OR subject:racing OR subject:stunts)', rights: 'mostly public domain' },
+  { id: 'dance', label: 'Dance & music', query: 'collection:prelinger AND (subject:dance OR subject:dancing OR subject:music)', rights: 'mostly public domain' },
   { id: 'custom', label: 'My search', query: '', rights: 'check rights' },
   { id: 'myvideos', label: 'My videos folder', query: '', rights: 'check rights' },
 ];

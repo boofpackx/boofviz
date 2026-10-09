@@ -536,7 +536,7 @@ export const GENERATORS: ModuleDef[] = [
     label: 'Archive footage',
     description: 'Real old films and TV from the Internet Archive (before 2003): a random clip every few bars, downloaded once and cached, kept in step with the beat. Optional jump cuts to a new moment every few beats.',
     params: [
-      e('collection', 'Collection', 'ephemeral', ['ephemeral', 'newsreels', 'classictv', 'cartoons', 'government', 'space', 'homemovies', 'commercials', 'custom', 'myvideos'], 'myvideos: your own clips from the BOOFVIZ videos folder (Master tab)'),
+      e('collection', 'Collection', 'ephemeral', ['ephemeral', 'newsreels', 'classictv', 'cartoons', 'government', 'space', 'homemovies', 'commercials', 'films', 'scifi', 'silent', 'travel', 'sports', 'dance', 'custom'], 'archive footage only (your own videos are for the clip and music-video looks)'),
       t('channels', 'Surf channels', '', 'channel surfing: a list of collections, e.g. cartoons, classictv, commercials (empty = just the collection above)'),
       e('decade', 'Decade', 'any', ['any', '30s', '40s', '50s', '60s', '70s', '80s', '90s', '00s'], 'any = the years below'),
       t('search', 'Search words', '', 'narrow the collection, e.g. dance, cars, television (My search: any query)'),
@@ -795,7 +795,7 @@ export const GENERATORS: ModuleDef[] = [
     description: 'Footage cut to the music: a pool of old films, cartoons, TV or your own clips, cut every few beats to a new clip and moment (twice as fast after the drop), with beat-synced stutters, reverses, scratches and freezes at the ends of bars. Music video mode plays your own video for the song that is on (a file in the videos folder named like "Artist - Title"), in time with the song.',
     params: [
       e('footage', 'Footage', 'clips', ['clips', 'musicvideo'], 'musicvideo: your own video for the playing song, from the videos folder'),
-      e('collection', 'Clips from', 'ephemeral', ['ephemeral', 'newsreels', 'classictv', 'cartoons', 'government', 'space', 'homemovies', 'commercials', 'custom', 'myvideos'], 'myvideos: your own clips from the videos folder (Master tab)'),
+      e('collection', 'Clips from', 'ephemeral', ['ephemeral', 'newsreels', 'classictv', 'cartoons', 'government', 'space', 'homemovies', 'commercials', 'films', 'scifi', 'silent', 'travel', 'sports', 'dance', 'custom', 'myvideos'], 'myvideos: your own clips from the videos folder (Master tab)'),
       e('decade', 'Decade', 'any', ['any', '30s', '40s', '50s', '60s', '70s', '80s', '90s', '00s']),
       t('search', 'Search words', '', 'extra archive search words (the whole search for "custom")'),
       f('cut', 'Cut every (beats)', 1, 0.25, 8, 0.25),

@@ -1,18 +1,13 @@
 {
   "schema": 1,
-  "name": "Late Night Cable '96",
-  "category": "Retro TV",
+  "name": "Travelogue",
+  "category": "Lost Media",
   "tags": [
-    "retro tv",
-    "channel surfing",
     "archive",
-    "real footage",
-    "lyrics",
-    "words",
-    "90s",
-    "late night",
-    "black set",
-    "vhs"
+    "found footage",
+    "travel",
+    "vintage",
+    "film"
   ],
   "energy": 3,
   "palette": "Custom",
@@ -30,24 +25,23 @@
   "layers": [
     {
       "id": "footage",
-      "name": "Channels",
+      "name": "Archive footage",
       "enabled": true,
       "source": {
         "type": "generator",
         "kind": "archiveFootage",
         "params": {
-          "collection": "ephemeral",
-          "channels": "classictv,commercials,government,ephemeral,space,scifi,travel",
+          "collection": "travel",
+          "channels": "",
           "decade": "any",
-          "search": "",
-          "yearFrom": 1930,
-          "yearTo": 2002,
-          "changeBars": 4,
+          "yearFrom": 1946,
+          "yearTo": 1975,
+          "changeBars": 16,
           "jumpBeats": 0,
           "skip": 0,
           "fit": "cover",
-          "punch": 0.15,
-          "switchStatic": 1
+          "punch": 0.3,
+          "switchStatic": 0
         }
       },
       "fx": [],
@@ -56,43 +50,14 @@
       "modulators": []
     },
     {
-      "id": "tape",
-      "name": "Signal",
-      "enabled": true,
-      "source": {
-        "type": "generator",
-        "kind": "adjust",
-        "params": {}
-      },
-      "fx": [
-        {
-          "type": "tapeStack",
-          "enabled": true,
-          "params": {
-            "format": "cable",
-            "generation": 2,
-            "wear": 0.9,
-            "events": 0.15,
-            "eventList": "signal,eat,overwrite",
-            "overwrite": 0,
-            "mood": 0.5,
-            "seed": 8
-          }
-        }
-      ],
-      "blend": "normal",
-      "opacity": 1,
-      "modulators": []
-    },
-    {
       "id": "text",
-      "name": "Channel & lyrics",
+      "name": "Lyrics & labels",
       "enabled": true,
       "source": {
         "type": "generator",
         "kind": "broadcast",
         "params": {
-          "kit": "channel",
+          "kit": "tv",
           "captions": "cc",
           "lyrics": 1,
           "safe43": false,
@@ -112,8 +77,8 @@
       "modulators": []
     },
     {
-      "id": "tv",
-      "name": "Old screen",
+      "id": "age",
+      "name": "Age",
       "enabled": true,
       "source": {
         "type": "generator",
@@ -122,16 +87,17 @@
       },
       "fx": [
         {
-          "type": "tvSet",
+          "type": "tapeStack",
           "enabled": true,
           "params": {
-            "set": "screen",
-            "zoom": 0.15,
-            "fit": "crop",
-            "curve": 1,
-            "glare": 1,
-            "room": 1,
-            "powerOn": true
+            "format": "broadcast",
+            "generation": 2,
+            "wear": 0.8,
+            "events": 0.2,
+            "eventList": "signal,eat",
+            "overwrite": 0,
+            "mood": 0.3,
+            "seed": 7
           }
         }
       ],
@@ -146,7 +112,7 @@
       "value": 1,
       "targets": [
         {
-          "path": "layers.2.source.params.lyrics",
+          "path": "layers.1.source.params.lyrics",
           "range": [
             0,
             1
@@ -155,7 +121,7 @@
       ]
     },
     {
-      "name": "Next channel",
+      "name": "Next clip",
       "value": 0,
       "targets": [
         {
@@ -168,43 +134,35 @@
       ]
     },
     {
-      "name": "Glass curve",
+      "name": "Wear",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape events",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.2.fx.0.params.events",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
       "value": 0.5,
-      "targets": [
-        {
-          "path": "layers.3.fx.0.params.curve",
-          "range": [
-            0,
-            2
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Reception",
-      "value": 0.4,
-      "targets": [
-        {
-          "path": "layers.1.fx.0.params.wear",
-          "range": [
-            0,
-            2
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Surf every",
-      "value": 0.2,
-      "targets": [
-        {
-          "path": "layers.0.source.params.changeBars",
-          "range": [
-            1,
-            16
-          ]
-        }
-      ]
+      "targets": []
     },
     {
       "name": "",
@@ -224,12 +182,12 @@
   ],
   "customPalettes": {
     "Custom": [
-      "#1a0f08",
-      "#5c2a14",
-      "#d0643a",
-      "#f2b56b",
-      "#fff1d6"
+      "#020812",
+      "#0b2a4a",
+      "#2f7fbf",
+      "#9fd8ff",
+      "#f2fbff"
     ]
   },
-  "description": "3am TV: whatever the old channels are showing, taped off cable, a channel change every four bars and the lyrics as captions."
+  "description": "Faded vacation travelogues from the public archive: postcard views, boats and boardwalks, cut to the music."
 }

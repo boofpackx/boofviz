@@ -36,7 +36,7 @@
         "kind": "archiveFootage",
         "params": {
           "collection": "ephemeral",
-          "channels": "classictv,newsreels,commercials,ephemeral",
+          "channels": "classictv,newsreels,commercials,ephemeral,travel,silent,films",
           "decade": "60s",
           "search": "",
           "yearFrom": 1930,

@@ -36,7 +36,7 @@
         "kind": "archiveFootage",
         "params": {
           "collection": "ephemeral",
-          "channels": "classictv,commercials,ephemeral,newsreels,cartoons",
+          "channels": "classictv,commercials,ephemeral,newsreels,cartoons,films,sports,dance",
           "decade": "any",
           "search": "",
           "yearFrom": 1930,

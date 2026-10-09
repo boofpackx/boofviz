@@ -69,7 +69,7 @@ export class ArchiveService {
     return p;
   }
 
-  /** A clip already in the download cache, or one of the user's own (for offline and slow moments). */
+  /** A clip already in the download cache (for offline and slow moments). Never the user's own videos: found footage is archive footage. */
   private async cachedClip(slot: number): Promise<ArchiveClip | null> {
     const cached = (await fs.readdir(this.dir).catch(() => [] as string[])).filter((n) => VIDEO_EXT.test(n)).sort();
     if (cached.length) {
@@ -77,7 +77,7 @@ export class ArchiveService {
       const id = name.split('__')[0];
       return { id, title: id.replace(/[_-]+/g, ' ').replace(/([a-z])([A-Z0-9])/g, '$1 $2'), year: null, url: `${ARCHIVE_SCHEME}://cache/${encodeURIComponent(name)}`, duration: 0, seed: hashSlot(slot + 97) };
     }
-    return this.localClip(slot);
+    return null;
   }
 
   /** A clip from the user's videos folder: the same file for the same slot, never the same one twice running. */

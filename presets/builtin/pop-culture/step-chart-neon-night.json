@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "name": "Step Chart: Neon Night",
+  "category": "Pop Culture",
+  "tags": [
+    "dance game",
+    "arcade",
+    "rhythm game",
+    "arrows",
+    "lyrics",
+    "words",
+    "90s",
+    "y2k",
+    "neon"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "customPalettes": {
+    "Custom": [
+      "#020210",
+      "#0a3a2a",
+      "#3aff9a",
+      "#8a3aff",
+      "#e8fff2"
+    ]
+  },
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "chart",
+      "name": "Step chart",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "stepChart",
+        "params": {
+          "source": "lyrics",
+          "text": "",
+          "lineBeats": 8,
+          "variant": "single",
+          "speed": 1.15
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [],
+  "description": "The dance chart on a dark neon stage: green and violet floor lights."
+}
