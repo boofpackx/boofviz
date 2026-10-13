@@ -76,8 +76,9 @@ void main() {
     float bottom = hasNext ? nextY - capN * 1.2 : mainY - capM * 1.15;
     vec2 c = vec2(cx, 0.5 * (top + bottom));
     vec2 half_ = vec2(0.5 * wPx + capM * 0.8, 0.5 * (top - bottom));
-    float d = sdRoundBox(p - c, half_, capM * 0.4);
-    float a = (1.0 - smoothstep(-2.0, 2.0, d)) * uBackdrop * 0.82 * max(hasMain ? uMainAlpha : 0.0, hasNext ? min(1.0, uNextAlpha * 2.0) : 0.0);
+    // A soft shadow, not a box: it fades out over most of a letter height, so no edge shows.
+    float d = sdRoundBox(p - c, half_ - capM * 0.35, capM * 0.9);
+    float a = (1.0 - smoothstep(-capM * 0.35, capM * 1.1, d)) * uBackdrop * 0.82 * max(hasMain ? uMainAlpha : 0.0, hasNext ? min(1.0, uNextAlpha * 2.0) : 0.0);
     acc = over(acc, dark, a);
   }
 
