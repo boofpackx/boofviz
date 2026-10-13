@@ -1,5 +1,5 @@
 import type { ArchiveClip, ArchiveRequest, SongRef } from './archive';
-import type { NowPlaying, SpotifyCommand, TrackLyrics } from './lyrics';
+import type { LocalProgress, LocalSong, NowPlaying, SpotifyCommand, TrackLyrics } from './lyrics';
 import type { Settings, SettingsPatch } from './settings';
 import type { GlobalControls, Scene } from './types/engine';
 
@@ -93,6 +93,9 @@ export interface BoofvizApi {
   openLyricsFolder(): Promise<void>;
   /** Attach .lrc text to the track playing now. Resolves to an error message, or null. */
   saveLyricsForCurrentTrack(lrcText: string): Promise<string | null>;
+  /** The song in BOOFVIZ's own file player (null: it stopped); it takes over now playing and lyrics. */
+  setLocalSong(song: LocalSong | null): void;
+  localProgress(p: LocalProgress): void;
   /** Archive footage: the clip for a slot (downloaded and cached by main), or null. */
   archiveClip(req: ArchiveRequest): Promise<ArchiveClip | null>;
   /** Open the folder of the user's own clips (created if missing). */
@@ -132,6 +135,8 @@ export const IPC = {
   lyrics: 'lyrics:track',
   openLyricsFolder: 'lyrics:openFolder',
   saveLyrics: 'lyrics:save',
+  localSong: 'local:song',
+  localProgress: 'local:progress',
   archiveClip: 'archive:clip',
   openVideosFolder: 'archive:openVideos',
   musicVideo: 'archive:musicVideo',

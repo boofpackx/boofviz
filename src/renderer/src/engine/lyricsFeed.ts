@@ -10,8 +10,10 @@ import { EMPTY_LYRICS, EMPTY_NOW_PLAYING, estimateLines, lineIndexAt, positionAt
 export const lyricsFeed = {
   now: { ...EMPTY_NOW_PLAYING } as NowPlaying,
   lyrics: { ...EMPTY_LYRICS } as TrackLyrics,
-  /** Settings offset (ms, positive = lyrics earlier). */
+  /** Settings offset (ms, positive = lyrics earlier), automatic timing included. */
   offsetMs: 0,
+  /** The automatic timing part of it: streamed players only (the file player's position is exact). */
+  autoDelayMs: 0,
   /** Bumped on every track / lyrics change. */
   version: 0,
 };
@@ -34,7 +36,8 @@ export function currentLines(): LyricLine[] | null {
 
 /** Song position (ms) at `epochMs`, including the settings offset and `leadMs`. */
 export function songPositionMs(epochMs: number, leadMs = 0): number {
-  return positionAt(lyricsFeed.now, epochMs) + lyricsFeed.offsetMs + leadMs;
+  const { now, offsetMs, autoDelayMs } = lyricsFeed;
+  return positionAt(now, epochMs) + offsetMs + (now.source === 'file' ? autoDelayMs : 0) + leadMs;
 }
 
 /** Current line at `epochMs` (debug hooks and the control panel's preview). */

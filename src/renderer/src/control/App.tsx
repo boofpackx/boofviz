@@ -79,7 +79,8 @@ function useBootstrap(): void {
       silent: () => (engine.builder.connected ? engine.builder.frame.silence : null),
       now: () => Date.now(),
       song: () => lyricsFeed.now,
-      enabled: () => useControl.getState().settings.lyrics.autoTiming,
+      // The file player's position is exact: nothing to measure.
+      enabled: () => useControl.getState().settings.lyrics.autoTiming && lyricsFeed.now.source !== 'file',
       report: (d) => useControl.getState().update({ lyrics: { timing: addMeasurement(useControl.getState().settings.lyrics.timing, d) } }),
     });
     const stopSpotifySync = startSpotifyAutoSync();

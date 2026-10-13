@@ -2,8 +2,8 @@ import { safeStorage, shell } from 'electron';
 import { existsSync, mkdirSync, readFileSync, rmSync, watch, writeFileSync, type FSWatcher } from 'node:fs';
 import { join } from 'node:path';
 import { IPC } from '@shared/ipc';
-import { EMPTY_LYRICS, type NowPlaying, type SpotifyCommand, type TrackLyrics } from '@shared/lyrics';
-import { LyricsService, type TrackInfo } from './lyrics';
+import { EMPTY_LYRICS, type LocalProgress, type LocalSong, type NowPlaying, type SpotifyCommand, type TrackLyrics } from '@shared/lyrics';
+import { LyricsService, lyricsFromText, type TrackInfo } from './lyrics';
 import { createMediaSource } from './smtc';
 import { SpotifyClient, type TokenStore } from './spotify';
 import { dataDir, type SettingsStore } from './settingsStore';
@@ -54,6 +54,10 @@ export class NowPlayingService {
   private readonly lyrics: LyricsService;
   private readonly lyricsDir = join(dataDir(), 'lyrics');
   private track: TrackInfo | null = null;
+  /** Spotify's (or the media session's) song, kept while a local file has the floor. */
+  private spotifyTrack: TrackInfo | null = null;
+  /** A song in BOOFVIZ's own file player: it takes over now playing and lyrics while it plays. */
+  private local: { song: LocalSong; state: NowPlaying } | null = null;
   private current: TrackLyrics = { ...EMPTY_LYRICS };
   private sentArt: string | undefined;
   private watcher: FSWatcher | null = null;
@@ -83,16 +87,20 @@ export class NowPlayingService {
         if (process.env.BOOFVIZ_OPEN_EXTERNAL === 'fetch') void fetch(url).then((r) => r.text()).catch(() => undefined);
         else await shell.openExternal(url);
       },
-      publish: (s) => this.publish(s),
+      publish: (s) => {
+        if (!this.local) this.publish(s);
+      },
       media: createMediaSource({ platform: process.platform, env: process.env, scriptPath: join(dataDir(), 'smtc.ps1'), fetch: (...a) => fetch(...a), now: () => Date.now() }),
       onTrack: (t) => {
-        this.track = t && { id: t.id, title: t.title, artists: t.artists, album: t.album, durationMs: t.durationMs };
+        this.spotifyTrack = t && { id: t.id, title: t.title, artists: t.artists, album: t.album, durationMs: t.durationMs };
+        if (this.local) return;
+        this.track = this.spotifyTrack;
         void this.loadLyrics();
       },
       onRefine: (t) => {
         // Found nothing under the media session's names: search again with Spotify's (exact length, split artists).
         if (this.track?.id !== t.id || this.current.trackId !== t.id || this.current.source !== 'none' || this.current.loading || this.current.instrumental) return;
-        this.track = { id: t.id, title: t.title, artists: t.artists, album: t.album, durationMs: t.durationMs };
+        this.track = this.spotifyTrack = { id: t.id, title: t.title, artists: t.artists, album: t.album, durationMs: t.durationMs };
         void this.loadLyrics(true);
       },
     });
@@ -152,8 +160,52 @@ export class NowPlayingService {
     const track = this.track;
     if (!track) return this.setLyrics({ ...EMPTY_LYRICS });
     this.setLyrics({ ...EMPTY_LYRICS, trackId: track.id, loading: true });
-    const result = await this.lyrics.lookup(track, fresh).catch(() => ({ ...EMPTY_LYRICS, trackId: track.id }));
+    const local = this.local?.song.id === track.id ? this.local.song : null;
+    // A local file's own lyrics come first: an .lrc beside it, then timed lyrics in its tags.
+    const sidecar = local?.path ? await this.lyrics.readLrc(track.id, local.path.replace(/\.[^.\\/]+$/, '') + '.lrc') : null;
+    const tagged = local?.lyrics ? lyricsFromText(track.id, 'file', local.lyrics) : null;
+    let result = sidecar ?? (tagged?.synced ? tagged : null) ?? (await this.lyrics.lookup(track, fresh).catch(() => ({ ...EMPTY_LYRICS, trackId: track.id })));
+    if (result.source === 'none' && !result.instrumental && tagged?.plain) result = tagged;
     if (this.track?.id === track.id) this.setLyrics(result);
+  }
+
+  /** The file player started a song (null: it stopped, so Spotify / the media session takes over again). */
+  setLocal(raw: unknown): void {
+    const song = parseLocalSong(raw);
+    if (!song) {
+      if (!this.local) return;
+      this.local = null;
+      this.publish(this.spotify.state);
+      this.track = this.spotifyTrack;
+      void this.loadLyrics();
+      return;
+    }
+    const state: NowPlaying = {
+      connected: true,
+      playing: false,
+      trackId: song.id,
+      title: song.title,
+      artists: song.artists,
+      album: song.album,
+      durationMs: song.durationMs,
+      progressMs: 0,
+      sampleEpochMs: Date.now(),
+      source: 'file',
+      player: 'BOOFVIZ',
+    };
+    this.local = { song, state };
+    this.track = { id: song.id, title: song.title, artists: song.artists, album: song.album, durationMs: song.durationMs };
+    this.publish(state);
+    void this.loadLyrics();
+  }
+
+  localProgress(raw: unknown): void {
+    if (!this.local || !raw || typeof raw !== 'object') return;
+    const p = raw as Partial<LocalProgress>;
+    const num = (v: unknown, d: number): number => (typeof v === 'number' && Number.isFinite(v) ? v : d);
+    const s = this.local.state;
+    this.local.state = { ...s, playing: p.playing === true, progressMs: Math.max(0, num(p.progressMs, s.progressMs)), durationMs: num(p.durationMs, s.durationMs), sampleEpochMs: num(p.sampleEpochMs, Date.now()) };
+    this.publish(this.local.state);
   }
 
   connect(): Promise<void> {
@@ -169,7 +221,7 @@ export class NowPlayingService {
   }
 
   snapshot(): { nowPlaying: NowPlaying; lyrics: TrackLyrics } {
-    return { nowPlaying: this.spotify.state, lyrics: this.current };
+    return { nowPlaying: this.local?.state ?? this.spotify.state, lyrics: this.current };
   }
 
   async openLyricsFolder(): Promise<void> {
@@ -193,4 +245,21 @@ export class NowPlayingService {
     this.watcher?.close();
     if (this.filesTimer) clearTimeout(this.filesTimer);
   }
+}
+
+function parseLocalSong(raw: unknown): LocalSong | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const o = raw as Record<string, unknown>;
+  const str = (v: unknown, max = 500): string => (typeof v === 'string' ? v.slice(0, max) : '');
+  const id = str(o.id, 100);
+  if (!id) return null;
+  return {
+    id,
+    path: str(o.path, 4096) || null,
+    title: str(o.title),
+    artists: Array.isArray(o.artists) ? o.artists.map((a) => str(a)).filter(Boolean).slice(0, 8) : [],
+    album: str(o.album),
+    durationMs: typeof o.durationMs === 'number' && Number.isFinite(o.durationMs) ? Math.max(0, o.durationMs) : 0,
+    lyrics: str(o.lyrics, 512 * 1024) || null,
+  };
 }

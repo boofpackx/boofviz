@@ -41,10 +41,32 @@ export interface NowPlaying {
   /** Playback position at `sampleEpochMs` (Date.now() clock). */
   progressMs: number;
   sampleEpochMs: number;
-  /** Where the song comes from: the Spotify login, or the Windows media session alone (no login). */
-  source?: 'spotify' | 'media';
+  /** Where the song comes from: the Spotify login, the Windows media session alone (no login), or BOOFVIZ's own file player. */
+  source?: 'spotify' | 'media' | 'file';
   /** The player followed through Windows ("Spotify", "Chrome", …). */
   player?: string;
+}
+
+/** A song playing in BOOFVIZ's own file player (control window → main). */
+export interface LocalSong {
+  /** Stable per file ("file-…"): keys the lyrics cache. */
+  id: string;
+  /** Where the file is on disk (an .lrc beside it is used first), or null. */
+  path: string | null;
+  title: string;
+  artists: string[];
+  album: string;
+  durationMs: number;
+  /** Lyrics stored in the file's tags (LRC or plain), or null. */
+  lyrics: string | null;
+}
+
+/** Where the file player is, as heard (control window → main, on every play, pause, seek and once a second). */
+export interface LocalProgress {
+  playing: boolean;
+  progressMs: number;
+  durationMs: number;
+  sampleEpochMs: number;
 }
 
 export type LyricsSource = 'file' | 'cache' | 'lrclib' | 'none';

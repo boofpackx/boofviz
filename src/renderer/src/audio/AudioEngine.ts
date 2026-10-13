@@ -110,7 +110,7 @@ export class AudioEngine {
   private pushWorkerSettings(): void {
     if (!this.analysis || !this.ctx) return;
     // A local file plays through our own output, so compensate its output latency automatically.
-    const extra = this.fileMode ? ((this.ctx.outputLatency || 0) + (this.ctx.baseLatency || 0)) * 1000 : 0;
+    const extra = this.fileMode ? this.outputLatencyMs : 0;
     this.post({ type: 'settings', analysis: this.analysis, extraLatencyMs: extra });
   }
 
@@ -258,6 +258,11 @@ export class AudioEngine {
     } catch (err) {
       this.setStatus({ state: 'error', label: file.name, message: (err as Error).message, hint: 'device' });
     }
+  }
+
+  /** How long the speakers lag what the file player plays (ms). */
+  get outputLatencyMs(): number {
+    return this.ctx ? ((this.ctx.outputLatency || 0) + (this.ctx.baseLatency || 0)) * 1000 : 0;
   }
 
   get filePlayer(): HTMLAudioElement | null {

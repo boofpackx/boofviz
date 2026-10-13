@@ -8,7 +8,7 @@ import { ThreeRenderer } from '@/engine/three/ThreeRenderer';
 import { RenderLoop } from '@/engine/RenderLoop';
 import { connectLyricsFeed, liveText, lyricAt, lyricsFeed, type TextSource } from '@/engine/lyricsFeed';
 import type { Settings } from '@shared/settings';
-import { lyricsOffsetMs } from '@shared/settings';
+import { autoDelayMs, lyricsOffsetMs } from '@shared/settings';
 import type { Scene } from '@shared/types/engine';
 
 const api = window.boofviz;
@@ -43,6 +43,7 @@ const overlayLead = (): number => {
 };
 const applyLyricsSettings = (s: Settings): void => {
   lyricsFeed.offsetMs = lyricsOffsetMs(s.lyrics);
+  lyricsFeed.autoDelayMs = autoDelayMs(s.lyrics);
   renderer?.setLostMedia(s.lostMedia);
   renderer?.setRetroTv(s.retroTv);
   renderer?.setNeoFlat(s.neoFlat);

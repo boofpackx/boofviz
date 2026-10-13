@@ -96,7 +96,12 @@ export function measuredDelayMs(timing: readonly number[]): number {
 
 /** The lyrics offset both windows use: the slider, plus the measured delay when automatic timing is on. */
 export function lyricsOffsetMs(l: Pick<LyricsSettings, 'offsetMs' | 'autoTiming' | 'timing'>): number {
-  return l.offsetMs - (l.autoTiming ? measuredDelayMs(l.timing ?? []) : 0);
+  return l.offsetMs - autoDelayMs(l);
+}
+
+/** The automatic timing correction alone (ms the music is heard after the player says). */
+export function autoDelayMs(l: Pick<LyricsSettings, 'autoTiming' | 'timing'>): number {
+  return l.autoTiming ? measuredDelayMs(l.timing ?? []) : 0;
 }
 
 /** "Make it lost media": ages whatever look is playing (tape, film or early web video). */

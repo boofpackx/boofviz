@@ -7,6 +7,7 @@ import { useTicker } from '../hooks';
 import { Button, Section, Slider, Toggle } from './ui';
 import { ModeSection, StyleSection, ThemesSection, ThisLookSection } from './LyricStyles';
 import { currentRouted } from '../lyricsMode';
+import { engine } from '../runtime';
 
 const fmt = (ms: number): string => {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -74,8 +75,19 @@ function SpotifySection() {
   };
   const windows = window.boofviz.platform === 'win32';
   // Following the player through Windows alone (no login) counts as connected, but isn't a Spotify login.
-  const loggedIn = np.connected && np.source !== 'media';
-  const status = loggedIn ? 'Logged in to Spotify' : np.connecting ? 'Waiting for the browser login…' : np.connected ? `Following ${np.player || 'your player'}` : windows ? 'Waiting for music' : 'Not connected';
+  const loggedIn = np.connected && np.source !== 'media' && np.source !== 'file';
+  const status =
+    np.source === 'file'
+      ? 'Playing your file'
+      : loggedIn
+        ? 'Logged in to Spotify'
+        : np.connecting
+          ? 'Waiting for the browser login…'
+          : np.connected
+            ? `Following ${np.player || 'your player'}`
+            : windows
+              ? 'Waiting for music'
+              : 'Not connected';
 
   const login = (
     <>
@@ -151,7 +163,14 @@ function NowPlayingSection() {
   const [err, setErr] = useState<string | null>(null);
   if (!np.connected) return null;
   const pos = positionAt(np, Date.now());
+  const file = np.source === 'file';
   const send = (cmd: SpotifyCommand): void => {
+    // BOOFVIZ's own file player is right here.
+    if (file) {
+      if (cmd === 'play') void engine.filePlayer?.play();
+      else if (cmd === 'pause') engine.filePlayer?.pause();
+      return;
+    }
     void window.boofviz.spotifyControl(cmd).then(setErr);
   };
   return (
@@ -167,6 +186,7 @@ function NowPlayingSection() {
             <div className="truncate text-[11px] text-ink-400">
               {np.album}
               {np.source === 'media' && np.player ? <span className="text-ink-500">{np.album ? ' · ' : ''}via {np.player}</span> : null}
+              {file ? <span className="text-ink-500">{np.album ? ' · ' : ''}your file</span> : null}
             </div>
           </div>
         </div>
@@ -183,15 +203,19 @@ function NowPlayingSection() {
         </div>
       )}
       <div className="flex gap-1">
-        <Button className="flex-1" title="Previous track" onClick={() => send('previous')}>
-          Prev
-        </Button>
+        {!file && (
+          <Button className="flex-1" title="Previous track" onClick={() => send('previous')}>
+            Prev
+          </Button>
+        )}
         <Button className="flex-1" title={np.playing ? 'Pause' : 'Resume'} onClick={() => send(np.playing ? 'pause' : 'play')}>
           {np.playing ? 'Pause' : 'Play'}
         </Button>
-        <Button className="flex-1" title="Next track" onClick={() => send('next')}>
-          Next
-        </Button>
+        {!file && (
+          <Button className="flex-1" title="Next track" onClick={() => send('next')}>
+            Next
+          </Button>
+        )}
       </div>
       {err && <p className="text-[11px] leading-snug text-warn">{err}</p>}
     </Section>

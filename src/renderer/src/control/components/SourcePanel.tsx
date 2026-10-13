@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type DragEvent } from 'react';
 import type { InputDevice } from '@/audio/AudioEngine';
 import { engine } from '../runtime';
+import { followLocalSong } from '../localSong';
 import { useControl } from '../store';
 import { useShow } from '../show';
 import { useTicker } from '../hooks';
@@ -32,6 +33,7 @@ export function useSourceActions() {
       update({ input: { kind: 'file' } });
       set({ fileName: file.name });
       await engine.loadFile(file);
+      await followLocalSong(file);
     },
     [update, set],
   );

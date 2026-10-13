@@ -58,6 +58,8 @@ function registerIpc(): void {
   ipcMain.handle(IPC.getNowPlaying, () => nowPlaying.snapshot());
   ipcMain.handle(IPC.openLyricsFolder, () => nowPlaying.openLyricsFolder());
   ipcMain.handle(IPC.saveLyrics, (_e, text: string) => nowPlaying.saveLrc(String(text)));
+  ipcMain.on(IPC.localSong, (_e, song: unknown) => nowPlaying.setLocal(song));
+  ipcMain.on(IPC.localProgress, (_e, p: unknown) => nowPlaying.localProgress(p));
   ipcMain.handle(IPC.archiveClip, (_e, req: ArchiveRequest) => archive.clip(req));
   ipcMain.handle(IPC.openVideosFolder, () => archive.openVideosFolder());
   ipcMain.handle(IPC.musicVideo, (_e, song: unknown) => {

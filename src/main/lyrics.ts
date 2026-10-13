@@ -133,7 +133,8 @@ export class LyricsService {
     return null;
   }
 
-  private async readLrc(trackId: string, path: string): Promise<TrackLyrics | null> {
+  /** An .lrc file's lyrics for a track, or null when it is missing or holds none. */
+  async readLrc(trackId: string, path: string): Promise<TrackLyrics | null> {
     try {
       const l = lyricsFromText(trackId, 'file', decodeText(await fsp.readFile(path)));
       // A file still being written (or empty) is not a match yet.

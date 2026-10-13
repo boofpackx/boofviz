@@ -1,4 +1,4 @@
-import { lyricsOffsetMs } from '@shared/settings';
+import { autoDelayMs, lyricsOffsetMs } from '@shared/settings';
 import { PORT_MESSAGE_TAG } from '@shared/ipc';
 import { archiveNow } from '@/engine/generators/ArchiveFootage';
 import { AudioEngine } from '@/audio/AudioEngine';
@@ -47,6 +47,12 @@ export function liveValue(layerId: string, path: string): number | undefined {
   lyricsOverlay: () => preview.renderer?.lyricsInfo ?? null,
   nowPlaying: () => ({ ...lyricsFeed.now, artDataUrl: lyricsFeed.now.artDataUrl ? '(data url)' : undefined }),
   trackLyrics: () => lyricsFeed.lyrics,
+  /** The file player's position (s), or null when no file is playing. */
+  filePosition: () => engine.filePlayer?.currentTime ?? null,
+  seekFile: (s: number) => {
+    if (engine.filePlayer) engine.filePlayer.currentTime = s;
+  },
+  pauseFile: () => engine.filePlayer?.pause(),
 };
 
 function overlayLead(): number {
@@ -58,6 +64,7 @@ function overlayLead(): number {
 connectLyricsFeed(window.boofviz, () => useControl.setState({ nowPlaying: lyricsFeed.now, trackLyrics: lyricsFeed.lyrics }));
 useControl.subscribe((s) => {
   lyricsFeed.offsetMs = lyricsOffsetMs(s.settings.lyrics);
+  lyricsFeed.autoDelayMs = autoDelayMs(s.settings.lyrics);
 });
 
 let ready = false;
