@@ -9,6 +9,7 @@ import { Concrete } from './Concrete';
 import { DemoParts } from './DemoParts';
 import { DeStijl } from './DeStijl';
 import { Dots } from './Dots';
+import { FretHighway } from './FretHighway';
 import type { Generator } from './Generator';
 import { GlassMeadow } from './GlassMeadow';
 import { KineticType } from './KineticType';
@@ -102,6 +103,7 @@ const FACTORIES: Record<string, () => Generator> = {
   keyframes: () => new Keyframes(),
   poured: () => new Poured(),
   beatGames: () => new BeatGames(),
+  fretHighway: () => new FretHighway(),
   clipEngine: () => new ClipEngine(),
 };
 

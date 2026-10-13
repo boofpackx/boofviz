@@ -21,7 +21,7 @@ export function liveValue(layerId: string, path: string): number | undefined {
 
 // Read-only snapshot hook for automated smoke tests.
 (window as unknown as { __BOOFVIZ_DEBUG__: unknown }).__BOOFVIZ_DEBUG__ = {
-  frame: () => ({ ...engine.builder.frame, fft: undefined, waveform: undefined, bands32: Array.from(engine.builder.frame.bands32), stereo: undefined }),
+  frame: () => ({ ...engine.builder.frame, fft: undefined, waveform: undefined, bands32: Array.from(engine.builder.frame.bands32), stereo: undefined, grid: undefined }),
   status: () => engine.status,
   packets: () => engine.builder.packetCount,
   beatAtEpoch: (ms: number) => engine.builder.beatAtEpoch(ms),

@@ -89,6 +89,33 @@ export interface AudioFrame {
   flux: number;
   drop: boolean;
   silence: boolean;
+
+  /** Onsets on the 16th-note grid, for looks that chart what's coming. */
+  grid: NoteGridState;
+}
+
+/** 16th-note slots the note grid keeps (16 bars of 4/4). A power of two: slots are ring-indexed. */
+export const GRID_SLOTS = 256;
+/** Rows of the note grid, each GRID_SLOTS bytes. */
+export const GRID_ROW = { kick: 0, snare: 1, hat: 2, tone: 3, pitch: 4, hold: 5 } as const;
+export const GRID_ROWS = 6;
+
+/**
+ * The music's onsets on the 16th-note grid of the beat clock, kept by the
+ * analysis worker for looks that chart the music ahead (see
+ * audio/tempo/noteGrid.ts). Slot s is beat s / 4.
+ */
+export interface NoteGridState {
+  /** Slot of the newest hop (still open: slots before it are final). */
+  slot: number;
+  /** Slots recorded since the grid last reset (older slots read as empty). */
+  valid: number;
+  /**
+   * GRID_ROWS × GRID_SLOTS bytes, slot s at (s & (GRID_SLOTS − 1)) in each row:
+   * kick, snare, hat and tone strength (0 = none), the tone's pitch (0..255,
+   * low to high) and how long it held (slots).
+   */
+  data: Uint8Array;
 }
 
 export interface BandSmoothing {
@@ -233,6 +260,7 @@ export interface AnalysisPacket {
   /** Effective visual delay in ms (user offset + automatic output-latency compensation). */
   latencyMs: number;
   tempo: TempoState;
+  grid: NoteGridState;
   /** Clock sync: audio-context time ↔ epoch ms, so other windows can extrapolate. */
   clock: ClockSync;
 }

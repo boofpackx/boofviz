@@ -1,6 +1,7 @@
 /// Clean output window: no UI, no cursor, no overlays. Only the rendered frame.
 import './output.css';
 import { archiveNow } from '@/engine/generators/ArchiveFootage';
+import { fretStats } from '@/engine/generators/FretHighway';
 import { PORT_MESSAGE_TAG } from '@shared/ipc';
 import { DEFAULT_GLOBALS, type GlobalControls } from '@shared/types/engine';
 import { AudioFrameBuilder } from '@/audio/frameBuilder';
@@ -20,7 +21,7 @@ let renderer: ThreeRenderer | null = null;
 
 // Read-only snapshot hook for automated smoke tests.
 (window as unknown as { __BOOFVIZ_DEBUG__: unknown }).__BOOFVIZ_DEBUG__ = {
-  frame: () => ({ ...builder.frame, fft: undefined, waveform: undefined, bands32: undefined, stereo: undefined }),
+  frame: () => ({ ...builder.frame, fft: undefined, waveform: undefined, bands32: undefined, stereo: undefined, grid: undefined }),
   packets: () => builder.packetCount,
   scene: () => scene,
   pendingBeat: () => renderer?.pendingBeat ?? null,
@@ -31,6 +32,7 @@ let renderer: ThreeRenderer | null = null;
   /** Current lyric line at an epoch time (with the overlay's lead), and what the overlay drew last frame. */
   lyricsAt: (ms: number) => lyricAt(ms, overlayLead()),
   archive: () => ({ ...archiveNow }),
+  fret: () => ({ ...fretStats }),
   lyricsOverlay: () => renderer?.lyricsInfo ?? null,
   liveText: (source: TextSource) => liveText(source, Date.now(), 150, 3, 4),
   nowPlaying: () => ({ ...lyricsFeed.now, artDataUrl: lyricsFeed.now.artDataUrl ? '(data url)' : undefined }),

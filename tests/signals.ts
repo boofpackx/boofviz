@@ -141,3 +141,66 @@ export function structuredTrack(p: { bpm: number; bars: number; phraseBars: numb
   }
   return { samples: out, barStarts, phraseStarts };
 }
+
+/**
+ * A band with a riff: kick on 1 and 3, snare on 2 and 4, 8th hats, and a
+ * plucked lead riff on the 8ths between them (a two-bar figure, so the tune
+ * repeats every two bars while the drums repeat every bar). `switchBar` swaps
+ * to a different groove and riff from that bar on.
+ */
+export function riffTrack(p: { bpm: number; bars: number; switchBar?: number; sr?: number }): { samples: Float32Array } {
+  const sr = p.sr ?? SR;
+  const beat = 60 / p.bpm;
+  const total = Math.round((p.bars * 4 * beat + 0.5) * sr);
+  const out = new Float32Array(total);
+  const rand = rng(23);
+  const add = (t0: number, len: number, fn: (t: number) => number): void => {
+    const st = Math.round(t0 * sr);
+    for (let i = 0; i < len * sr && st + i < total; i++) out[st + i] += fn(i / sr);
+  };
+  const kick = (t0: number): void => {
+    let ph = 0;
+    add(t0, 0.25, (t) => {
+      ph += (2 * Math.PI * (50 + 110 * Math.exp(-t * 30))) / sr;
+      return 0.75 * Math.sin(ph) * Math.exp(-t * 9);
+    });
+  };
+  const snare = (t0: number): void => add(t0, 0.16, (t) => (0.32 * (rand() * 2 - 1) + 0.2 * Math.sin(2 * Math.PI * 190 * t)) * Math.exp(-t * 24));
+  const hat = (t0: number): void => {
+    let prev = 0;
+    add(t0, 0.04, (t) => {
+      const x = rand() * 2 - 1;
+      const v = 0.14 * (x - prev) * Math.exp(-t * 90);
+      prev = x;
+      return v;
+    });
+  };
+  // A plucked note: a few harmonics with a fast attack and a decay.
+  const pluck = (t0: number, f: number, len: number): void =>
+    add(t0, len, (t) => {
+      const env = Math.min(1, t * 400) * Math.exp(-t * 3.5);
+      return 0.16 * env * (Math.sin(2 * Math.PI * f * t) + 0.5 * Math.sin(4 * Math.PI * f * t) + 0.25 * Math.sin(6 * Math.PI * f * t));
+    });
+  // Riff notes as [eighth in the two-bar figure, semitones above A3 (220 Hz), length in eighths].
+  const riffA: Array<[number, number, number]> = [[1, 0, 1], [3, 3, 1], [5, 7, 1], [7, 5, 2], [9, 0, 1], [11, 10, 1], [13, 12, 2], [15, 7, 1]];
+  const riffB: Array<[number, number, number]> = [[1, 12, 1], [2, 10, 1], [5, 7, 3], [9, 3, 1], [10, 5, 1], [13, 0, 3]];
+  for (let bar = 0; bar < p.bars; bar++) {
+    const tb = bar * 4 * beat;
+    const b = p.switchBar !== undefined && bar >= p.switchBar;
+    for (let k = 0; k < 4; k++) {
+      const t0 = tb + k * beat;
+      // Groove A: kick 1 & 3, snare 2 & 4. Groove B: kick on every beat and the "and" of 4, snare on 3.
+      if (!b ? k % 2 === 0 : true) kick(t0);
+      if (b && k === 3) kick(t0 + beat / 2);
+      if (!b ? k % 2 === 1 : k === 2) snare(t0);
+      hat(t0 + beat / 2);
+    }
+    const riff = b ? riffB : riffA;
+    for (const [e, semi, len] of riff) {
+      const inBar = e - (bar % 2) * 8;
+      if (inBar < 0 || inBar >= 8) continue;
+      pluck(tb + (inBar * beat) / 2, 220 * Math.pow(2, semi / 12), (len * beat) / 2);
+    }
+  }
+  return { samples: out };
+}

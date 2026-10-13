@@ -8,9 +8,12 @@ import '@fontsource/eb-garamond/700.css';
 import '@fontsource/oswald/700.css';
 import '@fontsource/pixelify-sans/700.css';
 import '@fontsource/unbounded/900.css';
+import '@fontsource/rock-salt/400.css';
+import '@fontsource/new-rocker/400.css';
+import '@fontsource/bungee/400.css';
 
 /** The faces to load before any text atlas is drawn (canvas text doesn't wait for fonts). */
-const FACES = ['900 40px Rubik', '400 40px "Russo One"', '400 40px "EB Garamond"', '700 40px "EB Garamond"', '700 40px Oswald', '700 40px "Pixelify Sans"', '900 40px Unbounded'];
+const FACES = ['900 40px Rubik', '400 40px "Russo One"', '400 40px "EB Garamond"', '700 40px "EB Garamond"', '700 40px Oswald', '700 40px "Pixelify Sans"', '900 40px Unbounded', '400 40px "Rock Salt"', '400 40px "New Rocker"', '400 40px Bungee'];
 const SAMPLE = 'AaZz09 Жж';
 
 let ready: Promise<void> | null = null;

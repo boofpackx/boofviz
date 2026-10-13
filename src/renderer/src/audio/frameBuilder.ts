@@ -1,5 +1,7 @@
 import {
   BAND_NAMES,
+  GRID_ROWS,
+  GRID_SLOTS,
   SPECTRUM_BINS,
   WAVEFORM_SIZE,
   type AnalysisPacket,
@@ -37,6 +39,7 @@ export function emptyFrame(): AudioFrame {
     flux: 0,
     drop: false,
     silence: true,
+    grid: { slot: 0, valid: 0, data: new Uint8Array(GRID_ROWS * GRID_SLOTS) },
   };
 }
 
@@ -169,6 +172,11 @@ export class AudioFrameBuilder {
     f.brightness = p.brightness;
     f.flux = p.flux;
     f.silence = p.silence;
+    if (p.grid) {
+      f.grid.slot = p.grid.slot;
+      f.grid.valid = p.grid.valid;
+      f.grid.data.set(p.grid.data);
+    }
   }
 
   /** Source vanished (worker stalled / window disconnected): fade rather than freeze. */
