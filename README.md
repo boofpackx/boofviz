@@ -41,6 +41,8 @@ Other commands:
 
 ### Building looks
 
+**The Create tab** is the easy way: start from scratch and build a visual in five steps (background, main element, words, effects, colours). Hover any card to try it in the preview (never on the screen), click to use it, open *Adjust* for the most useful sliders, and *Save to my looks* to keep it in the Library under the theme you pick. *Surprise me* rolls a random start; Ctrl+Z undoes anything. The Layers panel on the right still has every setting.
+
 * **Library (left):** search, category and tag filters. Click a preset to make it live. `Tab` / `Shift+Tab` step through the filtered list. Drop `.json` preset files anywhere on the window to import them.
 * **Layers (right):** scene palette, palette cycling (beat / bar / phrase / drop / energy) and hue rotation; up to 8 layers with blend mode, opacity and a luma or shape mask; per-layer generator parameters and FX chain (feedback trails, bloom, mirror, kaleidoscope, RGB split, gradient map, grade, vignette, grain).
 * **Right-click any parameter:** *Modulate by…* (audio bands, onsets, beat/bar/phrase waves, LFO, envelopes, random) or *Assign to macro*. Modulated sliders show a live meter of where the value actually is.

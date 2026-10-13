@@ -16,6 +16,7 @@ import { MacroStrip } from './components/MacroStrip';
 import { ContextMenuHost } from './components/ContextMenu';
 import { LyricsPanel } from './components/LyricsPanel';
 import { PerformPanel } from './components/PerformPanel';
+import { CreatePanel } from './components/CreatePanel';
 import { startMidiMap } from './midiMap';
 import { addMeasurement, startAutoTiming } from './autoTiming';
 import { lyricsFeed } from '@/engine/lyricsFeed';
@@ -228,7 +229,7 @@ function useShortcuts(): void {
   }, []);
 }
 
-type LeftTab = 'library' | 'input' | 'lyrics' | 'perform';
+type LeftTab = 'library' | 'create' | 'input' | 'lyrics' | 'perform';
 type RightTab = 'layers' | 'audio' | 'master';
 
 export function App() {
@@ -244,20 +245,21 @@ export function App() {
       {!hideUi && <TopBar />}
       <div className="flex min-h-0 flex-1">
         {!hideUi && (
-          <aside className="flex w-72 shrink-0 flex-col border-r border-ink-700 bg-ink-900">
+          <aside className={`flex ${left === 'create' ? 'w-96' : 'w-72'} shrink-0 flex-col border-r border-ink-700 bg-ink-900`}>
             <div className="border-b border-ink-700/70 p-2">
               <Segmented
                 value={left}
                 onChange={setLeft}
                 options={[
                   { value: 'library', label: 'Library' },
+                  { value: 'create', label: 'Create' },
                   { value: 'input', label: 'Input' },
                   { value: 'lyrics', label: 'Lyrics' },
                   { value: 'perform', label: 'Perform' },
                 ]}
               />
             </div>
-            <div className="min-h-0 flex-1">{left === 'library' ? <Library /> : left === 'input' ? <SourcePanel /> : left === 'lyrics' ? <LyricsPanel /> : <PerformPanel />}</div>
+            <div className="min-h-0 flex-1">{left === 'library' ? <Library /> : left === 'create' ? <CreatePanel /> : left === 'input' ? <SourcePanel /> : left === 'lyrics' ? <LyricsPanel /> : <PerformPanel />}</div>
           </aside>
         )}
         <main className="flex min-w-0 flex-1 flex-col">

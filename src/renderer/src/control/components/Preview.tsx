@@ -3,7 +3,7 @@ import { ThreeRenderer } from '@/engine/three/ThreeRenderer';
 import { RenderLoop } from '@/engine/RenderLoop';
 import { engine, preview } from '../runtime';
 import { useShow } from '../show';
-import { currentRouted, liveScene } from '../lyricsMode';
+import { currentRouted, liveScene, routed } from '../lyricsMode';
 import { useControl } from '../store';
 import { transitionFor } from '../launcher';
 import { DebugHud } from '../hud/DebugHud';
@@ -34,7 +34,10 @@ export function Preview() {
     void renderer.init(canvas, { renderScale: 1, isOutput: false }).then(() => {
       if (disposed) return;
       // The preview shows the look as the screen gets it, or with a lyric treatment being tried.
-        const scene = (): ReturnType<typeof liveScene> => currentRouted(useControl.getState().lyricTry).scene;
+        const scene = (): ReturnType<typeof liveScene> => {
+          const st = useControl.getState();
+          return st.previewDoc ? routed(st.previewDoc, useShow.getState().sourceId, st.settings.lyrics, st.lyricTry).scene : currentRouted(st.lyricTry).scene;
+        };
         renderer.setScene(scene());
       renderer.setLostMedia(useControl.getState().settings.lostMedia);
       renderer.setRetroTv(useControl.getState().settings.retroTv);
@@ -44,7 +47,7 @@ export function Preview() {
       const offOverlay = useControl.subscribe((s, prev) => {
         const a = s.settings.lyrics;
           const b = prev.settings.lyrics;
-          if (s.lyricTry !== prev.lyricTry || a.mode !== b.mode || a.allLooks !== b.allLooks || a.themes !== b.themes || a.lookChoice !== b.lookChoice || a.custom !== b.custom || a.tune !== b.tune) {
+          if (s.previewDoc !== prev.previewDoc || s.lyricTry !== prev.lyricTry || a.mode !== b.mode || a.allLooks !== b.allLooks || a.themes !== b.themes || a.lookChoice !== b.lookChoice || a.custom !== b.custom || a.tune !== b.tune) {
             renderer.setScene(scene());
             const q = useShow.getState().queued;
             if (q) renderer.setScene(liveScene(q.entry.preset, q.entry.id), q.atBeat, transitionFor(q.entry.preset));

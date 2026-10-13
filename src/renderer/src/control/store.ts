@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { DisplayInfo, LinkState, OutputStatus } from '@shared/ipc';
 import { EMPTY_LYRICS, EMPTY_NOW_PLAYING, type NowPlaying, type TrackLyrics } from '@shared/lyrics';
 import { DEFAULT_SETTINGS, mergeSettings, type Settings, type SettingsPatch } from '@shared/settings';
-import { DEFAULT_GLOBALS, type GlobalControls, type ParamBag } from '@shared/types/engine';
+import { DEFAULT_GLOBALS, type GlobalControls, type ParamBag, type Preset } from '@shared/types/engine';
 import type { EngineStatus, InputDevice } from '@/audio/AudioEngine';
 
 export interface MidiStatus {
@@ -41,6 +41,8 @@ interface ControlState {
   midiSeen: string;
   /** A lyric treatment being tried in the preview (hovered in the gallery), never on the screen. */
   lyricTry: ParamBag | null;
+  /** A change being tried in the preview (hovered in Create), never on the screen. */
+  previewDoc: Preset | null;
 
   hydrate(s: Settings): void;
   update(patch: SettingsPatch): void;
@@ -70,6 +72,7 @@ export const useControl = create<ControlState>((set, get) => ({
   midiSeen: '',
 
   lyricTry: null,
+  previewDoc: null,
 
   hydrate: (s) => set({ settings: s, loaded: true, hud: s.ui.showHud, globals: { ...s.globals, blackout: false, freeze: false, strobe: false } }),
   update: (patch) => {
