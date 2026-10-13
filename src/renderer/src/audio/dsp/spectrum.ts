@@ -130,3 +130,45 @@ export function spectralBrightness(mag: Float32Array, sampleRate: number, fftSiz
   const v = Math.log(c / 50) / Math.log(12000 / 50);
   return v < 0 ? 0 : v > 1 ? 1 : v;
 }
+
+/**
+ * How strongly the spectrum looks like a voice right now (raw, unnormalised):
+ * the best harmonic series for a pitch in the singing range (90–700 Hz, up to
+ * eight harmonics), weighted toward the 1–4 kHz presence region where a voice
+ * sits in a mix. Instruments with clear pitches score too, so callers
+ * normalise it adaptively and combine it with other hints. About 1,500
+ * multiply-adds a hop.
+ */
+export function voicePresence(mag: Float32Array, sampleRate: number, fftSize: number): number {
+  const binHz = sampleRate / fftSize;
+  const lo = Math.max(1, Math.floor(90 / binHz));
+  const top = Math.min(mag.length - 2, Math.floor(5600 / binHz));
+  let mean = 0;
+  for (let k = lo; k <= top; k++) mean += mag[k];
+  mean /= Math.max(1, top - lo + 1);
+  if (mean < EPS) return 0;
+  let best = 0;
+  for (let f0 = 90; f0 <= 700; f0 += binHz) {
+    let sum = 0;
+    let n = 0;
+    for (let h = 1; h <= 8; h++) {
+      const b = Math.round((f0 * h) / binHz);
+      if (b + 1 > top) break;
+      const peak = Math.max(mag[b - 1], mag[b], mag[b + 1]);
+      // Harmonics in the presence band count more: that is where a voice cuts through.
+      const hz = f0 * h;
+      sum += peak * (hz > 1000 && hz < 4000 ? 1.4 : 1);
+      n++;
+    }
+    if (n >= 4) best = Math.max(best, sum / n);
+  }
+  let pres = 0;
+  let all = 0;
+  for (let k = lo; k <= top; k++) {
+    const p = mag[k] * mag[k];
+    all += p;
+    if (k * binHz > 1000 && k * binHz < 4000) pres += p;
+  }
+  const presence = all > EPS ? pres / all : 0;
+  return (best / mean) * (0.5 + presence);
+}

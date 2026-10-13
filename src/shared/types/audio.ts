@@ -89,6 +89,10 @@ export interface AudioFrame {
   flux: number;
   drop: boolean;
   silence: boolean;
+  /** 0..1: someone is singing (voice detection, sharpened by the synced lyrics when known). */
+  vocals: number;
+  /** 0..1: music playing without singing. */
+  instrumental: number;
 }
 
 export interface BandSmoothing {
@@ -225,6 +229,8 @@ export interface AnalysisPacket {
   flux: number;
   drop: boolean;
   silence: boolean;
+  vocals: number;
+  instrumental: number;
   width: number;
   phase: number;
   balance: number;

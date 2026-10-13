@@ -10,7 +10,7 @@ import {
 } from '@shared/types/audio';
 import { OnsetDetector } from './onset';
 import { AttackRelease, coef, DbNormalizer } from './smoothing';
-import { BandPower, LogSpectrum, logBandEdges, namedBandEdges, spectralBrightness } from './spectrum';
+import { BandPower, LogSpectrum, logBandEdges, namedBandEdges, spectralBrightness, voicePresence } from './spectrum';
 
 /** Per-hop musical features, everything in an AnalysisPacket except tempo/clock. */
 export interface HopFeatures {
@@ -42,6 +42,10 @@ export interface HopFeatures {
   tempoOdf: number;
   /** Normalized bass level (for downbeat estimation). */
   bassLevel: number;
+  /** 0..1: someone is singing (a voice-like harmonic series in the presence band). */
+  vocals: number;
+  /** 0..1: music playing without singing. */
+  instrumental: number;
 }
 
 /**
@@ -84,6 +88,10 @@ export class AnalysisCore {
   private energyLong = 0;
   private energy = 0;
   private brightness = 0;
+  private vocalMax = 1e-3;
+  private vocalFloor = 1;
+  private vocals = 0;
+  private instrumental = 0;
 
   // Drop detection.
   private bassSlow = 0;
@@ -182,6 +190,14 @@ export class AnalysisCore {
     const bright = silent ? this.brightness : spectralBrightness(hop.mag, hop.sampleRate, FFT_SIZE);
     this.brightness += (bright - this.brightness) * coef(dt, 0.6);
 
+    // --- Vocals: a voice-like harmonic series, normalised against the track's own range ---
+    const voice = silent ? 0 : voicePresence(hop.mag, hop.sampleRate, FFT_SIZE);
+    this.vocalMax = Math.max(voice, this.vocalMax * Math.exp(-dt / 20), 1e-3);
+    this.vocalFloor = Math.min(voice || this.vocalFloor, this.vocalFloor + (voice - this.vocalFloor) * coef(dt, 12));
+    const vRange = Math.max(1e-3, this.vocalMax - this.vocalFloor);
+    const vRaw = silent ? 0 : clamp01(((voice - this.vocalFloor) / vRange - 0.3) / 0.45);
+    this.vocals += (vRaw - this.vocals) * coef(dt, vRaw > this.vocals ? 0.08 : 0.45);
+
     // --- Energy: loudness vs. the track's recent hottest level, bass presence, onset density ---
     if (!silent) {
       if (hop.lufs > this.loudRef) this.loudRef += (hop.lufs - this.loudRef) * coef(dt, 0.5);
@@ -253,6 +269,10 @@ export class AnalysisCore {
     out.inputLevelDb = hop.inputDb;
     out.tempoOdf = tempoOdf;
     out.bassLevel = bass;
+    out.vocals = clamp01(this.vocals);
+    const playing = silent ? 0 : clamp01(relLoud * 1.5);
+    this.instrumental += (playing * (1 - this.vocals) - this.instrumental) * coef(dt, 0.6);
+    out.instrumental = clamp01(this.instrumental);
     return out;
   }
 
@@ -284,6 +304,8 @@ export class AnalysisCore {
       inputLevelDb: -120,
       tempoOdf: 0,
       bassLevel: 0,
+      vocals: 0,
+      instrumental: 0,
     };
   }
 }

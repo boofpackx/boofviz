@@ -1055,6 +1055,8 @@ export const MOD_SOURCES: ModSourceOption[] = [
   { source: 'audio.energy', label: 'Energy (slow)', group: 'Audio' },
   { source: 'audio.flux', label: 'Flux', group: 'Audio' },
   { source: 'audio.brightness', label: 'Brightness', group: 'Audio' },
+  { source: 'audio.vocals', label: 'Vocals', group: 'Audio' },
+  { source: 'audio.instrumental', label: 'Instrumental', group: 'Audio' },
   { source: 'audio.onset.kick', label: 'Kick', group: 'Onset' },
   { source: 'audio.onset.snare', label: 'Snare', group: 'Onset' },
   { source: 'audio.onset.hat', label: 'Hat', group: 'Onset' },

@@ -65,6 +65,8 @@ function onHop(hop: RawHop): void {
     flux: f.flux,
     drop: f.drop,
     silence: f.silence,
+    vocals: f.vocals,
+    instrumental: f.instrumental,
     width: f.width,
     phase: f.phase,
     balance: f.balance,

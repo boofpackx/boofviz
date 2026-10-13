@@ -1,3 +1,5 @@
+import { lineIndexAt } from '@shared/lyrics';
+import { currentLines, lyricsFeed, songPositionMs } from '@/engine/lyricsFeed';
 import {
   BAND_NAMES,
   SPECTRUM_BINS,
@@ -37,6 +39,8 @@ export function emptyFrame(): AudioFrame {
     flux: 0,
     drop: false,
     silence: true,
+    vocals: 0,
+    instrumental: 0,
   };
 }
 
@@ -169,6 +173,12 @@ export class AudioFrameBuilder {
     f.brightness = p.brightness;
     f.flux = p.flux;
     f.silence = p.silence;
+    // Vocals: the voice detector, sharpened by the synced lyrics when the song has them.
+    const heard = p.vocals ?? 0;
+    const sung = sungNow();
+    f.vocals = sung === null ? heard : sung ? Math.max(heard, 0.55 + 0.45 * heard) : heard * 0.35;
+    const playing = Math.min(1, (p.instrumental ?? 0) / Math.max(0.05, 1 - heard));
+    f.instrumental = p.silence ? 0 : Math.min(1, playing * (1 - f.vocals));
   }
 
   /** Source vanished (worker stalled / window disconnected): fade rather than freeze. */
@@ -180,6 +190,8 @@ export class AudioFrameBuilder {
     f.waveform.fill(0);
     f.rms *= 0.9;
     f.peak *= 0.9;
+    f.vocals *= 0.9;
+    f.instrumental *= 0.9;
     f.silence = true;
   }
 
@@ -213,4 +225,16 @@ export class AudioFrameBuilder {
       this.lastBeatInt = beatInt;
     }
   }
+}
+
+/** Whether the synced lyrics say a line is being sung now (null: no timed lyrics for this song). */
+function sungNow(): number | null {
+  const lines = lyricsFeed.now.connected && lyricsFeed.now.playing ? currentLines() : null;
+  if (!lines?.length) return null;
+  const ms = songPositionMs(Date.now());
+  const i = lineIndexAt(lines, ms);
+  if (i < 0 || !lines[i].text.trim()) return 0;
+  const end = lines[i + 1]?.t ?? lines[i].t + 4000;
+  // The sung part of a line: most of its span, never a long instrumental tail.
+  return ms < lines[i].t + Math.min(6000, (end - lines[i].t) * 0.85) ? 1 : 0;
 }

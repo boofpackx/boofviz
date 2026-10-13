@@ -7,6 +7,7 @@ import { connectLyricsFeed, lyricAt, lyricsFeed } from '@/engine/lyricsFeed';
 import { libraryEntries, useShow } from './show';
 import { useControl } from './store';
 import { currentRouted } from './lyricsMode';
+import * as createKit from './createKit';
 
 /** Process-wide singletons for the control window (outside React's lifecycle). */
 export const engine = new AudioEngine();
@@ -34,6 +35,8 @@ export function liveValue(layerId: string, path: string): number | undefined {
     return !!e;
   },
   show: () => useShow.getState(),
+  /** The Create tab's building blocks (the thumbnail script builds its scenes with them). */
+  kit: createKit,
   settings: () => useControl.getState().settings,
   updateSettings: (patch: Parameters<ReturnType<typeof useControl.getState>['update']>[0]) => useControl.getState().update(patch),
   gpu: () => preview.renderer?.gpuInfo ?? null,

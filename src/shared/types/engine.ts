@@ -130,6 +130,8 @@ export type AudioModSource =
   | 'audio.energy'
   | 'audio.flux'
   | 'audio.brightness'
+  | 'audio.vocals'
+  | 'audio.instrumental'
   | `audio.onset.${OnsetKind | 'any'}`;
 
 export type TempoModSource = 'tempo.beat' | 'tempo.bar' | 'tempo.phrase';

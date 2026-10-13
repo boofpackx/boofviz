@@ -182,6 +182,61 @@ try {
   check(savedOk, 'Save as writes the preset JSON (with the new modulator) to the user folder');
   check((await dbg(() => window.__BOOFVIZ_DEBUG__.show().sourceId)) === 'user:smoke-test-look', 'saved preset becomes the active user preset');
 
+  // ---- Create: a look from scratch, dice, lock, Feel, music reaction ------
+
+  const docNow = () =>
+    dbg(() => {
+      const d = window.__BOOFVIZ_DEBUG__.show().doc;
+      return { kinds: d.layers.map((l) => l.source.kind), ids: d.layers.map((l) => l.id), fx: d.layers.flatMap((l) => l.fx.map((f) => f.type)), palette: d.palette, macros: d.macros, mods: d.layers.map((l) => l.modulators) };
+    });
+  const stepBox = (re) => control.locator('section').filter({ has: control.locator('h3', { hasText: re }) });
+  await control.getByRole('button', { name: 'Create', exact: true }).click();
+  await control.getByRole('button', { name: 'Start from scratch' }).click();
+  await sleep(300);
+  let c = await docNow();
+  const feelNames = (m) => m.filter((x) => ['Energy', 'Speed', 'Punch'].includes(x.name)).map((x) => x.name);
+  check(c.kinds.join() === 'background' && feelNames(c.macros).length === 3, `Start from scratch: one plain background and the Energy, Speed and Punch knobs (${c.kinds.join()} / ${feelNames(c.macros).join()})`);
+  await stepBox(/^1 · Background$/i).getByRole('button', { name: 'Synth sunset', exact: true }).click();
+  await stepBox(/^2 · Main element$/i).getByRole('button', { name: 'Spectrum bars', exact: true }).click();
+  await stepBox(/^4 · Effects$/i).getByRole('button', { name: 'Bloom', exact: true }).click();
+  await sleep(300);
+  c = await docNow();
+  check(c.kinds.join() === 'synthSunset,spectrumBars,adjust' && c.fx.join() === 'bloom', `cards build the look: background, main element, effect (${c.kinds.join()} + ${c.fx.join()})`);
+  check(c.macros.filter((m) => feelNames([m]).length).some((m) => m.targets.length > 0), 'the Feel knobs reach the new layers');
+  await stepBox(/^2 · Main element$/i).locator('select').selectOption('kick');
+  c = await docNow();
+  check(c.mods[1].some((m) => m.source === 'audio.onset.kick' && m.target === 'opacity'), 'Music: "Pulses on the kick" adds a kick modulator to the main element');
+  const energy = stepBox(/^6 · Feel$/i).locator('input[type=range]').first();
+  await energy.focus();
+  await control.keyboard.press('End');
+  await sleep(200);
+  c = await docNow();
+  check(c.macros.find((m) => m.name === 'Energy')?.value === 1, 'the Energy slider turns the Energy knob');
+  await stepBox(/^1 · Background$/i).getByTitle('Roll this step').click();
+  for (let i = 0; i < 4 && (await docNow()).kinds[0] === 'synthSunset'; i++) await stepBox(/^1 · Background$/i).getByTitle('Roll this step').click();
+  c = await docNow();
+  const rolledBg = c.kinds[0];
+  check(rolledBg !== 'synthSunset' && c.ids[0] === 'bg', `🎲 rolls the background (${rolledBg})`);
+  await stepBox(/^1 · Background$/i).getByTitle(/^Lock/).click();
+  const seen = new Set();
+  for (let i = 0; i < 4; i++) {
+    await control.getByRole('button', { name: 'Surprise me' }).click();
+    c = await docNow();
+    seen.add(`${c.kinds.slice(1).join()}|${c.palette}`);
+    if (c.kinds[0] !== rolledBg) break;
+  }
+  check(c.kinds[0] === rolledBg && seen.size > 1, `Surprise me rolls the rest and leaves the locked background (${c.kinds[0]}, ${seen.size} different looks)`);
+  // The test track is drums, bass and a pad: it should read as instrumental, not singing.
+  let voc = 0;
+  let inst = 0;
+  for (let i = 0; i < 12; i++) {
+    const fr = await dbg(() => window.__BOOFVIZ_DEBUG__.frame());
+    voc += fr.vocals / 12;
+    inst += fr.instrumental / 12;
+    await sleep(250);
+  }
+  check(voc < 0.35 && inst > 0.4, `detection hears an instrumental (vocals ${voc.toFixed(2)}, instrumental ${inst.toFixed(2)})`);
+
   await control.screenshot({ path: join(outDir, 'control.png') });
   await output.screenshot({ path: join(outDir, 'output.png') });
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(' | ')}` : ''}`);

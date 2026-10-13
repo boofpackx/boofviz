@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { BAND_NAMES, DEFAULT_ANALYSIS_SETTINGS, type BandName } from '@shared/types/audio';
 import type { LostMediaSettings, NeoFlatSettings, RetroTvSettings } from '@shared/settings';
 import { useControl } from '../store';
+import { engine } from '../runtime';
+import { useTicker } from '../hooks';
 import { Section, Segmented, Slider, Toggle } from './ui';
 
 const BAND_LABEL: Record<BandName, string> = { sub: 'Sub', bass: 'Bass', lowMid: 'Low mid', mid: 'Mid', highMid: 'High mid', presence: 'Presence', air: 'Air' };
@@ -15,6 +17,7 @@ export function AnalysisPanel() {
 
   return (
     <div className="h-full overflow-y-auto">
+      <LiveMeters />
       <Section title="Input">
         <Slider label="Gain" value={a.gainDb} min={-24} max={24} step={0.5} unit=" dB" defaultValue={d.gainDb} onChange={(v) => patch({ gainDb: v })} />
         <Slider label="Noise gate" value={a.gateDb} min={-90} max={-20} step={1} unit=" dB" defaultValue={d.gateDb} onChange={(v) => patch({ gateDb: v })} />
@@ -283,6 +286,40 @@ function NeoFlatSection() {
       />
       <Slider label="Outline" value={neo.outline} min={0} max={16} step={0.5} defaultValue={4} onChange={(v) => set({ outline: v })} />
       <Slider label="Shadow" value={neo.shadow} min={0} max={40} step={0.5} defaultValue={12} onChange={(v) => set({ shadow: v })} />
+    </Section>
+  );
+}
+
+/** What the analysis hears right now: the parts of the music looks can react to. */
+function LiveMeters() {
+  useTicker(20);
+  const f = engine.builder.frame;
+  const hit = useState<Record<string, number>>({})[0];
+  const now = performance.now();
+  for (const k of ['kick', 'snare', 'hat'] as const) if (f.onsets[k]) hit[k] = now;
+  const flash = (k: string): number => Math.max(0, 1 - (now - (hit[k] ?? 0)) / 250);
+  const rows: Array<[string, number]> = [
+    ['Kick', flash('kick')],
+    ['Snare', flash('snare')],
+    ['Hats', flash('hat')],
+    ['Bass', (f.bands.sub + f.bands.bass) / 2],
+    ['Vocals', f.vocals],
+    ['Instrumental', f.instrumental],
+    ['Energy', f.energy],
+  ];
+  return (
+    <Section title="What's playing" right={<span className="text-[10px] text-ink-400">{f.silence ? 'silence' : f.vocals > 0.5 ? 'singing' : f.instrumental > 0.4 ? 'instrumental' : 'music'}</span>}>
+      <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1">
+        {rows.map(([label, v]) => (
+          <div key={label} className="contents">
+            <span className="text-[11px] text-ink-300">{label}</span>
+            <div className="h-1.5 overflow-hidden rounded bg-ink-800">
+              <div className="h-full rounded bg-accent" style={{ width: `${Math.round(Math.min(1, Math.max(0, v)) * 100)}%` }} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="text-[10px] leading-snug text-ink-400">Detected live from the audio (no separation needed). Vocals also use the synced lyrics when the song has them. Any look can react to these: right-click a setting → Modulate by.</p>
     </Section>
   );
 }

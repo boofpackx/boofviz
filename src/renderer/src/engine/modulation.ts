@@ -113,6 +113,10 @@ export class ModulationEngine {
           return f.flux;
         case 'brightness':
           return f.brightness;
+        case 'vocals':
+          return f.vocals;
+        case 'instrumental':
+          return f.instrumental;
       }
       if (name.startsWith('onset.')) {
         // A one-frame trigger is useless as a level, so onsets become a fast decay.
