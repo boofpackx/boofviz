@@ -29,6 +29,7 @@ Other commands:
 | `npm run lyrics:smtc:e2e` | The same with a mock Windows media session (`BOOFVIZ_SMTC_URL`): hybrid mode, request counts against polling, a rate limit, Spotify closing and reopening |
 | `npm run tour` | Loads every preset and template in the running app and screenshots the output window into `test-output/tour/` (`npm run tour -- lyrics` tours only matching presets) |
 | `npm run presets:format` | Rewrites every file in `presets/` in canonical form (`presets:check` only reports) |
+| `npm run music:organize` | Sorts the music on your Desktop and in Downloads into one library BOOFVIZ reads well (see [Organizing your music](#organizing-your-music)) |
 | `npm run typecheck` | TypeScript checks for the main and renderer code |
 | `npm run dist:win` | Build a Windows installer into `release/` |
 
@@ -38,6 +39,17 @@ Other commands:
 * **Input device:** any mic, line-in, audio interface or DJ mixer USB input. For interfaces with more than 2 channels you pick the stereo pair.
 * **Virtual cable:** VB-Audio Cable, VoiceMeeter and BlackHole (macOS) are detected and badged. Use the in-app **Routing guide** to isolate the DJ software from system sounds.
 * **Local file:** drop an MP3, WAV, FLAC, M4A or Ogg anywhere on the control window. It gets lyrics like a Spotify song (see below): the song is named from its tags (or an `Artist - Title` file name), and the lyrics follow the file as it plays, pauses and seeks. The beat comes from the audio itself, as with any source.
+
+### Organizing your music
+
+`npm run music:organize` gathers downloaded music into one tidy library. It reads each file's tags, or failing those its name ("Artist - Title (Official Video) [id]" is tidied) and folder, and files it like this:
+
+* **Songs:** `Music\BOOFVIZ\Artist\Album\Artist - Title.mp3` (no album: straight under the artist; compilations under *Various Artists*). That is the name BOOFVIZ shows when you drop the song on it.
+* **Lyrics** (`.lrc`): BOOFVIZ's lyrics folder as `Artist - Title.lrc`, so they are used for that song.
+* **Music videos:** BOOFVIZ's videos folder as `Artist - Title.mp4`, so music-video mode finds them.
+* **Album covers** (`cover.jpg`, `folder.jpg`) go with their album.
+
+With no folder named it looks through your Desktop and Downloads, taking the folders with songs in them and songs or lyrics lying loose (not other videos, or code projects). Name folders to look through those instead: `npm run music:organize -- "C:\Users\me\Desktop\old music"`. It lists where every file would go and asks before doing anything. It copies by default and leaves your originals; `--move` moves them instead and removes the folders it empties. No file is ever overwritten: a second copy of a song is skipped, and a different file with the same name gets ` (2)`. Running it again only picks up what's new. Formats BOOFVIZ can't play (WMA, Opus, audio-only WebM) are listed and left where they are. `--to="<folder>"` puts the library somewhere else, and `--yes` skips the question. What went where is written to `organize-log.txt` in the library.
 
 ### Building looks
 
