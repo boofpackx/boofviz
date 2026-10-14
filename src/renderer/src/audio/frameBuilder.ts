@@ -2,6 +2,8 @@ import { lineIndexAt } from '@shared/lyrics';
 import { currentLines, lyricsFeed, songPositionMs } from '@/engine/lyricsFeed';
 import {
   BAND_NAMES,
+  GRID_ROWS,
+  GRID_SLOTS,
   SPECTRUM_BINS,
   WAVEFORM_SIZE,
   type AnalysisPacket,
@@ -41,6 +43,7 @@ export function emptyFrame(): AudioFrame {
     silence: true,
     vocals: 0,
     instrumental: 0,
+    grid: { slot: 0, valid: 0, data: new Uint8Array(GRID_ROWS * GRID_SLOTS) },
   };
 }
 
@@ -179,6 +182,11 @@ export class AudioFrameBuilder {
     f.vocals = sung === null ? heard : sung ? Math.max(heard, 0.55 + 0.45 * heard) : heard * 0.35;
     const playing = Math.min(1, (p.instrumental ?? 0) / Math.max(0.05, 1 - heard));
     f.instrumental = p.silence ? 0 : Math.min(1, playing * (1 - f.vocals));
+    if (p.grid) {
+      f.grid.slot = p.grid.slot;
+      f.grid.valid = p.grid.valid;
+      f.grid.data.set(p.grid.data);
+    }
   }
 
   /** Source vanished (worker stalled / window disconnected): fade rather than freeze. */

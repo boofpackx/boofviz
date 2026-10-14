@@ -29,6 +29,7 @@
     "music:organize": "esbuild scripts/organize-music.ts --tsconfig=tsconfig.node.json --bundle --platform=node --format=esm --log-level=warning --outfile=out/tools/organize-music.mjs && node out/tools/organize-music.mjs",
     "tour": "node scripts/preset-tour.mjs",
     "thumbs": "node scripts/make-thumbs.mjs",
+    "fret:capture": "node scripts/fret-capture.mjs",
     "archive:e2e": "node scripts/archive-e2e.mjs",
     "link:build": "node scripts/build-link.mjs"
   },
@@ -36,9 +37,12 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "@fontsource/bungee": "^5.3.0",
     "@fontsource/eb-garamond": "^5.3.0",
+    "@fontsource/new-rocker": "^5.3.0",
     "@fontsource/oswald": "^5.3.0",
     "@fontsource/pixelify-sans": "^5.3.0",
+    "@fontsource/rock-salt": "^5.3.0",
     "@fontsource/rubik": "^5.3.0",
     "@fontsource/russo-one": "^5.3.0",
     "@fontsource/unbounded": "^5.3.0",

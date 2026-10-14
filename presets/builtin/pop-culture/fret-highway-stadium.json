@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "name": "Fret Highway: Stadium",
+  "category": "Pop Culture",
+  "tags": [
+    "rhythm game",
+    "guitar game",
+    "note highway",
+    "fret",
+    "2000s",
+    "console",
+    "stadium",
+    "fireworks",
+    "crowd"
+  ],
+  "energy": 5,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "highway",
+      "name": "Fret highway",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "fretHighway",
+        "params": {
+          "venue": "stadium",
+          "difficulty": "hard",
+          "speed": 1,
+          "finish": "console",
+          "hud": true,
+          "sections": true,
+          "stage": 1,
+          "react": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Highway speed",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.6,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stage lights",
+      "value": 0.67,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stage",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Music reaction",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#02030c",
+      "#141a3a",
+      "#ff7a1a",
+      "#3aa8ff",
+      "#ffffff"
+    ]
+  },
+  "description": "The guitar game at a stadium at night: video screens with the music as LED bars, a ring-of-fire LED wall, lamps chasing round the roof arch, searchlights, camera flashes in the stands, lighters in the crowd and fireworks in star power, with the gems on the neck playing the music."
+}

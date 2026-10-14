@@ -34,7 +34,7 @@ describe('built-in presets', () => {
 
   it('keeps third-party trademarks out of everything a user sees', () => {
     // Homages are by likeness only: no brand, product, band or film names.
-    const marks = /\b(winamp|pac-?man|tetris|space invaders|the matrix|tron|mystify|dvd|daft punk|pink floyd|joy division|unknown pleasures|kraftwerk|star ?wars|stargate|stranger things|interstellar|nokia|game ?boy|atari|nintendo|sega|out ?run|tame impala|boards of canada|new order|mondrian|warhol|kusama|lichtenstein|kandinsky|albers|vasarely)\b/i;
+    const marks = /\b(winamp|pac-?man|tetris|space invaders|the matrix|tron|mystify|dvd|daft punk|pink floyd|joy division|unknown pleasures|kraftwerk|star ?wars|stargate|stranger things|interstellar|nokia|game ?boy|atari|nintendo|sega|out ?run|tame impala|boards of canada|new order|mondrian|warhol|kusama|lichtenstein|kandinsky|albers|vasarely|guitar ?hero|rock ?band|activision|harmonix|red ?octane|frets on fire)\b/i;
     const seen: string[] = [];
     for (const { preset } of all) {
       seen.push(preset.name, preset.description ?? '', ...preset.tags, preset.palette, ...Object.keys(preset.customPalettes ?? {}));

@@ -733,6 +733,21 @@ export const GENERATORS: ModuleDef[] = [
     ],
   },
   {
+    kind: 'fretHighway',
+    label: 'Fret highway',
+    description: 'The mid-2000s guitar game, played by the music: five-lane neck, chrome gems that reach the frets on the beat they are played and burst into flame, sustains that wobble, star phrases that fill the star power meter and the drop that sets it off (blue notes, double score), with the score, streak lights, multiplier and rock meter at the sides and section names as the song moves on. The notes on their way are predicted from the bars just heard (music repeats in one-, two- and four-bar loops) and the music says at the frets whether each one was right.',
+    params: [
+      e('venue', 'Venue', 'garage', ['garage', 'arena', 'neon', 'stadium'], "garage: a rehearsal room · arena: a metal stage under a horned skull · neon: an '80s club · stadium: a stadium at night"),
+      e('difficulty', 'Difficulty', 'hard', ['easy', 'medium', 'hard', 'expert'], 'how many notes: easy keeps three lanes and the beats, expert every sixteenth'),
+      f('speed', 'Highway speed', 1, 0.6, 1.6),
+      e('finish', 'Finish', 'console', ['console', 'clean'], 'console: drawn at 480 lines and scaled up, soft like the console · clean: sharp at full resolution'),
+      b('hud', 'Score and meters', true),
+      b('sections', 'Section names', true),
+      f('stage', 'Stage lights', 1, 0, 1.5),
+      f('react', 'Music reaction', 1, 0, 2),
+    ],
+  },
+  {
     kind: 'hotMetal',
     label: 'Hot metal',
     description: 'Hot-metal typesetting and letterpress: each word\'s brass matrices drop into the composing stick as it is sung, spacebands widen to justify the line, then it is cast (a hot glow, a lead slug) and struck onto cotton paper with a deep impression, squeezed ink and a touch of misregistration. The hero word prints in wood type, choruses in a second colour; the drop pulls a proof with an ink spatter.',

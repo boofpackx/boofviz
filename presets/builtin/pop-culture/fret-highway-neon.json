@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "name": "Fret Highway: Neon '80s",
+  "category": "Pop Culture",
+  "tags": [
+    "rhythm game",
+    "guitar game",
+    "note highway",
+    "fret",
+    "2000s",
+    "console",
+    "neon",
+    "80s",
+    "club",
+    "hair metal"
+  ],
+  "energy": 4,
+  "palette": "Custom",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "highway",
+      "name": "Fret highway",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "fretHighway",
+        "params": {
+          "venue": "neon",
+          "difficulty": "hard",
+          "speed": 1,
+          "finish": "console",
+          "hud": true,
+          "sections": true,
+          "stage": 1,
+          "react": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Highway speed",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.6,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stage lights",
+      "value": 0.67,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stage",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Music reaction",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Custom": [
+      "#0a0620",
+      "#3a0a5a",
+      "#ff3ab4",
+      "#38f0ff",
+      "#ffd23a"
+    ]
+  },
+  "description": "The guitar game in a neon '80s club: tubes buzz on with the beat, a mirror ball throws specks across the bricks, lasers fan out on the drop, hair-metal silhouettes over a checkerboard stage, and the gems on the neck play the music."
+}
