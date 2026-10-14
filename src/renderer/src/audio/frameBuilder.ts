@@ -126,8 +126,11 @@ export class AudioFrameBuilder {
     const due = now - Math.max(0, this.latencySec);
 
     let applied: AnalysisPacket | null = null;
+    let grid: AnalysisPacket['grid'] = undefined;
     while (this.queue.length && this.queue[0].t <= due) {
       const p = this.queue.shift()!;
+      // The grid only comes when it changed: take the newest of the packets drained.
+      if (p.grid) grid = p.grid;
       this.pendingKick ||= p.kick;
       this.pendingSnare ||= p.snare;
       this.pendingHat ||= p.hat;
@@ -137,6 +140,11 @@ export class AudioFrameBuilder {
       applied = p;
     }
     if (applied) this.apply(applied);
+    if (grid) {
+      f.grid.slot = grid.slot;
+      f.grid.valid = grid.valid;
+      f.grid.data.set(grid.data);
+    }
     else if (this.latest && epochNow() - this.lastPacketEpoch > 500) this.decayToSilence();
 
     f.onsets.kick = this.pendingKick;
@@ -172,11 +180,6 @@ export class AudioFrameBuilder {
     f.brightness = p.brightness;
     f.flux = p.flux;
     f.silence = p.silence;
-    if (p.grid) {
-      f.grid.slot = p.grid.slot;
-      f.grid.valid = p.grid.valid;
-      f.grid.data.set(p.grid.data);
-    }
   }
 
   /** Source vanished (worker stalled / window disconnected): fade rather than freeze. */

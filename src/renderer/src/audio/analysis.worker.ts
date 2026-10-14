@@ -2,7 +2,7 @@
 import { DEFAULT_ANALYSIS_SETTINGS, type AnalysisPacket, type AnalysisSettings, type ClockSync, type RawHop } from '@shared/types/audio';
 import { AnalysisCore, type HopFeatures } from './dsp/analysisCore';
 import type { TempoCommand } from './tempo/beatClock';
-import { NoteGrid } from './tempo/noteGrid';
+import { BandEngine } from './band/bandEngine';
 import { TempoPipeline } from './tempo/pipeline';
 
 export type WorkerInMessage =
@@ -19,7 +19,7 @@ let extraLatencyMs = 0;
 let core: AnalysisCore | null = null;
 let features: HopFeatures = AnalysisCore.allocFeatures();
 let tempo: TempoPipeline | null = null;
-let grid: NoteGrid | null = null;
+let band: BandEngine | null = null;
 let workletPort: MessagePort | null = null;
 let clock: ClockSync = { ctxTime: 0, epochMs: 0 };
 // Commands that arrive before the first hop (tap, external) wait for the pipeline.
@@ -36,13 +36,16 @@ function onHop(hop: RawHop): void {
     core = new AnalysisCore(hop.sampleRate);
     features = AnalysisCore.allocFeatures();
     tempo = new TempoPipeline(core.hopRate);
-    grid = new NoteGrid(core.hopRate);
+    band = new BandEngine(hop.sampleRate, core.hopRate);
     applySettings();
     for (const fn of pending.splice(0)) fn(tempo);
   }
   const f = core.process(hop, features);
   tempo!.process(f, settings);
-  grid!.process(f, hop.mag, hop.sampleRate, tempo!.state);
+  band!.process(f, hop, tempo!.state);
+  // The note grid goes out when it changed (a new slot, a note), not on every hop.
+  const grid = band!.grid.dirty ? band!.grid.state : undefined;
+  band!.grid.dirty = false;
 
   const packet: AnalysisPacket = {
     type: 'analysis',
@@ -76,7 +79,7 @@ function onHop(hop: RawHop): void {
     appliedGain: hop.appliedGain,
     latencyMs: settings.latencyMs + extraLatencyMs,
     tempo: tempo!.state,
-    grid: grid!.state,
+    grid,
     clock,
   };
   for (const port of consumers.values()) port.postMessage(packet); // structured clone (copies)
