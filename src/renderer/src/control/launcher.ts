@@ -6,7 +6,7 @@ import { liveScene } from './lyricsMode';
 import { engine } from './runtime';
 import { libraryEntries, useShow } from './show';
 import { useControl } from './store';
-import { autoInterval, nextAutoBeat, joinRound, pickNext, resolvePool, type PickContext } from './autopilot';
+import { autoInterval, nextAutoBeat, pickNext, resolvePool, type PickContext } from './autopilot';
 import { filteredEntries, libraryView } from './components/Library';
 
 /**
@@ -107,53 +107,31 @@ export function favoriteEntries(): PresetEntry[] {
 
 const recent: string[] = [];
 
-/** Play counts per look (kept between sessions) so shuffle gives every look its turn. */
-const PLAYS_KEY = 'boofviz.plays';
-const plays: Record<string, number> = (() => {
-  try {
-    const v = JSON.parse(localStorage.getItem(PLAYS_KEY) ?? '{}') as unknown;
-    return v && typeof v === 'object' ? (v as Record<string, number>) : {};
-  } catch {
-    return {};
-  }
-})();
-/** Which looks the play counts already account for (see joinRound). */
-const SEEN_KEY = 'boofviz.seenLooks';
-const seen = new Set<string>((() => {
-  try {
-    const v = JSON.parse(localStorage.getItem(SEEN_KEY) ?? '[]') as unknown;
-    return Array.isArray(v) ? (v as string[]) : [];
-  } catch {
-    return [];
-  }
-})());
-// Counts from before this record existed: everything already played counts as seen.
-if (!seen.size) for (const id of Object.keys(plays)) seen.add(id);
-let playsSaveTimer: number | undefined;
+/**
+ * Plays per look in the current shuffle round. A round belongs to one pool: it
+ * starts empty, and starts again whenever the pool changes (a different pool, a
+ * look favorited or added), so a look new to the pool never has to catch up with
+ * counts built up elsewhere and every look in the pool gets its turn.
+ */
+const plays: Record<string, number> = {};
+let roundKey = '';
 
 /** Count a look as played (shuffle, auto-play or launched by hand). */
 export function notePlayed(id: string): void {
   plays[id] = (plays[id] ?? 0) + 1;
-  seen.add(id);
-  savePlays();
 }
 
-function savePlays(): void {
-  window.clearTimeout(playsSaveTimer);
-  playsSaveTimer = window.setTimeout(() => {
-    try {
-      localStorage.setItem(SEEN_KEY, JSON.stringify([...seen]));
-      localStorage.setItem(PLAYS_KEY, JSON.stringify(plays));
-    } catch {
-      // Storage unavailable: counts still work for this session.
-    }
-  }, 2000);
+/** Start a new round when the pool is no longer the one the counts were for. */
+function syncRound(poolEntries: PresetEntry[], pool: string): void {
+  const key = `${pool}|${poolEntries.map((e) => e.id).sort().join(',')}`;
+  if (key === roundKey) return;
+  roundKey = key;
+  for (const id of Object.keys(plays)) delete plays[id];
 }
 
 function pickContext(): PickContext {
   const all = libraryEntries().presets.length ? libraryEntries().presets : BUILTIN_PRESETS;
-  if (joinRound(plays, seen, all.map((e) => e.id))) savePlays();
-  return {
+  const ctx: PickContext = {
     all,
     view: filteredEntries(libraryView.tab, libraryView.query, libraryView.category, libraryView.tag).filter((e) => !e.preset.isTemplate),
     currentId: useShow.getState().sourceId,
@@ -162,6 +140,9 @@ function pickContext(): PickContext {
     rand: Math.random(),
     plays,
   };
+  const lib = useControl.getState().settings.library;
+  syncRound(resolvePool(lib, ctx).entries, lib.shufflePool);
+  return ctx;
 }
 
 /** What the shuffle pool holds right now, for the UI. */

@@ -127,25 +127,6 @@ export function pickNext(lib: LibrarySettings, ctx: PickContext): PresetEntry | 
   return choices[choices.length - 1];
 }
 
-/**
- * Looks the app has not seen before (new in an update, or just added) join the
- * shuffle at the current round's level, not at zero: otherwise they would be the
- * only looks in the running until they caught up with everything played so far.
- * `seen` holds the ids already accounted for; it is updated in place. The first
- * run (nothing seen, nothing played) leaves every look at zero.
- */
-export function joinRound(plays: Record<string, number>, seen: Set<string>, ids: string[]): boolean {
-  const fresh = ids.filter((id) => !seen.has(id));
-  if (!fresh.length) return false;
-  const known = ids.filter((id) => seen.has(id));
-  const level = known.length ? Math.min(...known.map((id) => plays[id] ?? 0)) : 0;
-  for (const id of fresh) {
-    seen.add(id);
-    if (level > 0 && plays[id] === undefined) plays[id] = level;
-  }
-  return true;
-}
-
 /** Beats between automatic changes for the interval modes. */
 export function autoInterval(lib: Pick<LibrarySettings, 'autoMode' | 'shuffleBars' | 'autoPhrases'>, beatsPerBar: number, beatsPerPhrase: number): number {
   if (lib.autoMode === 'phrases') return Math.max(1, lib.autoPhrases) * Math.max(1, beatsPerPhrase);
