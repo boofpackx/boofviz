@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_SETTINGS, type LibrarySettings } from '@shared/settings';
 import type { PresetEntry } from '@/engine/library';
-import { autoInterval, energyTarget, nextAutoBeat, pickNext, resolvePool, type PickContext } from '@/control/autopilot';
+import { autoInterval, energyTarget, joinRound, nextAutoBeat, pickNext, resolvePool, type PickContext } from '@/control/autopilot';
 
 const entry = (id: string, category: string, energy: number): PresetEntry =>
   ({ id, source: 'builtin', preset: { name: id, category, energy, layers: [], tags: [] } }) as unknown as PresetEntry;
@@ -110,6 +110,38 @@ describe('fair shuffle', () => {
     const counts = many.map((e) => plays[e.id]);
     expect(Math.min(...counts)).toBe(10);
     expect(Math.max(...counts)).toBe(10);
+  });
+
+  it('looks added by an update join the current round instead of hogging the shuffle', () => {
+    const old = Array.from({ length: 20 }, (_, i) => entry(`o${i}`, 'Equalizers', 3));
+    const fresh = Array.from({ length: 5 }, (_, i) => entry(`n${i}`, 'Real 2000s', 3));
+    const all = [...old, ...fresh];
+    const plays: Record<string, number> = Object.fromEntries(old.map((e) => [e.id, 3]));
+    const seen = new Set(old.map((e) => e.id));
+    expect(joinRound(plays, seen, all.map((e) => e.id))).toBe(true);
+    expect(fresh.every((e) => plays[e.id] === 3 && seen.has(e.id))).toBe(true);
+    // Nothing more to join the second time.
+    expect(joinRound(plays, seen, all.map((e) => e.id))).toBe(false);
+    // The next round draws from old and new looks together.
+    const picked = new Set<string>();
+    let current: string | null = null;
+    for (let n = 0; n < 25; n++) {
+      const pick: PresetEntry = pickNext(lib({ shufflePool: 'all', noRepeat: 0, energyMatch: false }), { all, view: all, currentId: current, recent: [], energy: 0.5, rand: (n * 0.37) % 1, plays })!;
+      plays[pick.id] = (plays[pick.id] ?? 0) + 1;
+      picked.add(pick.id);
+      current = pick.id;
+    }
+    expect(picked.size).toBeGreaterThan(20);
+    expect(old.some((e) => picked.has(e.id))).toBe(true);
+  });
+
+  it('a first run leaves every look at zero', () => {
+    const ids = ['a', 'b', 'c'];
+    const plays: Record<string, number> = {};
+    const seen = new Set<string>();
+    joinRound(plays, seen, ids);
+    expect(plays).toEqual({});
+    expect(seen.size).toBe(3);
   });
 
   it('still leans toward matching energy within a round', () => {

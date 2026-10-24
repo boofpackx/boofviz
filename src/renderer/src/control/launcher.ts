@@ -6,7 +6,7 @@ import { liveScene } from './lyricsMode';
 import { engine } from './runtime';
 import { libraryEntries, useShow } from './show';
 import { useControl } from './store';
-import { autoInterval, nextAutoBeat, pickNext, resolvePool, type PickContext } from './autopilot';
+import { autoInterval, nextAutoBeat, joinRound, pickNext, resolvePool, type PickContext } from './autopilot';
 import { filteredEntries, libraryView } from './components/Library';
 
 /**
@@ -117,14 +117,32 @@ const plays: Record<string, number> = (() => {
     return {};
   }
 })();
+/** Which looks the play counts already account for (see joinRound). */
+const SEEN_KEY = 'boofviz.seenLooks';
+const seen = new Set<string>((() => {
+  try {
+    const v = JSON.parse(localStorage.getItem(SEEN_KEY) ?? '[]') as unknown;
+    return Array.isArray(v) ? (v as string[]) : [];
+  } catch {
+    return [];
+  }
+})());
+// Counts from before this record existed: everything already played counts as seen.
+if (!seen.size) for (const id of Object.keys(plays)) seen.add(id);
 let playsSaveTimer: number | undefined;
 
 /** Count a look as played (shuffle, auto-play or launched by hand). */
 export function notePlayed(id: string): void {
   plays[id] = (plays[id] ?? 0) + 1;
+  seen.add(id);
+  savePlays();
+}
+
+function savePlays(): void {
   window.clearTimeout(playsSaveTimer);
   playsSaveTimer = window.setTimeout(() => {
     try {
+      localStorage.setItem(SEEN_KEY, JSON.stringify([...seen]));
       localStorage.setItem(PLAYS_KEY, JSON.stringify(plays));
     } catch {
       // Storage unavailable: counts still work for this session.
@@ -133,8 +151,10 @@ export function notePlayed(id: string): void {
 }
 
 function pickContext(): PickContext {
+  const all = libraryEntries().presets.length ? libraryEntries().presets : BUILTIN_PRESETS;
+  if (joinRound(plays, seen, all.map((e) => e.id))) savePlays();
   return {
-    all: libraryEntries().presets.length ? libraryEntries().presets : BUILTIN_PRESETS,
+    all,
     view: filteredEntries(libraryView.tab, libraryView.query, libraryView.category, libraryView.tag).filter((e) => !e.preset.isTemplate),
     currentId: useShow.getState().sourceId,
     recent,
