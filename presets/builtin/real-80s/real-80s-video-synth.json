@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "name": "Video Synth",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "video art",
+    "feedback",
+    "psychedelic",
+    "scope",
+    "retro"
+  ],
+  "energy": 4,
+  "palette": "Video Synth",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "vsynth",
+      "name": "Video synth",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "vsynth80",
+        "params": {
+          "shape": "both",
+          "gain": 1.4,
+          "thickness": 1,
+          "zoom": 1.02,
+          "turn": 0.6,
+          "drift": 1,
+          "trail": 0.6,
+          "bands": 6,
+          "cycle": 1,
+          "mirror": "none",
+          "react": 1,
+          "lines": 360
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.25,
+            "threshold": 0.8,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "vhs",
+            "generation": 2,
+            "wear": 0.4,
+            "events": 0.04,
+            "eventList": "focus,pause",
+            "overwrite": 0,
+            "mood": 0.25,
+            "seed": 33
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Zoom",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.zoom",
+          "range": [
+            0.94,
+            1.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Turn",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.turn",
+          "range": [
+            -3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trail",
+      "value": 0.128,
+      "targets": [
+        {
+          "path": "layers.0.source.params.trail",
+          "range": [
+            0.1,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bands",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bands",
+          "range": [
+            2,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Colour steps",
+      "value": 0.125,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycle",
+          "range": [
+            0,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gain",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.0.source.params.gain",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Video Synth": [
+      "#000000",
+      "#ff2a6a",
+      "#ffd23a",
+      "#2ad0ff",
+      "#7a3aff"
+    ]
+  },
+  "bpmHint": [
+    100,
+    160
+  ],
+  "description": "An 80s video synthesizer: the waveform drawn as a ring and a line and fed back into itself, spiralling outward into tunnels of its own past, pumping on the kick, cut into flat colour bands with dark contours that step round on every beat. Recorded to tape."
+}

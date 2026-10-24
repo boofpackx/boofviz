@@ -28,7 +28,22 @@ trademark test in `tests/engine.test.ts` guards this).
   segments, amber/red tops, peak hold, mesh and filaments, and 14-segment
   text (`vfd.ts`).
 
+- **`raytrace80` Raytrace reel.** One shader, Whitted-style: ellipsoid
+  spheres (squashed on landing), a chequered floor, reflection, refraction
+  and hard shadows over up to five bounces, coarse un-smoothed pixels, a new
+  camera every phrase revealed by a scanline sweep.
+- **`dots80` Dot demo.** Point sprites shaded as balls, drawn into a
+  low-resolution target with depth and upscaled with sharp pixels; shapes
+  are functions of the dot index, morphed per dot with a stagger.
+- **`vsynth80` Video synth.** Its own feedback buffers at reduced
+  resolution: the waveform seeded as a line or ring, zoomed and turned each
+  frame, then posterised into palette bands with contour lines.
+- `vector80` also has `fractal` (ridged value-noise terrain in wireframe),
+  laser routines per phrase, and a tinted overlay multiplied over white beams.
+
 ## Looks (category Real 80s)
-Rock Field, Tube Web, Tank Sight, Trench Run, Laser Show, Tape Loading,
-Press Play on Tape, One-Line Maze, Light Synth 84, Checkered Ball,
+Rock Field, Tube Web, Tank Sight, Trench Run, Fractal Flight, Laser Show,
+Overlay Rocks, Overlay Battle, Tape Loading, Press Play on Tape, One-Line
+Maze, Raytrace Reel, Chrome Night, Glass Row, Dot Morph, Dot Tunnel,
+Light Synth 84, Checkered Ball, Video Synth, Colourizer Mirror,
 VFD Analyzer, VFD Mirror.

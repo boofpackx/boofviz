@@ -1,4 +1,6 @@
-import type * as THREE from 'three';
+import * as THREE from 'three';
+import { FULLSCREEN_VERT } from '../shaders/common';
+import { FullscreenPass } from '../three/fullscreen';
 import { StrokeBatch } from '../three/StrokeBatch';
 import { liveText, type TextSource } from '../lyricsFeed';
 import { hash01 } from '../modulation';
@@ -22,13 +24,15 @@ import { num } from './ShaderGenerator';
  *   cracks on the drop.
  * - trench: flying down a trench whose catwalks pass exactly on the beat,
  *   lasers on the kick and a target flash on the phrase.
- * - laser: a planetarium laser show. Beams fan out of the projector through
- *   the haze and sweep on the beat, a Lissajous figure is drawn from the left
- *   and right channels like the scanners did, a new colour every bar and a
- *   light tunnel on the phrase.
+ * - laser: a planetarium laser show, a new routine every phrase: a figure
+ *   drawn by the left and right channels under fanning beams, a sheet of
+ *   light rippling with the waveform, a cone of light breathing with the
+ *   bass, a spirograph, and four scanners chasing on the beat.
+ * - fractal: a low, fast flight over a glowing wireframe fractal landscape,
+ *   peaks rising with the bass and towering on the drop.
  */
 
-type Mode = 'rocks' | 'web' | 'tank' | 'trench' | 'laser';
+type Mode = 'rocks' | 'web' | 'tank' | 'trench' | 'laser' | 'fractal';
 type RGB = [number, number, number];
 
 const MAX_PTS = 24000;
@@ -50,6 +54,30 @@ interface Shot { x: number; y: number; vx: number; vy: number; life: number }
 interface Climber { lane: number; z: number; flip: number }
 
 const WHITE: RGB = [0.85, 0.9, 1];
+
+/**
+ * Tinted overlay: the home vector console drew in white and came with a
+ * coloured plastic sheet laid over the screen, so a beam took the colour of
+ * wherever it was. Multiplied over the beams.
+ */
+const OVERLAY = /* glsl */ `
+precision highp float;
+uniform vec3 uA, uB, uC;
+uniform float uMode, uAspect;
+in vec2 vUv;
+out vec4 fragColor;
+void main() {
+  vec3 c;
+  if (uMode < 1.5) {
+    float top = smoothstep(0.74, 0.76, vUv.y), bottom = 1.0 - smoothstep(0.24, 0.26, vUv.y);
+    c = mix(mix(uB, uA, top), uC, bottom);
+  } else {
+    vec2 p = (vUv - 0.5) * vec2(uAspect, 1.0);
+    c = mix(uB, uA, smoothstep(0.4, 0.42, length(p)));
+  }
+  fragColor = vec4(c, 1.0);
+}
+`;
 
 /** Tube rims: 16 lanes, closed shapes have 16 points, open ones 17. */
 function rim(shape: number, out: number[]): boolean {
@@ -110,6 +138,21 @@ function rim(shape: number, out: number[]): boolean {
 export class Vector80 implements Generator {
   readonly kind = 'vector80';
   private readonly batch = new StrokeBatch(MAX_PTS * 10);
+  private readonly overlayPass = new FullscreenPass(
+    new THREE.RawShaderMaterial({
+      glslVersion: THREE.GLSL3,
+      vertexShader: FULLSCREEN_VERT,
+      fragmentShader: OVERLAY,
+      depthTest: false,
+      depthWrite: false,
+      transparent: true,
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.DstColorFactor,
+      blendDst: THREE.ZeroFactor,
+      uniforms: { uA: { value: new THREE.Vector3() }, uB: { value: new THREE.Vector3() }, uC: { value: new THREE.Vector3() }, uMode: { value: 1 }, uAspect: { value: 16 / 9 } },
+    }),
+  );
+  private overlay = 0;
   private readonly pts = new Float32Array(MAX_PTS * 2);
   private readonly tmp = new Float32Array(8);
   private n = 0;
@@ -168,6 +211,23 @@ export class Vector80 implements Generator {
     }
     this.thick = Math.max(0.6, (this.H / 1080) * 1.6 * num(p.beam, 1));
     this.glow = num(p.glow, 1);
+    this.overlay = p.overlay === 'bands' ? 1 : p.overlay === 'centre' ? 2 : 0;
+    if (this.overlay) {
+      const ou = this.overlayPass.material.uniforms;
+      const pal = ctx.palette;
+      const fixed = String(p.color ?? 'palette') !== 'palette';
+      const set = (v: THREE.Vector3, stop: number, fb: RGB): void => {
+        const o = stop * 3;
+        const m = Math.max(pal[o], pal[o + 1], pal[o + 2], 1e-4);
+        if (fixed) v.set(fb[0], fb[1], fb[2]);
+        else v.set(pal[o] / m, pal[o + 1] / m, pal[o + 2] / m);
+      };
+      set(ou.uA.value as THREE.Vector3, 2, [1, 0.15, 0.1]);
+      set(ou.uB.value as THREE.Vector3, 1, [0.2, 0.9, 1]);
+      set(ou.uC.value as THREE.Vector3, 3, [1, 0.85, 0.15]);
+      ou.uMode.value = this.overlay;
+      ou.uAspect.value = ctx.width / Math.max(1, ctx.height);
+    }
     // A little beam jitter, the same in every window.
     const fr = Math.floor(ctx.time * 60);
     const jit = num(p.jitter, 1) * 0.0012;
@@ -177,6 +237,7 @@ export class Vector80 implements Generator {
     else if (mode === 'tank') this.tank(ctx);
     else if (mode === 'trench') this.trench(ctx);
     else if (mode === 'laser') this.laser(ctx);
+    else if (mode === 'fractal') this.fractal(ctx);
     else this.rocksGame(ctx);
     this.lastBeat = ctx.beat;
   }
@@ -243,6 +304,8 @@ export class Vector80 implements Generator {
    */
   private colour(ctx: GenContext, c: RGB, slot: number): RGB {
     const mode = String(ctx.params.color ?? 'palette');
+    // Under an overlay the console draws in white and the sheet does the colouring.
+    if (this.overlay) return [1, 1, 1];
     if (mode === 'classic') return c;
     if (mode === 'white') return WHITE;
     if (mode === 'green') return [0.25, 1, 0.35];
@@ -864,36 +927,93 @@ export class Vector80 implements Generator {
   private tunnel = -1;
 
   private laser(ctx: GenContext): void {
+    const p = ctx.params;
     const f = ctx.frame;
-    const dt = Math.min(0.05, ctx.dt) * num(ctx.params.speed, 1);
+    const dt = Math.min(0.05, ctx.dt) * num(p.speed, 1);
     const LASERS: RGB[] = [[0.1, 1, 0.15], [0.15, 0.3, 1], [1, 0.08, 0.05], [0.1, 0.9, 1], [1, 0.1, 0.9], [1, 0.75, 0.1]];
-    const bar = Math.floor(ctx.beat / (f.beatsPerBar || 4));
+    const bpb = f.beatsPerBar || 4;
+    const bar = Math.floor(ctx.beat / bpb);
     const c1 = this.colour(ctx, LASERS[bar % LASERS.length], bar);
     const c2 = this.colour(ctx, LASERS[(bar + 2) % LASERS.length], bar + 2);
-    // Beams through the haze, fanning from the projector and sweeping on the beat.
-    const beams = 12;
-    const spread = 1.1 * (0.5 + ctx.env.energy * 0.8);
-    const centre = Math.sin((ctx.beat * Math.PI) / 4) * 0.45;
-    const flash = 0.25 + ctx.env.kick * 0.6;
-    for (let k = 0; k < beams; k++) {
-      const a = Math.PI / 2 + centre + (k / (beams - 1) - 0.5) * spread;
-      const ox = 0, oy = -1.05;
-      this.line([ox, oy, ox + Math.cos(a) * 3.2, oy + Math.sin(a) * 3.2], k % 2 ? c1 : c2, flash * num(ctx.params.haze, 1), false, false);
-    }
-    // The figure: a Lissajous whose ratio changes every bar, pushed around by the stereo signal.
-    const ratios = [[1, 2], [2, 3], [3, 4], [3, 5], [4, 5], [1, 3]];
-    const [ra, rb] = ratios[bar % ratios.length];
+    const haze = num(p.haze, 1);
+    const phrase = Math.floor(ctx.beat / Math.max(4, f.beatsPerPhrase || 16));
+    const ROUTINES = ['figure', 'sheet', 'cone', 'spiro', 'scan'];
+    const fixed = String(p.routine ?? 'sequence');
+    const routine = fixed !== 'sequence' && ROUTINES.includes(fixed) ? fixed : ROUTINES[phrase % ROUTINES.length];
+    const ox = 0, oy = -1.05;
+    const beam = (x: number, y: number, c: RGB, i: number, x0 = ox, y0 = oy): void => {
+      // Extend the beam past the point so it reads as light through the room.
+      const dx = x - x0, dy = y - y0, l = Math.hypot(dx, dy) || 1;
+      this.line([x0, y0, x0 + (dx / l) * 3.4, y0 + (dy / l) * 3.4], c, i * haze, false, false);
+    };
     const L = f.stereo.left, R = f.stereo.right;
-    const n = 220;
-    const amp = 0.35 + ctx.env.bass * 0.3;
-    const phase = ctx.beat * 0.5;
-    const xy: number[] = [];
-    for (let k = 0; k <= n; k++) {
-      const t = (k / n) * Math.PI * 2;
-      const s = Math.floor((k / n) * (L.length - 1));
-      xy.push(Math.sin(ra * t + phase) * amp * 1.2 + (L[s] ?? 0) * 0.18, 0.15 + Math.sin(rb * t) * amp + (R[s] ?? 0) * 0.18);
+    const wf = f.waveform;
+    if (routine === 'figure') {
+      const beams = 12, spread = 1.1 * (0.5 + ctx.env.energy * 0.8);
+      const centre = Math.sin((ctx.beat * Math.PI) / 4) * 0.45;
+      for (let k = 0; k < beams; k++) {
+        const a = Math.PI / 2 + centre + (k / (beams - 1) - 0.5) * spread;
+        beam(ox + Math.cos(a), oy + Math.sin(a), k % 2 ? c1 : c2, 0.25 + ctx.env.kick * 0.6);
+      }
+      const ratios = [[1, 2], [2, 3], [3, 4], [3, 5], [4, 5], [1, 3]];
+      const [ra, rb] = ratios[bar % ratios.length];
+      const n = 220, amp = 0.35 + ctx.env.bass * 0.3, ph = ctx.beat * 0.5;
+      const xy: number[] = [];
+      for (let k = 0; k <= n; k++) {
+        const t = (k / n) * Math.PI * 2, s = Math.floor((k / n) * (L.length - 1));
+        xy.push(Math.sin(ra * t + ph) * amp * 1.2 + (L[s] ?? 0) * 0.18, 0.15 + Math.sin(rb * t) * amp + (R[s] ?? 0) * 0.18);
+      }
+      this.line(xy, c1, 1.1, false, false);
+    } else if (routine === 'sheet') {
+      // A sheet of light over the crowd: dozens of beams to a rippling edge.
+      const n = 48, tilt = Math.sin(ctx.beat * 0.125) * 0.25;
+      const edge: number[] = [];
+      for (let k = 0; k < n; k++) {
+        const u = k / (n - 1);
+        const x = (u * 2 - 1) * 2.2;
+        const s = Math.floor(u * (wf.length - 1));
+        const y = 0.35 + tilt * (u * 2 - 1) + (wf[s] ?? 0) * 0.3 + Math.sin(u * 9 + ctx.beat * 1.5) * 0.04;
+        edge.push(x, y);
+        this.line([ox, oy + 0.35, x, y], c1, 0.13 * haze * (1 + ctx.env.kick), false, false);
+      }
+      this.line(edge, c1, 0.9, false, false);
+    } else if (routine === 'cone') {
+      // A tunnel of light: beams to a circle that breathes with the bass.
+      const n = 40, cx = Math.sin(ctx.beat * 0.25) * 0.5, cy = 0.25 + Math.cos(ctx.beat * 0.19) * 0.2;
+      const r = 0.25 + ctx.env.bass * 0.3 + ctx.env.kick * 0.08;
+      const ring: number[] = [];
+      for (let k = 0; k < n; k++) {
+        const a = (k / n) * Math.PI * 2 + ctx.beat * 0.5;
+        const x = cx + Math.cos(a) * r * 1.2, y = cy + Math.sin(a) * r;
+        ring.push(x, y);
+        this.line([ox, oy + 0.2, x + (x - ox) * 0.6, y + (y - oy - 0.2) * 0.6], k % 2 ? c1 : c2, 0.16 * haze, false, false);
+      }
+      this.line(ring, c2, 1.1, true, false);
+    } else if (routine === 'spiro') {
+      // A spirograph whose wheel changes every bar.
+      const Rr = 5, rr = 2 + (bar % 4), d = 2.2 + Math.sin(ctx.beat * 0.25) * 1.2;
+      const n = 420, sc = 0.11 * (1 + ctx.env.bass * 0.3);
+      const xy: number[] = [];
+      const turns = rr / this.gcd(Rr, rr);
+      for (let k = 0; k <= n; k++) {
+        const t = (k / n) * Math.PI * 2 * turns + ctx.beat * 0.1;
+        xy.push(((Rr - rr) * Math.cos(t) + d * Math.cos(((Rr - rr) / rr) * t)) * sc * 1.15, 0.12 + ((Rr - rr) * Math.sin(t) - d * Math.sin(((Rr - rr) / rr) * t)) * sc);
+      }
+      this.line(xy, bar % 2 ? c1 : c2, 1, false, false);
+      for (let k = 0; k < 4; k++) beam(xy[k * 100] ?? 0, xy[k * 100 + 1] ?? 0, c1, 0.18);
+    } else {
+      // Scanners: four projectors chasing in turns on the beat.
+      const beat = Math.floor(ctx.beat), fr = ctx.beat - beat;
+      for (let pj = 0; pj < 4; pj++) {
+        const x0 = -1.2 + pj * 0.8, y0 = -1.05;
+        const dir = (beat + pj) % 2 ? 1 : -1;
+        const sweep = dir * (fr * 2 - 1) * 0.6;
+        for (let k = 0; k < 5; k++) {
+          const a = Math.PI / 2 + sweep + (k - 2) * 0.12;
+          beam(x0 + Math.cos(a), y0 + Math.sin(a), pj % 2 ? c1 : c2, 0.3 + ctx.env.kick * 0.5, x0, y0);
+        }
+      }
     }
-    this.line(xy, c1, 1.1, false, false);
     // A cone of light on each phrase: rings racing outward.
     if (f.isPhraseStart || f.drop) this.tunnel = 0;
     if (this.tunnel >= 0) {
@@ -908,6 +1028,104 @@ export class Vector80 implements Generator {
     }
     const w = this.words(ctx);
     if (w) this.text(w.toUpperCase().slice(0, 32), 0, -0.75, 0.09, c2, 1.1, 'center');
+  }
+
+  private gcd(a: number, b: number): number {
+    return b ? this.gcd(b, a % b) : a;
+  }
+
+  // ── Fractal flyover ─────────────────────────────────────────────────────
+
+  private flyZ = 0;
+  private flyDrop = -99;
+
+  /** Smooth value noise, then a ridged sum of octaves: sharp peaks like the early fractal films. */
+  private noise(x: number, z: number): number {
+    const xi = Math.floor(x), zi = Math.floor(z), fx = x - xi, fz = z - zi;
+    const sx = fx * fx * (3 - 2 * fx), sz = fz * fz * (3 - 2 * fz);
+    const h = (i: number, j: number): number => hash01(i * 73856093 + j * 19349663, 5);
+    const a = h(xi, zi), b = h(xi + 1, zi), c = h(xi, zi + 1), d = h(xi + 1, zi + 1);
+    return a + (b - a) * sx + (c - a) * sz + (a - b - c + d) * sx * sz;
+  }
+
+  private ridge(x: number, z: number): number {
+    let v = 0, amp = 0.55, fq = 0.2;
+    for (let o = 0; o < 4; o++) {
+      const n = 1 - Math.abs(this.noise(x * fq, z * fq) * 2 - 1);
+      v += n * n * amp;
+      amp *= 0.5;
+      fq *= 2.1;
+    }
+    return v;
+  }
+
+  private fractal(ctx: GenContext): void {
+    const p = ctx.params;
+    const f = ctx.frame;
+    const A = this.aspect;
+    const dt = Math.min(0.05, ctx.dt);
+    const lo = this.colour(ctx, [0.1, 0.35, 1], 1);
+    const hi = this.colour(ctx, [0.2, 1, 0.6], 2);
+    const peak = this.colour(ctx, [1, 0.95, 0.8], 3);
+    this.flyZ += dt * num(p.speed, 1) * (2.2 + ctx.env.energy * 3);
+    if (f.drop) this.flyDrop = ctx.beat;
+    const bpb = f.beatsPerBar || 4;
+    const dd = (ctx.beat - this.flyDrop) / (2 * bpb);
+    const rise = dd >= 0 && dd < 1 ? Math.sin(Math.PI * dd) : 0;
+    const amp = (1.1 + ctx.env.bass * 0.8 + rise * 1.6) * num(p.peaks, 1);
+    const cols = 40, rows = 38, step = 0.45;
+    const z0 = Math.floor(this.flyZ / step);
+    const camH = 1.35 + amp * 0.5, horizon = 0.32, focal = 1.25;
+    const roll = Math.sin(ctx.beat * 0.25) * 0.08;
+    const cr = Math.cos(roll), sr = Math.sin(roll);
+    const proj = (x: number, y: number, z: number): [number, number] => {
+      const sx0 = (x / z) * focal, sy0 = ((y - camH) / z) * focal;
+      return [sx0 * cr - sy0 * sr, horizon + sx0 * sr + sy0 * cr];
+    };
+    const height = (x: number, z: number): number => {
+      const h = this.ridge(x, z) * amp;
+      // A valley down the middle so the flight path stays clear.
+      return h * (0.35 + Math.min(1, Math.abs(x) / 2.5) * 0.65);
+    };
+    // Stars above the horizon.
+    for (let k = 0; k < 70; k++) this.dot((hash01(k, 21) * 2 - 1) * A, horizon + 0.05 + hash01(k, 22) * 0.8, [0.8, 0.85, 1], 0.4 + 0.4 * hash01(k, 23));
+    const grid: Array<Array<[number, number]>> = [];
+    const hs: number[][] = [];
+    for (let r = rows - 1; r >= 0; r--) {
+      const zw = (z0 + r) * step;
+      const zc = zw - this.flyZ + 0.6;
+      const row: Array<[number, number]> = [];
+      const hr: number[] = [];
+      for (let c = 0; c < cols; c++) {
+        const xw = (c - (cols - 1) / 2) * step * 1.1;
+        const h = height(xw, zw);
+        hr.push(h);
+        row.push(zc > 0.3 ? proj(xw, h, zc) : [NaN, NaN]);
+      }
+      grid[r] = row;
+      hs[r] = hr;
+    }
+    // Rows across, fading into the distance, coloured by how high they reach.
+    for (let r = rows - 1; r >= 0; r--) {
+      const fade = Math.min(1, (rows - r) / 14) * Math.min(1, r / 2);
+      const xy: number[] = [];
+      let top = 0;
+      for (let c = 0; c < cols; c++) {
+        if (Number.isNaN(grid[r][c][0])) continue;
+        xy.push(grid[r][c][0], grid[r][c][1]);
+        top = Math.max(top, hs[r][c]);
+      }
+      const col = top > amp * 0.75 ? peak : top > amp * 0.45 ? hi : lo;
+      this.line(xy, col, 0.85 * fade, false, false);
+    }
+    // Lines along the flight, every other column.
+    for (let c = 0; c < cols; c += 2) {
+      const xy: number[] = [];
+      for (let r = 0; r < rows; r++) if (!Number.isNaN(grid[r][c][0])) xy.push(grid[r][c][0], grid[r][c][1]);
+      this.line(xy, lo, 0.45, false, false);
+    }
+    const w = this.words(ctx);
+    if (w) this.text(w.toUpperCase().slice(0, 32), 0, 0.82, 0.06, peak, 1, 'center');
   }
 
   render(renderer: THREE.WebGLRenderer, target: THREE.WebGLRenderTarget): void {
@@ -936,13 +1154,15 @@ export class Vector80 implements Generator {
       }
     }
     b.draw(renderer, target, true);
+    if (this.overlay) this.overlayPass.render(renderer, target);
   }
 
   compileTargets(): CompileTarget[] {
-    return [this.batch.compileTarget];
+    return [this.batch.compileTarget, this.overlayPass];
   }
 
   dispose(): void {
     this.batch.dispose();
+    this.overlayPass.dispose();
   }
 }

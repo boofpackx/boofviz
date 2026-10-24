@@ -1,0 +1,196 @@
+{
+  "schema": 1,
+  "name": "Overlay Rocks",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "vector",
+    "arcade",
+    "game",
+    "overlay",
+    "retro"
+  ],
+  "energy": 3,
+  "palette": "Overlay",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "rocks",
+      "name": "Rock field",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "vector80",
+        "params": {
+          "mode": "rocks",
+          "overlay": "bands",
+          "routine": "sequence",
+          "peaks": 1,
+          "haze": 1,
+          "color": "palette",
+          "speed": 1,
+          "beam": 1.1,
+          "glow": 1,
+          "jitter": 1.2,
+          "rocks": 6,
+          "shapePhrases": 1,
+          "spikes": 1,
+          "source": "text",
+          "text": ""
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.5,
+            "zoom": 0,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.7,
+            "threshold": 0.5,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.2,
+            "scanlines": 0.25,
+            "mask": 0.3,
+            "vignette": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Beam",
+      "value": 0.231,
+      "targets": [
+        {
+          "path": "layers.0.source.params.beam",
+          "range": [
+            0.4,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Afterglow",
+      "value": 0.611,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.437,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Jitter",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.jitter",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rocks",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.rocks",
+          "range": [
+            2,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Overlay": [
+      "#000000",
+      "#30e0ff",
+      "#ff3020",
+      "#ffd820",
+      "#ffffff"
+    ]
+  },
+  "bpmHint": [
+    100,
+    150
+  ],
+  "description": "The rock field on the early-80s home vector console: white beams under a tinted plastic overlay, so the rocks turn red as they cross the top band, cyan through the middle and yellow at the bottom. Kicks split the rocks, the saucer crosses on the phrase."
+}

@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "name": "Glass Row",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "cgi",
+    "raytrace",
+    "glass",
+    "3d",
+    "pastel",
+    "retro"
+  ],
+  "energy": 2,
+  "palette": "Glass Row",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "reel",
+      "name": "Raytrace",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "raytrace80",
+        "params": {
+          "spheres": 6,
+          "layout": "row",
+          "materials": "glass",
+          "hop": 0.8,
+          "spin": 1,
+          "cutPhrases": 1,
+          "revealBeats": 1,
+          "lines": 200,
+          "check": 0.8,
+          "floorShine": 0.25,
+          "fog": 0.03,
+          "sun": 0.8
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.35,
+            "threshold": 0.9,
+            "radius": 0.5,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.2,
+            "scanlines": 0.25,
+            "mask": 0.2,
+            "vignette": 0.35
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Hop",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.hop",
+          "range": [
+            0,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spheres",
+      "value": 0.571,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spheres",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ring turn",
+      "value": 0.625,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            -4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Resolution",
+      "value": 0.182,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lines",
+          "range": [
+            90,
+            1080
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Floor shine",
+      "value": 0.278,
+      "targets": [
+        {
+          "path": "layers.0.source.params.floorShine",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sun",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.sun",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Glass Row": [
+      "#000000",
+      "#4a7ac8",
+      "#f6d6c0",
+      "#e8a0b8",
+      "#a0e0d0"
+    ]
+  },
+  "bpmHint": [
+    80,
+    130
+  ],
+  "description": "A row of glass spheres on a pastel chequered floor, the floor bending through each one, hopping in turn on the beat under a soft sky, at the chunky resolution of an early render."
+}

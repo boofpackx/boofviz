@@ -10,6 +10,7 @@ import { Demo80 } from './Demo80';
 import { DemoParts } from './DemoParts';
 import { DeStijl } from './DeStijl';
 import { Dots } from './Dots';
+import { Dots80 } from './Dots80';
 import { FretHighway } from './FretHighway';
 import type { Generator } from './Generator';
 import { GlassMeadow } from './GlassMeadow';
@@ -43,6 +44,7 @@ import { PixelArcade } from './PixelArcade';
 import { Polygon } from './Polygon';
 import { Prism } from './Prism';
 import { RadialSpectrum } from './RadialSpectrum';
+import { Raytrace80 } from './Raytrace80';
 import { Ricochet } from './Ricochet';
 import { Scope } from './Scope';
 import { Screensaver90 } from './Screensaver90';
@@ -54,6 +56,7 @@ import { Tiles } from './Tiles';
 import { TwistCube } from './TwistCube';
 import { Vector80 } from './Vector80';
 import { VitalSigns } from './VitalSigns';
+import { VideoSynth80 } from './VideoSynth80';
 import { Warp } from './Warp';
 
 const FACTORIES: Record<string, () => Generator> = {
@@ -81,6 +84,9 @@ const FACTORIES: Record<string, () => Generator> = {
   vector80: () => new Vector80(),
   loader8: () => new Loader8(),
   demo80: () => new Demo80(),
+  raytrace80: () => new Raytrace80(),
+  dots80: () => new Dots80(),
+  vsynth80: () => new VideoSynth80(),
   demoParts: () => new DemoParts(),
   codeRain: () => new CodeRain(),
   warp: () => new Warp(),

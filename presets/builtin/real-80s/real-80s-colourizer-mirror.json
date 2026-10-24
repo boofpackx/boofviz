@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "name": "Colourizer Mirror",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "video art",
+    "feedback",
+    "kaleidoscope",
+    "psychedelic",
+    "retro"
+  ],
+  "energy": 4,
+  "palette": "Colourizer",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "vsynth",
+      "name": "Video synth",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "vsynth80",
+        "params": {
+          "shape": "ring",
+          "gain": 1.4,
+          "thickness": 1,
+          "zoom": 0.975,
+          "turn": 1.2,
+          "drift": 1,
+          "trail": 0.9,
+          "bands": 8,
+          "cycle": 2,
+          "mirror": "quad",
+          "react": 1,
+          "lines": 360
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.25,
+            "threshold": 0.8,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.25,
+            "scanlines": 0.3,
+            "mask": 0.25,
+            "vignette": 0.4
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Zoom",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.zoom",
+          "range": [
+            0.94,
+            1.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Turn",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.turn",
+          "range": [
+            -3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trail",
+      "value": 0.128,
+      "targets": [
+        {
+          "path": "layers.0.source.params.trail",
+          "range": [
+            0.1,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bands",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bands",
+          "range": [
+            2,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Colour steps",
+      "value": 0.125,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycle",
+          "range": [
+            0,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gain",
+      "value": 0.35,
+      "targets": [
+        {
+          "path": "layers.0.source.params.gain",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Colourizer": [
+      "#05000a",
+      "#00e0a0",
+      "#ff4a20",
+      "#ffe060",
+      "#3060ff"
+    ]
+  },
+  "bpmHint": [
+    100,
+    160
+  ],
+  "description": "A video mixer folding the feedback four ways: a waveform ring falling inward into a kaleidoscope tunnel, posterised into eight bands of colour that cycle with the beat, like the effects machines on late-night music TV."
+}

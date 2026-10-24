@@ -34,6 +34,9 @@
         "kind": "vector80",
         "params": {
           "mode": "trench",
+          "overlay": "none",
+          "routine": "sequence",
+          "peaks": 1,
           "haze": 1,
           "color": "palette",
           "speed": 1,

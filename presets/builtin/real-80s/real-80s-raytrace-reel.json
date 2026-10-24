@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "name": "Raytrace Reel",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "cgi",
+    "raytrace",
+    "chrome",
+    "3d",
+    "retro"
+  ],
+  "energy": 3,
+  "palette": "Reel Classic",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "reel",
+      "name": "Raytrace",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "raytrace80",
+        "params": {
+          "spheres": 5,
+          "layout": "ring",
+          "materials": "mixed",
+          "hop": 1,
+          "spin": 1,
+          "cutPhrases": 1,
+          "revealBeats": 1,
+          "lines": 270,
+          "check": 1,
+          "floorShine": 0.25,
+          "fog": 0.03,
+          "sun": 0.6
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.35,
+            "threshold": 0.9,
+            "radius": 0.5,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "betamax",
+            "generation": 1,
+            "wear": 0.25,
+            "events": 0,
+            "eventList": "all",
+            "overwrite": 0,
+            "mood": 0.2,
+            "seed": 80
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Hop",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.hop",
+          "range": [
+            0,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spheres",
+      "value": 0.571,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spheres",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ring turn",
+      "value": 0.625,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            -4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Resolution",
+      "value": 0.182,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lines",
+          "range": [
+            90,
+            1080
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Floor shine",
+      "value": 0.278,
+      "targets": [
+        {
+          "path": "layers.0.source.params.floorShine",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sun",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.sun",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Reel Classic": [
+      "#00000a",
+      "#0b2e8c",
+      "#a8ccff",
+      "#c81818",
+      "#f2e23c"
+    ]
+  },
+  "bpmHint": [
+    90,
+    140
+  ],
+  "description": "The early-80s computer graphics reel: chrome, glass and painted spheres over an endless red and yellow chequered floor under a blue sky, true reflections and hard shadows. They hop 1-3-2-4, landing on the beat; each phrase cuts to a new angle that renders down the screen a line at a time."
+}

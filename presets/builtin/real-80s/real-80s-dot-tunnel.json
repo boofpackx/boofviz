@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "name": "Dot Tunnel",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "demo",
+    "home computer",
+    "tunnel",
+    "dots",
+    "retro"
+  ],
+  "energy": 4,
+  "palette": "Dot Tunnel",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "dots",
+      "name": "Dots",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "dots80",
+        "params": {
+          "scene": "tunnel",
+          "shapes": "all",
+          "barsPerShape": 1,
+          "morphBeats": 1,
+          "dots": 1400,
+          "style": "balls",
+          "size": 0.05,
+          "lines": 200,
+          "spin": 1.2,
+          "zoom": 1,
+          "react": 1,
+          "cycle": 0.05,
+          "stars": 0.5
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.45,
+            "threshold": 0.7,
+            "radius": 0.5,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.3,
+            "scanlines": 0.35,
+            "mask": 0.3,
+            "vignette": 0.45
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Spin",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ball size",
+      "value": 0.263,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.01,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reaction",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Zoom",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.zoom",
+          "range": [
+            0.4,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Colour cycling",
+      "value": 0.05,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycle",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pixels",
+      "value": 0.175,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lines",
+          "range": [
+            90,
+            720
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Dot Tunnel": [
+      "#000000",
+      "#10306a",
+      "#2aa0ff",
+      "#a0f0ff",
+      "#ffffff"
+    ]
+  },
+  "bpmHint": [
+    110,
+    170
+  ],
+  "description": "Rings of shaded dots flying at you down a tunnel that bends, twists and breathes with the spectrum, from the late-80s demo scene, in chunky pixels."
+}

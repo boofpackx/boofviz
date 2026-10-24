@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "name": "Chrome Night",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "cgi",
+    "raytrace",
+    "chrome",
+    "3d",
+    "night",
+    "retro"
+  ],
+  "energy": 3,
+  "palette": "Chrome Night",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "reel",
+      "name": "Raytrace",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "raytrace80",
+        "params": {
+          "spheres": 7,
+          "layout": "ring",
+          "materials": "chrome",
+          "hop": 1,
+          "spin": 1,
+          "cutPhrases": 1,
+          "revealBeats": 1,
+          "lines": 270,
+          "check": 1.4,
+          "floorShine": 0.45,
+          "fog": 0.02,
+          "sun": 0.25
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.35,
+            "threshold": 0.9,
+            "radius": 0.5,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.25,
+            "scanlines": 0.3,
+            "mask": 0.25,
+            "vignette": 0.45
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Hop",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.hop",
+          "range": [
+            0,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spheres",
+      "value": 0.571,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spheres",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ring turn",
+      "value": 0.625,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            -4,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Resolution",
+      "value": 0.182,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lines",
+          "range": [
+            90,
+            1080
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Floor shine",
+      "value": 0.278,
+      "targets": [
+        {
+          "path": "layers.0.source.params.floorShine",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sun",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.sun",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Chrome Night": [
+      "#000000",
+      "#07051a",
+      "#5a3d7a",
+      "#0c0c0e",
+      "#e6e6ea"
+    ]
+  },
+  "bpmHint": [
+    90,
+    150
+  ],
+  "description": "Seven chrome spheres on a black and white chequerboard under a violet night sky, each a perfect mirror of the others and the floor, hopping on the beat and flying up together on the drop."
+}

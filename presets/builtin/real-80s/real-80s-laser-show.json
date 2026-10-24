@@ -33,6 +33,9 @@
         "kind": "vector80",
         "params": {
           "mode": "laser",
+          "overlay": "none",
+          "routine": "sequence",
+          "peaks": 1,
           "haze": 1,
           "color": "palette",
           "speed": 1,
@@ -185,5 +188,5 @@
     100,
     150
   ],
-  "description": "A planetarium laser show taped off the dome: beams fan out of the projector through the haze and sweep on the beat, a Lissajous figure is drawn by the left and right channels, a new laser colour every bar and a cone of light on each phrase."
+  "description": "A planetarium laser show taped off the dome, a new routine every phrase: a figure drawn by the left and right channels under fanning beams, a sheet of light rippling over the crowd, a cone of light breathing with the bass, a spirograph, and four scanners chasing on the beat."
 }
