@@ -24,19 +24,22 @@ export class FiberOptic implements Generator {
   private readonly fibre = new Float32Array((SEG + 1) * 2);
   private readonly tip = new Float32Array(4);
   private ctx: GenContext | null = null;
-  private wheel = 0;
+  private step = 0;
+  private frac = 0;
+  private spin = 0;
   private dropAt = -99;
 
   update(ctx: GenContext): void {
     this.ctx = ctx;
     const f = ctx.frame;
-    // The wheel steps one colour on the beat (eased, so it rests on a pure
-    // palette colour, never a muddy mix), and spins on the drop.
+    // The wheel steps one colour on the beat and spins on the drop. The change
+    // sweeps across the spray fibre by fibre (as the filter wheel turns past
+    // the light), so the lamp rests on pure palette colours, never a muddy mix.
     const beat = ctx.beat * num(ctx.params.wheel, 1);
-    const b = Math.floor(beat), fr = beat - b;
+    this.step = Math.floor(beat);
+    this.frac = beat - this.step;
     if (f.drop) this.dropAt = ctx.beat;
-    const spin = Math.max(0, 1 - (ctx.beat - this.dropAt) / 2) ** 2;
-    this.wheel = (b + Math.min(1, fr * 4)) * 0.25 + spin * 2;
+    this.spin = Math.max(0, 1 - (ctx.beat - this.dropAt) / 2) ** 2 * 2;
   }
 
   render(renderer: THREE.WebGLRenderer, target: THREE.WebGLRenderTarget): void {
@@ -65,7 +68,8 @@ export class FiberOptic implements Generator {
     const sway = Math.sin(ctx.time * 0.7) * 0.05 + Math.sin(ctx.time * 1.9) * 0.015;
     const quiet = env.energy < 0.18;
     const colourAt = (u: number): [number, number, number] => {
-      const w = this.wheel + (mode === 'rainbow' ? u : mode === 'split' ? (u < 0.5 ? 0 : 0.5) : 0);
+      const sweep = Math.min(1, Math.max(0, (this.frac - u * 0.45) * 5));
+      const w = (this.step + sweep * sweep * (3 - 2 * sweep)) * 0.25 + this.spin + (mode === 'rainbow' ? u : mode === 'split' ? (u < 0.5 ? 0 : 0.5) : 0);
       const x = (((w % 1) + 1) % 1) * 4;
       const i = Math.floor(x), fr = x - i;
       const a = (1 + (i % 4)) * 3, c = (1 + ((i + 1) % 4)) * 3;
