@@ -23,7 +23,7 @@ vec3 hue(float h) {
 }
 
 void main() {
-  vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
+  vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / min(uRes.y, uRes.x * 1.1); // fits the width on tall screens
   // The disc is a touch off centre and slightly tilted towards us.
   p -= vec2(0.03, -0.02);
   p.y *= 1.06;

@@ -134,7 +134,8 @@ export class Rail implements Generator {
     const f = ctx.frame;
     const W = target.width, H = target.height;
     const px = H / 1080;
-    const focal = H * 0.9;
+    // Narrower lens on tall screens so the targets stay in frame.
+    const focal = Math.min(H, W * 1.1) * 0.9;
     const roll = Math.sin(ctx.beat * 0.13) * 0.06;
     const cr = Math.cos(roll), sr = Math.sin(roll);
     const proj = (x: number, y: number, z: number): [number, number] | null => {

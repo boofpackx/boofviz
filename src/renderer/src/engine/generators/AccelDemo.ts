@@ -36,7 +36,7 @@ vec3 env(vec3 r) {
 }
 
 void main() {
-  vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
+  vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / min(uRes.y, uRes.x * 1.1); // fits the width on tall screens
   vec3 ro = vec3(0.0, 0.3, 4.2);
   vec3 rd = normalize(vec3(uv, -1.4));
   // Stars and a little nebula.

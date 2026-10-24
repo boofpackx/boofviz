@@ -55,7 +55,7 @@ vec3 normalAt(vec3 p) {
 }
 
 void main() {
-  vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
+  vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / min(uRes.y, uRes.x * 1.1); // fits the width on tall screens
   vec3 ro = uCamPos;
   vec3 fw = normalize(-ro);
   vec3 rt = normalize(cross(fw, vec3(0.0, 1.0, 0.0)));
@@ -82,7 +82,7 @@ void main() {
     if (h.x < 0.001 || t > 20.0) break;
     t += h.x * 0.9;
   }
-  float px = 1.0 / uRes.y;
+  float px = 1.0 / min(uRes.y, uRes.x * 1.1);
   float ink = uOutline * px * 2.4;
   if (h.x < 0.001) {
     vec3 p = ro + rd * t;

@@ -33,7 +33,8 @@ float hexGrid(vec2 p) {
 }
 
 void main() {
-  vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
+  // Scaled by height, or by width on tall screens so the swooshes fit.
+  vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / min(uRes.y, uRes.x * 1.1);
   float r = length(p);
   // Deep background with a lighter middle.
   vec3 col = mix(uPal[1] * 0.35, uPal[0], smoothstep(0.0, 0.9, r));
