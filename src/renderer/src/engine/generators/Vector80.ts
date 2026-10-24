@@ -236,13 +236,21 @@ export class Vector80 implements Generator {
     return live.lines[live.current] ?? '';
   }
 
+  /**
+   * A game element's colour. With the look's palette (the default), element
+   * slots 0–3 take palette stops 1–4, brought up to full brightness because
+   * a beam is light; each look ships a palette of its game's own colours.
+   */
   private colour(ctx: GenContext, c: RGB, slot: number): RGB {
-    const mode = String(ctx.params.color ?? 'classic');
+    const mode = String(ctx.params.color ?? 'palette');
     if (mode === 'classic') return c;
     if (mode === 'white') return WHITE;
     if (mode === 'green') return [0.25, 1, 0.35];
-    const o = (1 + (slot % 4)) * 3;
-    return [ctx.palette[o], ctx.palette[o + 1], ctx.palette[o + 2]];
+    const o = (1 + (((slot % 4) + 4) % 4)) * 3;
+    const r = ctx.palette[o], g = ctx.palette[o + 1], b = ctx.palette[o + 2];
+    const m = Math.max(r, g, b, 1e-4);
+    const k = m < 0.9 ? 0.9 / m : 1;
+    return [r * k, g * k, b * k];
   }
 
   private sparkUpdate(dt: number): void {

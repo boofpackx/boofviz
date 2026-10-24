@@ -35,6 +35,12 @@ vec3 seqClassic(int i) {
   return vec3(0.40, 0.75, 0.30);
 }
 vec3 toLin(vec3 s) { return pow(s, vec3(2.2)); }
+// The look's palette as an 8-step sequence: stops 1-4, then lighter versions of them.
+vec3 seqPalette(int i) {
+  i = i % 8;
+  vec3 c = uPal[1 + i % 4];
+  return i < 4 ? c : mix(c, vec3(1.0), 0.45);
+}
 
 float shapeDist(vec2 d, float shape) {
   d = abs(d);
@@ -63,7 +69,7 @@ vec3 lightSynth(vec2 cell, vec2 grid) {
     float into = r - d;
     if (into >= 0.0 && into < uWidth) {
       int ci = int(floor(into / uStep) + idx * 3.0 + floor(uBeat * uCycle));
-      vec3 s = uColourMode < 0.5 ? toLin(seqClassic(ci)) : paletteWrap(float(ci) * 0.13);
+      vec3 s = uColourMode < 0.5 ? toLin(seqClassic(ci)) : seqPalette(ci);
       // Rings fade out as the burst grows old.
       col = s * (1.0 - smoothstep(uWidth * 0.75, uWidth, into)) * (1.0 + uKick * 0.35);
       break;
@@ -73,8 +79,12 @@ vec3 lightSynth(vec2 cell, vec2 grid) {
 }
 
 vec3 ball(vec2 cell, vec2 grid) {
-  vec3 bg = toLin(vec3(0.67, 0.67, 0.67));
-  vec3 purple = toLin(vec3(0.62, 0.0, 0.62));
+  // Classic colours, or the look's palette: wall, grid, then the two checks.
+  bool pal = uColourMode > 0.5;
+  vec3 bg = pal ? uPal[1] : toLin(vec3(0.67, 0.67, 0.67));
+  vec3 purple = pal ? uPal[2] : toLin(vec3(0.62, 0.0, 0.62));
+  vec3 checkA = pal ? uPal[3] : toLin(vec3(0.95, 0.0, 0.0));
+  vec3 checkB = pal ? uPal[4] : vec3(1.0);
   float floorY = grid.y * 0.18;
   float sq = floor(grid.y / 12.0);
   vec3 col = bg;
@@ -114,7 +124,7 @@ vec3 ball(vec2 cell, vec2 grid) {
     float lon = atan(n.z, n.x) + spin;
     float lat = asin(clamp(n.y, -1.0, 1.0));
     float ch = mod(floor(lon / (6.2831853 / 16.0)) + floor(lat / (3.14159265 / 8.0)), 2.0);
-    col = ch < 0.5 ? toLin(vec3(0.95, 0.0, 0.0)) : toLin(vec3(1.0));
+    col = ch < 0.5 ? checkA : checkB;
   }
   return col;
 }
@@ -163,7 +173,7 @@ export class Demo80 extends ShaderGenerator {
     u.uStep.value = num(p.step, 3);
     u.uSym.value = p.symmetry === '4' ? 4 : 8;
     u.uShape.value = ['diamond', 'square', 'cross', 'round'].indexOf(String(p.shape)) === -1 ? 4 : ['diamond', 'square', 'cross', 'round'].indexOf(String(p.shape));
-    u.uColourMode.value = p.colours === 'look' ? 1 : 0;
+    u.uColourMode.value = p.colours === 'classic' ? 0 : 1;
     u.uCycle.value = num(p.cycle, 1);
     u.uBounceBeats.value = num(p.bounceBeats, 2);
     u.uCrossBars.value = num(p.crossBars, 2);

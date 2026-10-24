@@ -11,7 +11,7 @@
     "retro"
   ],
   "energy": 4,
-  "palette": "Neon",
+  "palette": "Laser",
   "paletteCycle": {
     "mode": "off",
     "every": 1,
@@ -34,7 +34,7 @@
         "params": {
           "mode": "laser",
           "haze": 1,
-          "color": "classic",
+          "color": "palette",
           "speed": 1,
           "beam": 1.2,
           "glow": 1.4,
@@ -172,6 +172,15 @@
       "targets": []
     }
   ],
+  "customPalettes": {
+    "Laser": [
+      "#000000",
+      "#1aff26",
+      "#2650ff",
+      "#ff140d",
+      "#1ae6ff"
+    ]
+  },
   "bpmHint": [
     100,
     150

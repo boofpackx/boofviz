@@ -4,6 +4,18 @@ import { num } from './ShaderGenerator';
 import { liveText, type TextSource } from '../lyricsFeed';
 import { drawSegText, marquee, meshPattern, phosphor, segTextWidth } from './vfd';
 
+/** A palette stop (linear) as a CSS colour, brought up to `min` brightness (a lit segment is light). */
+function lightCss(pal: Float32Array, i: number, min: number, alpha = 1, scale = 1): string {
+  const o = i * 3;
+  const m = Math.max(pal[o], pal[o + 1], pal[o + 2], 1e-4);
+  const k = (m < min ? min / m : 1) * scale;
+  const ch = (v: number): number => {
+    const x = Math.min(1, v * k);
+    return Math.round((x <= 0.0031308 ? x * 12.92 : 1.055 * Math.pow(x, 1 / 2.4) - 0.055) * 255);
+  };
+  return `rgba(${ch(pal[o])},${ch(pal[o + 1])},${ch(pal[o + 2])},${alpha})`;
+}
+
 /**
  * The glowing display of an 80s stereo spectrum analyzer, filling the
  * screen: columns of vacuum-fluorescent segments with amber and red tops,
@@ -60,13 +72,19 @@ export class Hifi80 extends CanvasLook {
 
   protected draw(g: CanvasRenderingContext2D, W: number, H: number, ctx: GenContext): void {
     const p = ctx.params;
-    const ph = phosphor(p.phosphor);
+    // The look's palette (stop 2 lights the segments, 3 and 4 the amber and red tops), or a fixed phosphor.
+    const usePal = (p.phosphor ?? 'palette') === 'palette';
+    const pal = ctx.palette;
+    const ph = usePal ? { lit: lightCss(pal, 2, 0.75), glow: lightCss(pal, 2, 0.6), ghost: lightCss(pal, 2, 0.6, 0.075) } : phosphor(p.phosphor);
+    const mid = usePal ? { lit: lightCss(pal, 3, 0.75), glow: lightCss(pal, 3, 0.6) } : { lit: '#ffc46b', glow: '#ff9a1f' };
+    const top = usePal ? { lit: lightCss(pal, 4, 0.75), glow: lightCss(pal, 4, 0.6) } : { lit: '#ff7a6a', glow: '#ff2a1a' };
     const n = Math.round(num(p.bands, 20));
     const S = Math.round(num(p.segments, 16));
     const zones = p.zones !== false;
     const mirror = p.mirror === true;
     this.analyse(ctx, n);
-    g.fillStyle = '#030405';
+    // The glass stays dark whatever the palette's darkest colour.
+    g.fillStyle = usePal ? lightCss(pal, 0, 0, 1, 0.35) : '#030405';
     g.fillRect(0, 0, W, H);
     const u = Math.min(W / 16, H / 9);
     const pad = u * 0.6;
@@ -74,11 +92,11 @@ export class Hifi80 extends CanvasLook {
     // The song along the top in 14-segment letters, a few indicators beside it.
     const textH = H * 0.09;
     const showText = p.header !== false;
-    let top = pad;
+    let y0 = pad;
     if (showText) {
       const cells = Math.max(8, Math.floor((W * 0.62) / segTextWidth(1, textH)));
       const text = marquee(this.words(ctx, `${Math.round(ctx.frame.bpm || 120)} BPM  STEREO`), cells, ctx.beat * num(p.scroll, 2));
-      drawSegText(g, text, pad, top, textH, { lit: ph.lit, ghost: ph.ghost, glow: ph.glow });
+      drawSegText(g, text, pad, y0, textH, { lit: ph.lit, ghost: ph.ghost, glow: ph.glow });
       g.font = `700 ${Math.round(textH * 0.32)}px "Helvetica Neue", Arial, sans-serif`;
       g.textAlign = 'right';
       g.textBaseline = 'middle';
@@ -89,15 +107,15 @@ export class Hifi80 extends CanvasLook {
         g.fillText(label, W - pad, y);
         g.shadowBlur = 0;
       };
-      ind('STEREO', true, top + textH * 0.2);
-      ind('PEAK HOLD', num(p.peakHold, 0.6) > 0, top + textH * 0.6);
-      ind('OVER', ctx.env.kick > 0.6 && ctx.env.energy > 0.55, top + textH * 1.0, '#ff5a3a');
-      top += textH * 1.6;
+      ind('STEREO', true, y0 + textH * 0.2);
+      ind('PEAK HOLD', num(p.peakHold, 0.6) > 0, y0 + textH * 0.6);
+      ind('OVER', ctx.env.kick > 0.6 && ctx.env.energy > 0.55, y0 + textH * 1.0, top.lit);
+      y0 += textH * 1.6;
     }
 
     // The analyzer.
     const labels = p.labels !== false;
-    const ax = pad + (labels ? u * 0.5 : 0), ay = top;
+    const ax = pad + (labels ? u * 0.5 : 0), ay = y0;
     const aw = W - ax - pad, ah = H - ay - pad - (labels ? u * 0.4 : 0);
     const colW = aw / n;
     const segH = (mirror ? ah / 2 : ah) / S;
@@ -122,11 +140,11 @@ export class Hifi80 extends CanvasLook {
     g.shadowColor = ph.glow;
     g.fillStyle = ph.lit;
     g.fill(lit);
-    g.shadowColor = '#ff9a1f';
-    g.fillStyle = '#ffc46b';
+    g.shadowColor = mid.glow;
+    g.fillStyle = mid.lit;
     g.fill(amber);
-    g.shadowColor = '#ff2a1a';
-    g.fillStyle = '#ff7a6a';
+    g.shadowColor = top.glow;
+    g.fillStyle = top.lit;
     g.fill(red);
     g.restore();
     if (labels) {

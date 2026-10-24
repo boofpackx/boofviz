@@ -12,7 +12,7 @@
     "retro"
   ],
   "energy": 4,
-  "palette": "Neon",
+  "palette": "Tube Web",
   "paletteCycle": {
     "mode": "off",
     "every": 1,
@@ -35,7 +35,7 @@
         "params": {
           "mode": "web",
           "haze": 1,
-          "color": "classic",
+          "color": "palette",
           "speed": 1,
           "beam": 1,
           "glow": 1,
@@ -177,6 +177,15 @@
       "targets": []
     }
   ],
+  "customPalettes": {
+    "Tube Web": [
+      "#000000",
+      "#33ff55",
+      "#2a44ff",
+      "#ffe626",
+      "#ff2219"
+    ]
+  },
   "bpmHint": [
     110,
     160

@@ -10,7 +10,7 @@
     "retro"
   ],
   "energy": 2,
-  "palette": "Neon",
+  "palette": "Checkered",
   "paletteCycle": {
     "mode": "off",
     "every": 1,
@@ -39,7 +39,7 @@
           "step": 3,
           "symmetry": "8",
           "shape": "mixed",
-          "colours": "classic",
+          "colours": "palette",
           "cycle": 1,
           "bounceBeats": 2,
           "crossBars": 2,
@@ -146,6 +146,15 @@
       "targets": []
     }
   ],
+  "customPalettes": {
+    "Checkered": [
+      "#000000",
+      "#aaaaaa",
+      "#a000a0",
+      "#f00000",
+      "#ffffff"
+    ]
+  },
   "bpmHint": [
     80,
     140

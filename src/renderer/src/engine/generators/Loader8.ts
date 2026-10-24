@@ -79,6 +79,35 @@ const ZXC = ZX.map(([r, g, b]) => rgb(r, g, b));
 const C64H = [0x000000, 0xffffff, 0x68372b, 0x70a4b2, 0x6f3d86, 0x588d43, 0x352879, 0xb8c76f, 0x6f4f25, 0x433900, 0x9a6759, 0x444444, 0x6c6c6c, 0x9ad284, 0x6c5eb5, 0x959595];
 const C64 = C64H.map((h) => [(h >> 16) & 255, (h >> 8) & 255, h & 255]);
 const C64C = C64H.map(hexc);
+/** C64 colours from darkest to lightest, for following a look's palette. */
+const C64_RANK = (() => {
+  const lum = C64.map(([r, g, b]) => 0.299 * r + 0.587 * g + 0.114 * b);
+  const order = lum.map((l, i) => [l, i]).sort((a, b) => a[0] - b[0]).map((a) => a[1]);
+  const rank = new Array<number>(16);
+  order.forEach((idx, k) => (rank[idx] = k / 15));
+  return rank;
+})();
+
+const toSrgb = (v: number): number => {
+  const s = v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(Math.max(0, v), 1 / 2.4) - 0.055;
+  return Math.min(255, Math.max(0, Math.round(s * 255)));
+};
+
+/** A palette stop (linear) in 0..255 display values. */
+function stop(pal: Float32Array, i: number): [number, number, number] {
+  return [toSrgb(pal[i * 3]), toSrgb(pal[i * 3 + 1]), toSrgb(pal[i * 3 + 2])];
+}
+
+/** The look's 5-stop palette at t (0..1), smoothly, in 0..255 display values. */
+function ramp(pal: Float32Array, t: number): [number, number, number] {
+  const x = Math.min(1, Math.max(0, t)) * 4;
+  const i = Math.min(3, Math.floor(x));
+  let f = x - i;
+  f = f * f * (3 - 2 * f);
+  const a = stop(pal, i), b = stop(pal, i + 1);
+  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+}
+
 const BAYER4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 
 /** A 256×192 picture with attribute clash: one bit per pixel, ink/paper/bright per 8×8 cell. */
@@ -289,6 +318,9 @@ export class Loader8 extends ShaderGenerator {
   private runCycle = -1;
   private lastProg = 0;
   private textColour = 14;
+  /** The machines' colours as shown: their own, or built from the look's palette. */
+  private zxc = ZXC.slice();
+  private c64c = C64C.slice();
 
   constructor() {
     const tex = Loader8.texture(16, 16, new Uint8Array(16 * 16 * 4));
@@ -321,9 +353,37 @@ export class Loader8 extends ShaderGenerator {
       (this.u.uSize.value as THREE.Vector2).set(LW, LH);
     }
     this.u.uSoft.value = num(p.soft, 0.5);
+    this.colours(ctx);
     if (machine === 'micro64') this.draw64(ctx);
     else this.draw48(ctx);
     this.tex.needsUpdate = true;
+  }
+
+  /**
+   * Follow the look's colour scheme. The 48K micro's eight colours are sums
+   * of three primaries, so palette stops 1, 2 and 3 become its blue, red and
+   * green and every other colour is built from them the same way (a palette
+   * of pure blue, red and green gives the real machine). On the 64 the
+   * screen and its text take stops 1 and 2, and every other colour takes its
+   * place on the palette by brightness.
+   */
+  private colours(ctx: GenContext): void {
+    if (ctx.params.colours === 'machine') {
+      this.zxc = ZXC.slice();
+      this.c64c = C64C.slice();
+      return;
+    }
+    const pal = ctx.palette;
+    const base = stop(pal, 0), B = stop(pal, 1), R = stop(pal, 2), G = stop(pal, 3);
+    for (let i = 0; i < 16; i++) {
+      const k = i >= 8 ? 1 : 215 / 255;
+      const c = [0, 1, 2].map((ch) => Math.min(255, Math.round((base[ch] + (i & 1 ? B[ch] : 0) + (i & 2 ? R[ch] : 0) + (i & 4 ? G[ch] : 0)) * k)));
+      this.zxc[i] = rgb(c[0], c[1], c[2]);
+    }
+    for (let i = 0; i < 16; i++) {
+      const c = i === 6 ? B : i === 14 ? R : ramp(pal, C64_RANK[i]);
+      this.c64c[i] = rgb(Math.round(c[0]), Math.round(c[1]), Math.round(c[2]));
+    }
   }
 
   /** Song name and artist, or the look's own text. */
@@ -450,12 +510,12 @@ export class Loader8 extends ShaderGenerator {
     const attrs = Math.floor(stage(0.55, 0.65) * 768);
     const error = failed && t > 0.86;
     // Border.
-    const WHITE = ZXC[7], BLACK = ZXC[0];
+    const WHITE = this.zxc[7], BLACK = this.zxc[0];
     const lines = this.stripes(ctx, H, pilot);
     for (let y = 0; y < H; y++) {
       let c = WHITE;
-      if (!error && pilot) c = lines[y] ? ZXC[2] : ZXC[5];
-      else if (!error && data) c = lines[y] ? ZXC[1] : ZXC[6];
+      if (!error && pilot) c = lines[y] ? this.zxc[2] : this.zxc[5];
+      else if (!error && data) c = lines[y] ? this.zxc[1] : this.zxc[6];
       else if (t > 0.65 && !error) c = BLACK;
       px.data.fill(c, y * W, y * W + W);
     }
@@ -481,8 +541,8 @@ export class Loader8 extends ShaderGenerator {
           const coloured = cell < attrs;
           // FLASH: the title cells swap ink and paper on the beat once loaded.
           const flash = coloured && t > 0.7 && cy >= 22 && Math.floor(ctx.beat) % 2 === 1 && p.flash !== false;
-          let ink = coloured ? ZXC[pic.ink[cell]] : BLACK;
-          let paper = coloured ? ZXC[pic.paper[cell]] : WHITE;
+          let ink = coloured ? this.zxc[pic.ink[cell]] : BLACK;
+          let paper = coloured ? this.zxc[pic.paper[cell]] : WHITE;
           if (flash) [ink, paper] = [paper, ink];
           const base = (y0 + y) * W + x0 + bx * 8;
           for (let b = 0; b < 8; b++) px.data[base + b] = bits[y * 256 + bx * 8 + b] ? ink : paper;
@@ -506,7 +566,7 @@ export class Loader8 extends ShaderGenerator {
     const len = Math.max(2, num(p.cycleBars, 16)) * bpb;
     const cyc = Math.floor(ctx.beat / len);
     const t = ctx.beat / len - cyc;
-    const LB = C64C[14], BG = C64C[6];
+    const LB = this.c64c[14], BG = this.c64c[6];
     const pic = this.picture(this.multi, ctx, (img, title, artist) => {
       const rgba = img ? drawInto(img, 160, 200, [30, 0, 100, 200], '#000000') : titleScreen(160, 200, title, artist, cyc);
       return toMulticolour(rgba, 0);
@@ -555,8 +615,8 @@ export class Loader8 extends ShaderGenerator {
     // Border: turbo-loader stripes while loading, plain otherwise.
     const loadingStripes = t >= 0.16 && t < 0.6;
     const lines = loadingStripes ? this.stripes(ctx, H, false) : null;
-    const stripeCols = [C64C[6], C64C[14], C64C[3], C64C[1], C64C[7], C64C[10], C64C[4], C64C[13]];
-    const textCol = running ? C64C[this.textColour] : LB;
+    const stripeCols = [this.c64c[6], this.c64c[14], this.c64c[3], this.c64c[1], this.c64c[7], this.c64c[10], this.c64c[4], this.c64c[13]];
+    const textCol = running ? this.c64c[this.textColour] : LB;
     let run = 0;
     for (let y = 0; y < H; y++) {
       let c = LB;
@@ -568,7 +628,7 @@ export class Loader8 extends ShaderGenerator {
       px.data.fill(c, y * W, y * W + W);
     }
     if (blank) return;
-    px.rect(x0, y0, 320, 200, loadingPic ? C64C[0] : BG);
+    px.rect(x0, y0, 320, 200, loadingPic ? this.c64c[0] : BG);
     if (loadingPic && pic) {
       // The bitmap arrives cell by cell, left to right, row by row.
       const cells = Math.floor(stage(0.17, 0.55) * 1000);
@@ -578,7 +638,7 @@ export class Loader8 extends ShaderGenerator {
           for (let y = 0; y < 8; y++) {
             const base = (y0 + cy * 8 + y) * W + x0 + cx * 8;
             for (let x = 0; x < 4; x++) {
-              const c = C64C[pic.px[(cy * 8 + y) * 160 + cx * 4 + x]];
+              const c = this.c64c[pic.px[(cy * 8 + y) * 160 + cx * 4 + x]];
               px.data[base + x * 2] = c;
               px.data[base + x * 2 + 1] = c;
             }

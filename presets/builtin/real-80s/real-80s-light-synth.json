@@ -11,7 +11,7 @@
     "retro"
   ],
   "energy": 4,
-  "palette": "Neon",
+  "palette": "Light Synth",
   "paletteCycle": {
     "mode": "off",
     "every": 1,
@@ -40,7 +40,7 @@
           "step": 3,
           "symmetry": "8",
           "shape": "mixed",
-          "colours": "classic",
+          "colours": "palette",
           "cycle": 1,
           "bounceBeats": 2,
           "crossBars": 2,
@@ -165,6 +165,15 @@
       "targets": []
     }
   ],
+  "customPalettes": {
+    "Light Synth": [
+      "#000000",
+      "#3328a0",
+      "#c03850",
+      "#f2d94c",
+      "#70d1dc"
+    ]
+  },
   "bpmHint": [
     100,
     160

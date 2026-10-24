@@ -366,7 +366,7 @@ export const GENERATORS: ModuleDef[] = [
     description:
       'The glowing display of an 80s stereo spectrum analyzer, filling the screen: vacuum-fluorescent segments with amber and red tops, peak hold, the unlit segments faint behind the glass, the wire mesh in front and the song scrolling in 14-segment letters.',
     params: [
-      e('phosphor', 'Display colour', 'cyan', ['cyan', 'green', 'amber', 'blue', 'red']),
+      e('phosphor', 'Display colour', 'palette', ['palette', 'cyan', 'green', 'amber', 'blue', 'red'], 'palette: the look\u2019s colours (stop 3 lights the segments, stops 4 and 5 the tops) · or a fixed phosphor'),
       i('bands', 'Bands', 20, 8, 48),
       i('segments', 'Segments', 16, 6, 32, 'per column'),
       b('mirror', 'Mirror', false, 'columns grow up and down from the middle'),
@@ -388,7 +388,7 @@ export const GENERATORS: ModuleDef[] = [
     params: [
       e('mode', 'Game', 'rocks', ['rocks', 'web', 'tank', 'trench', 'laser'], 'rocks: white rock field · web: colour tube · tank: green battlefield · trench: the trench run · laser: a planetarium laser show'),
       f('haze', 'Beams in the haze', 1, 0, 2, 0.01, '(laser)'),
-      e('color', 'Colours', 'classic', ['classic', 'white', 'green', 'palette'], 'classic: each game\u2019s own colours'),
+      e('color', 'Colours', 'palette', ['palette', 'classic', 'white', 'green'], 'palette: the look\u2019s colours, brightened like a beam · classic: each game\u2019s fixed colours'),
       f('speed', 'Speed', 1, 0.25, 3, 0.05),
       f('beam', 'Beam width', 1, 0.4, 3, 0.05),
       f('glow', 'Glow', 1, 0, 2),
@@ -414,6 +414,7 @@ export const GENERATORS: ModuleDef[] = [
       i('stripeStride', 'Stripe width', 3, 1, 12, 'raster lines per tape pulse × 1/3: higher = wider stripes'),
       f('errors', 'Loading errors', 0.15, 0, 1, 0.01, 'share of loads that fail at the end (48K)'),
       b('flash', 'Flashing title', true, 'the title cells swap colours on the beat (48K)'),
+      e('colours', 'Colours', 'palette', ['palette', 'machine'], 'palette: the machine\u2019s colours built from the look\u2019s palette (attribute clash and all) · machine: its fixed colours'),
       f('soft', 'Composite blur', 0.5, 0, 1),
       e('source', 'Text from', 'lyrics', ['lyrics', 'title', 'text'], 'what the 64 prints and both machines name the tape'),
       t('text', 'Text', '', 'your own words when Text from is text'),
@@ -433,7 +434,7 @@ export const GENERATORS: ModuleDef[] = [
       f('step', 'Ring width', 3, 1, 12, 0.5, 'pixels per colour ring (light synth)'),
       e('symmetry', 'Symmetry', '8', ['4', '8'], '(light synth)'),
       e('shape', 'Shape', 'mixed', ['mixed', 'diamond', 'square', 'cross', 'round'], '(light synth)'),
-      e('colours', 'Colours', 'classic', ['classic', 'look'], 'classic: the home computer\u2019s colours · look: the look\u2019s palette'),
+      e('colours', 'Colours', 'palette', ['palette', 'classic'], 'palette: the look\u2019s colours · classic: the original demo\u2019s fixed colours'),
       f('cycle', 'Colour cycling', 1, 0, 8, 0.25, 'palette steps per beat (light synth)'),
       f('bounceBeats', 'Bounce every', 2, 0.5, 8, 0.5, 'beats per bounce (ball)'),
       f('crossBars', 'Cross every', 2, 0.5, 16, 0.5, 'bars to cross the room (ball)'),

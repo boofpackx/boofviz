@@ -12,7 +12,7 @@
     "retro"
   ],
   "energy": 3,
-  "palette": "Neon",
+  "palette": "Battlefield",
   "paletteCycle": {
     "mode": "off",
     "every": 1,
@@ -35,7 +35,7 @@
         "params": {
           "mode": "tank",
           "haze": 1,
-          "color": "classic",
+          "color": "palette",
           "speed": 1,
           "beam": 1,
           "glow": 1,
@@ -169,6 +169,15 @@
       "targets": []
     }
   ],
+  "customPalettes": {
+    "Battlefield": [
+      "#000000",
+      "#36ff52",
+      "#1f6b2a",
+      "#9cffa8",
+      "#ff2a1f"
+    ]
+  },
   "bpmHint": [
     90,
     140

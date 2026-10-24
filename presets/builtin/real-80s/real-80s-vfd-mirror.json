@@ -11,7 +11,7 @@
     "retro"
   ],
   "energy": 3,
-  "palette": "Neon",
+  "palette": "VFD Amber",
   "paletteCycle": {
     "mode": "off",
     "every": 1,
@@ -32,7 +32,7 @@
         "type": "generator",
         "kind": "hifi80",
         "params": {
-          "phosphor": "amber",
+          "phosphor": "palette",
           "bands": 40,
           "segments": 12,
           "mirror": true,
@@ -147,6 +147,15 @@
       "targets": []
     }
   ],
+  "customPalettes": {
+    "VFD Amber": [
+      "#050302",
+      "#3a2408",
+      "#ffc46b",
+      "#ff9a1f",
+      "#ff5a3a"
+    ]
+  },
   "bpmHint": [
     90,
     150

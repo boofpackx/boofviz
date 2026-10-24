@@ -12,7 +12,7 @@
     "retro"
   ],
   "energy": 3,
-  "palette": "Neon",
+  "palette": "48K",
   "paletteCycle": {
     "mode": "off",
     "every": 1,
@@ -41,6 +41,7 @@
           "stripeStride": 3,
           "errors": 0.15,
           "flash": true,
+          "colours": "palette",
           "soft": 0.5,
           "source": "lyrics",
           "text": ""
@@ -162,6 +163,15 @@
       "targets": []
     }
   ],
+  "customPalettes": {
+    "48K": [
+      "#000000",
+      "#0000ff",
+      "#ff0000",
+      "#00ff00",
+      "#ffffff"
+    ]
+  },
   "bpmHint": [
     90,
     150
