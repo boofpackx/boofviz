@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "name": "Laser Show",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "vector",
+    "laser",
+    "lissajous",
+    "club",
+    "retro"
+  ],
+  "energy": 4,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "laser",
+      "name": "Lasers",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "vector80",
+        "params": {
+          "mode": "laser",
+          "haze": 1,
+          "color": "classic",
+          "speed": 1,
+          "beam": 1.2,
+          "glow": 1.4,
+          "jitter": 0.5,
+          "rocks": 5,
+          "shapePhrases": 1,
+          "spikes": 1,
+          "source": "text",
+          "text": ""
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.5,
+            "zoom": 0,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 1.1,
+            "threshold": 0.45,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "vhs",
+            "generation": 2,
+            "wear": 0.4,
+            "events": 0.03,
+            "eventList": "focus",
+            "overwrite": 0,
+            "mood": 0.3,
+            "seed": 12
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Haze",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.haze",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Afterglow",
+      "value": 0.556,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.55,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape wear",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.fx.2.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    100,
+    150
+  ],
+  "description": "A planetarium laser show taped off the dome: beams fan out of the projector through the haze and sweep on the beat, a Lissajous figure is drawn by the left and right channels, a new laser colour every bar and a cone of light on each phrase."
+}

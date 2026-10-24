@@ -6,6 +6,7 @@ import { Desktop90 } from './Desktop90';
 import { BarCity } from './BarCity';
 import { CodeRain } from './CodeRain';
 import { Concrete } from './Concrete';
+import { Demo80 } from './Demo80';
 import { DemoParts } from './DemoParts';
 import { DeStijl } from './DeStijl';
 import { Dots } from './Dots';
@@ -14,6 +15,7 @@ import type { Generator } from './Generator';
 import { GlassMeadow } from './GlassMeadow';
 import { KineticType } from './KineticType';
 import { Lines } from './Lines';
+import { Loader8 } from './Loader8';
 import { LostScene } from './LostScene';
 import { LowPoly } from './LowPoly';
 import { LiquidChrome } from './LiquidChrome';
@@ -28,6 +30,7 @@ import { Neo90 } from './Neo90';
 import { Prints } from './Prints';
 import { StepChart } from './StepChart';
 import { HotMetal } from './HotMetal';
+import { Hifi80 } from './Hifi80';
 import { Keyframes } from './Keyframes';
 import { Poured } from './Poured';
 import { BeatGames } from './BeatGames';
@@ -49,6 +52,7 @@ import { SwissGrid } from './SwissGrid';
 import { SynthSunset } from './SynthSunset';
 import { Tiles } from './Tiles';
 import { TwistCube } from './TwistCube';
+import { Vector80 } from './Vector80';
 import { VitalSigns } from './VitalSigns';
 import { Warp } from './Warp';
 
@@ -73,6 +77,10 @@ const FACTORIES: Record<string, () => Generator> = {
   glassMeadow: () => new GlassMeadow(),
   deStijl: () => new DeStijl(),
   pixelArcade: () => new PixelArcade(),
+  hifi80: () => new Hifi80(),
+  vector80: () => new Vector80(),
+  loader8: () => new Loader8(),
+  demo80: () => new Demo80(),
   demoParts: () => new DemoParts(),
   codeRain: () => new CodeRain(),
   warp: () => new Warp(),

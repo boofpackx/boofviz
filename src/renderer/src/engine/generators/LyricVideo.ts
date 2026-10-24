@@ -226,6 +226,7 @@ const AUTO_STYLE: Record<string, LyricStyle> = {
   'Logo / Branding': 'spin3d',
   'Icons & Homages': 'stack',
   'Pop Culture': 'drop',
+  'Real 80s': 'teletext',
   'Real 90s': 'teletext',
   'Y2K & Aero': 'infomercial',
   'Retro Type': 'credits',

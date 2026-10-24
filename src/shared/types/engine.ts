@@ -212,6 +212,7 @@ export const PRESET_CATEGORIES = [
   'Logo / Branding',
   'Icons & Homages',
   'Pop Culture',
+  'Real 80s',
   'Real 90s',
   'Y2K & Aero',
   'Retro Type',

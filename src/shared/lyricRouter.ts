@@ -161,6 +161,7 @@ export const THEME_DEFAULTS: Record<string, string> = {
   'Logo / Branding': 'spin',
   'Icons & Homages': 'stack',
   'Pop Culture': 'drop',
+  'Real 80s': 'teletext',
   'Real 90s': 'teletext',
   'Y2K & Aero': 'infomercial',
   'Retro Type': 'credits',
@@ -198,7 +199,7 @@ export interface RouteOptions {
 /** Generators that are only words. */
 const WORD_KINDS = new Set(['lyrics', 'lyricVideo', 'kineticType']);
 /** Looks whose words come from `source` ('lyrics' | 'title' | 'text'). */
-const SOURCE_KINDS = new Set(['lyricVideo', 'kineticType', 'demoParts', 'desktop90', 'neoBrutal', 'neo90', 'prints', 'tapeDeck', 'sketchScreen', 'stepChart', 'hotMetal', 'keyframes', 'poured', 'beatGames']);
+const SOURCE_KINDS = new Set(['lyricVideo', 'kineticType', 'demoParts', 'desktop90', 'neoBrutal', 'neo90', 'prints', 'tapeDeck', 'sketchScreen', 'stepChart', 'hotMetal', 'keyframes', 'poured', 'beatGames', 'hifi80', 'vector80', 'loader8']);
 /** Layouts that never print the sung line. */
 const WORDLESS: Record<string, string[]> = {
   desktop90: ['pet'],

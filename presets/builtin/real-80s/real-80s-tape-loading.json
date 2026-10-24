@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "name": "Tape Loading",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "home computer",
+    "8-bit",
+    "cassette",
+    "loading",
+    "old hardware",
+    "retro"
+  ],
+  "energy": 3,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "loader",
+      "name": "Tape loader",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "loader8",
+        "params": {
+          "machine": "micro48",
+          "cycleBars": 16,
+          "picture": "cover",
+          "program": "both",
+          "printSpeed": 1,
+          "stripeStride": 3,
+          "errors": 0.15,
+          "flash": true,
+          "soft": 0.5,
+          "source": "lyrics",
+          "text": ""
+        }
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "cable",
+            "generation": 1,
+            "wear": 0.3,
+            "events": 0,
+            "eventList": "all",
+            "overwrite": 0,
+            "mood": 0.2,
+            "seed": 48
+          }
+        },
+        {
+          "type": "tvSet",
+          "enabled": true,
+          "params": {
+            "set": "screen",
+            "zoom": 1,
+            "fit": "letterbox",
+            "curve": 1,
+            "glare": 0.8,
+            "room": 1,
+            "powerOn": true
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Load every",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycleBars",
+          "range": [
+            4,
+            64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stripe width",
+      "value": 0.182,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stripeStride",
+          "range": [
+            1,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Errors",
+      "value": 0.15,
+      "targets": [
+        {
+          "path": "layers.0.source.params.errors",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glass curve",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.curve",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Signal wear",
+      "value": 0.15,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    90,
+    150
+  ],
+  "description": "LOAD \"\" on the rubber-keyed 48K micro, on a curved TV screen: red and cyan pilot stripes, blue and yellow data stripes cut by the music itself, then the loading screen (the album cover with real attribute clash) arriving a third at a time before the colours flood in. Sometimes the tape fails."
+}

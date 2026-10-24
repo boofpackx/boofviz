@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "name": "VFD Analyzer",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "hi-fi",
+    "vfd",
+    "equalizer",
+    "spectrum analyzer",
+    "retro"
+  ],
+  "energy": 3,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "rack",
+      "name": "Analyzer",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "hifi80",
+        "params": {
+          "phosphor": "cyan",
+          "bands": 20,
+          "segments": 16,
+          "mirror": false,
+          "zones": true,
+          "gain": 1.1,
+          "peakHold": 0.6,
+          "header": true,
+          "labels": true,
+          "source": "title",
+          "text": "",
+          "scroll": 2
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.55,
+            "threshold": 0.75,
+            "radius": 0.55,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "hi8",
+            "generation": 1,
+            "wear": 0.3,
+            "events": 0,
+            "eventList": "all",
+            "overwrite": 0,
+            "mood": 0.2,
+            "seed": 8
+          }
+        },
+        {
+          "type": "vignette",
+          "enabled": true,
+          "params": {
+            "amount": 0.3,
+            "size": 0.85,
+            "softness": 0.6
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Gain",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.gain",
+          "range": [
+            0.4,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Peak hold",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.source.params.peakHold",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.344,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape wear",
+      "value": 0.175,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scroll",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.scroll",
+          "range": [
+            0,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    80,
+    140
+  ],
+  "description": "The glowing display of an 80s stereo spectrum analyzer, filling the screen: twenty columns of cyan VFD segments with amber and red tops, peak hold, the wire mesh in front and the song scrolling in 14-segment letters. Shot on a camcorder."
+}

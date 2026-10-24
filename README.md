@@ -2,7 +2,7 @@
 
 Real-time audio visualizer and auto-VJ for Windows (macOS second). It listens to anything playing on the computer (Serato, Rekordbox, Traktor, Spotify, YouTube, DAWs) and renders beat-locked visuals to a clean output window for a projector, LED wall or second screen.
 
-> **Status: Phase 6 (Performance layer) complete.** Over 200 built-in looks, synced lyrics on every look (Off / Looks' own / Everywhere) with four hero lyric looks, archive footage, and clips cut to the beat. See [Roadmap](#roadmap).
+> **Status: Phase 6 (Performance layer) complete.** Over 200 built-in looks (now with a Real 80s set), synced lyrics on every look (Off / Looks' own / Everywhere) with four hero lyric looks, archive footage, and clips cut to the beat. See [Roadmap](#roadmap).
 
 ## Run it (Windows)
 
@@ -51,6 +51,10 @@ Other commands:
 * **Album covers** (`cover.jpg`, `folder.jpg`) go with their album.
 
 With no folder named it looks through your Desktop and Downloads, taking the folders with songs in them and songs or lyrics lying loose (not other videos, or code projects). Name folders to look through those instead: `npm run music:organize -- "C:\Users\me\Desktop\old music"`. It lists where every file would go and asks before doing anything. It copies by default and leaves your originals; `--move` moves them instead and removes the folders it empties. No file is ever overwritten: a second copy of a song is skipped, and a different file with the same name gets ` (2)`. Running it again only picks up what's new. Formats BOOFVIZ can't play (WMA, Opus, audio-only WebM) are listed and left where they are. `--to="<folder>"` puts the library somewhere else, and `--yes` skips the question. What went where is written to `organize-log.txt` in the library.
+
+### Real 80s
+
+Twelve looks from things you actually saw in the 80s, at the old hardware's own resolution, colours and quirks, shown through a tube or a camcorder tape. **Vector arcade** draws with a beam instead of pixels, bright on the corners where it lingers: a rock field split on the kick (**Rock Field**), a 16-lane tube lit by the spectrum (**Tube Web**), a green wireframe battlefield through the gun sight (**Tank Sight**), a trench whose catwalks pass on the beat (**Trench Run**) and a **Laser Show** with beams fanning through the haze and a Lissajous figure drawn by the stereo signal. **Tape loader** is a home computer loading from cassette: the 48K micro's stripes (the data stripes come from the music) and its loading screen arriving in memory order with real attribute clash (**Tape Loading**, the album cover when there is one), or the 64K breadbox booting, loading in multicolour and running 10 PRINT the lyric (**Press Play on Tape**, **One-Line Maze**). **80s computer demo** is the mirror-symmetric **Light Synth 84** and the bouncing **Checkered Ball**, and **VFD analyzer** is a stereo's glowing spectrum display blown up to fill the screen (**VFD Analyzer**, **VFD Mirror**). Autopilot has an *80s night* playlist.
 
 ### Building looks
 
@@ -203,7 +207,7 @@ Both windows receive identical packets. Each one rebuilds the same `AudioFrame` 
 1. **Foundation**: done ✅
 2. **Engine core**: done ✅. Compositor, modulation, macros, palettes, preset save/load
 3. **Beat engine**: done ✅. Stronger beat tracker, Ableton Link, MIDI Clock in, beat-quantized changes
-4. **3D, techniques and looks**: done ✅. 3D scenes, raymarching, SDF text, particles, post-FX, and the era looks (Real 90s, Y2K, Lost Media, Retro TV, Brutalist, Neo 90s, Vintage, Lyrics)
+4. **3D, techniques and looks**: done ✅. 3D scenes, raymarching, SDF text, particles, post-FX, and the era looks (Real 80s, Real 90s, Y2K, Lost Media, Retro TV, Brutalist, Neo 90s, Vintage, Lyrics)
 5. **Clip engine**: done ✅. Clips cut to the beat from the archive or your own videos folder (the next clip cued before its cut), beat-synced stutter, reverse, scratch and freeze, and music-video mode: your own video for the playing song (named "Artist - Title" in the videos folder), in time with the song
 6. **Performance layer**: done ✅. Cue and GO, MIDI learn for any controller, sets played in order, blackout / strobe / freeze, on top of the beat-quantized launches and 9 transition types
 7. Output pro: Spout, recording, keystone, auto-quality, photosensitivity limiter

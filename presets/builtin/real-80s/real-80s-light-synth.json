@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "name": "Light Synth 84",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "home computer",
+    "8-bit",
+    "psychedelic",
+    "symmetry",
+    "retro"
+  ],
+  "energy": 4,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "synth",
+      "name": "Light synth",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "demo80",
+        "params": {
+          "mode": "lightSynth",
+          "lines": 150,
+          "rate": 2,
+          "grow": 24,
+          "width": 40,
+          "step": 3,
+          "symmetry": "8",
+          "shape": "mixed",
+          "colours": "classic",
+          "cycle": 1,
+          "bounceBeats": 2,
+          "crossBars": 2,
+          "ballSize": 0.2,
+          "spin": 1.2
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.45,
+            "threshold": 0.6,
+            "radius": 0.5,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.3,
+            "scanlines": 0.4,
+            "mask": 0.3,
+            "vignette": 0.45
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Bursts",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.rate",
+          "range": [
+            0.5,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Growth",
+      "value": 0.263,
+      "targets": [
+        {
+          "path": "layers.0.source.params.grow",
+          "range": [
+            4,
+            80
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Depth",
+      "value": 0.298,
+      "targets": [
+        {
+          "path": "layers.0.source.params.width",
+          "range": [
+            6,
+            120
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rings",
+      "value": 0.182,
+      "targets": [
+        {
+          "path": "layers.0.source.params.step",
+          "range": [
+            1,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cycling",
+      "value": 0.125,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycle",
+          "range": [
+            0,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pixels",
+      "value": 0.265,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lines",
+          "range": [
+            60,
+            400
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    100,
+    160
+  ],
+  "description": "The mid-80s home-computer light synthesizer: mirror-symmetric bursts of fat pixels bloom from the middle two a beat, stepping through colour rings, newer bursts painting over older ones while the palette rotates a notch every beat. Straight off a tube TV."
+}

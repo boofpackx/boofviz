@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "name": "One-Line Maze",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "home computer",
+    "8-bit",
+    "basic",
+    "maze",
+    "old hardware",
+    "retro"
+  ],
+  "energy": 2,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "loader",
+      "name": "Tape loader",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "loader8",
+        "params": {
+          "machine": "micro64",
+          "cycleBars": 32,
+          "picture": "title",
+          "program": "maze",
+          "printSpeed": 1,
+          "stripeStride": 2,
+          "errors": 0.15,
+          "flash": true,
+          "soft": 0.35,
+          "source": "title",
+          "text": ""
+        }
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.35,
+            "scanlines": 0.45,
+            "mask": 0.35,
+            "vignette": 0.45
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.3,
+            "threshold": 0.7,
+            "radius": 0.5,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Load every",
+      "value": 0.467,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycleBars",
+          "range": [
+            4,
+            64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Print speed",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.printSpeed",
+          "range": [
+            0.25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Curvature",
+      "value": 0.233,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.curvature",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scanlines",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.scanlines",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    80,
+    140
+  ],
+  "description": "The most famous line of home-computer BASIC filling a blue screen with a diagonal maze, two lines a beat and a new text colour every bar, after a quick tape load — straight to a sharp monitor."
+}

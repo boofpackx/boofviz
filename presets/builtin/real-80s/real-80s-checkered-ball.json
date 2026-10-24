@@ -1,0 +1,154 @@
+{
+  "schema": 1,
+  "name": "Checkered Ball",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "home computer",
+    "demo",
+    "3d",
+    "retro"
+  ],
+  "energy": 2,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "ball",
+      "name": "Ball",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "demo80",
+        "params": {
+          "mode": "boing",
+          "lines": 200,
+          "rate": 2,
+          "grow": 24,
+          "width": 40,
+          "step": 3,
+          "symmetry": "8",
+          "shape": "mixed",
+          "colours": "classic",
+          "cycle": 1,
+          "bounceBeats": 2,
+          "crossBars": 2,
+          "ballSize": 0.2,
+          "spin": 1.2
+        }
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.3,
+            "scanlines": 0.35,
+            "mask": 0.3,
+            "vignette": 0.4
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Bounce every",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bounceBeats",
+          "range": [
+            0.5,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cross every",
+      "value": 0.097,
+      "targets": [
+        {
+          "path": "layers.0.source.params.crossBars",
+          "range": [
+            0.5,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ball size",
+      "value": 0.375,
+      "targets": [
+        {
+          "path": "layers.0.source.params.ballSize",
+          "range": [
+            0.08,
+            0.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            0,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pixels",
+      "value": 0.412,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lines",
+          "range": [
+            60,
+            400
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    80,
+    140
+  ],
+  "description": "The 1984 demo everyone remembers: a red and white checkered ball spinning on a tilted axis, bouncing across a purple grid and landing on the beat, its shadow on the wall, turning back at each wall."
+}

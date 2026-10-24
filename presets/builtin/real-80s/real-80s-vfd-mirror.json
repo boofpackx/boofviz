@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "name": "VFD Mirror",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "hi-fi",
+    "vfd",
+    "equalizer",
+    "spectrum analyzer",
+    "retro"
+  ],
+  "energy": 3,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "vfd",
+      "name": "Analyzer",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "hifi80",
+        "params": {
+          "phosphor": "amber",
+          "bands": 40,
+          "segments": 12,
+          "mirror": true,
+          "zones": false,
+          "gain": 1.2,
+          "peakHold": 0.5,
+          "header": false,
+          "labels": false,
+          "source": "title",
+          "text": "",
+          "scroll": 2
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.8,
+            "threshold": 0.6,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.2,
+            "scanlines": 0.3,
+            "mask": 0.25,
+            "vignette": 0.4
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Gain",
+      "value": 0.381,
+      "targets": [
+        {
+          "path": "layers.0.source.params.gain",
+          "range": [
+            0.4,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Peak hold",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.peakHold",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Curvature",
+      "value": 0.133,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.curvature",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    90,
+    150
+  ],
+  "description": "Forty columns of amber vacuum-fluorescent segments growing up and down from the middle, peak caps hanging on the loud bits, glowing through the wire mesh: the analyzer display blown up to fill the wall."
+}

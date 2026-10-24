@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "name": "Tank Sight",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "vector",
+    "arcade",
+    "game",
+    "wireframe",
+    "3d",
+    "retro"
+  ],
+  "energy": 3,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "tank",
+      "name": "Battlefield",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "vector80",
+        "params": {
+          "mode": "tank",
+          "haze": 1,
+          "color": "classic",
+          "speed": 1,
+          "beam": 1,
+          "glow": 1,
+          "jitter": 1,
+          "rocks": 5,
+          "shapePhrases": 1,
+          "spikes": 1,
+          "source": "text",
+          "text": ""
+        }
+      },
+      "fx": [
+        {
+          "type": "feedback",
+          "enabled": true,
+          "params": {
+            "amount": 0.55,
+            "zoom": 0,
+            "rotate": 0,
+            "shiftX": 0,
+            "shiftY": 0,
+            "hueDrift": 0,
+            "blend": "max"
+          }
+        },
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.7,
+            "threshold": 0.5,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.45,
+            "scanlines": 0.25,
+            "mask": 0.3,
+            "vignette": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Speed",
+      "value": 0.273,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Beam",
+      "value": 0.231,
+      "targets": [
+        {
+          "path": "layers.0.source.params.beam",
+          "range": [
+            0.4,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Afterglow",
+      "value": 0.611,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.437,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Jitter",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.jitter",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    90,
+    140
+  ],
+  "description": "The 1980 green wireframe battlefield through the gun sight: pyramids and blocks sliding past, mountains and a smoking volcano all around, a red radar sweeping once a bar. The cannon fires on the kick, and the glass cracks on the drop."
+}

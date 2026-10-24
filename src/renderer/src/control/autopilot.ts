@@ -31,6 +31,7 @@ const tagged = (e: PresetEntry, tags: string[]): boolean => e.preset.tags.some((
 export const PLAYLISTS: Array<{ id: string; name: string; test: (e: PresetEntry) => boolean }> = [
   { id: 'lyrics', name: 'With lyrics', test: hasWords },
   { id: 'nowords', name: 'No words', test: (e) => !hasWords(e) && e.preset.layers.every((l) => l.source.kind !== 'demoParts') },
+  { id: 'eighties', name: '80s night', test: (e) => e.preset.category === 'Real 80s' || tagged(e, ['80s', 'vector', 'vfd', 'home computer', 'cassette', 'hi-fi']) },
   { id: 'nineties', name: '90s night', test: (e) => ['Real 90s', 'Retro Type', 'Retro / Glitch', 'Neo 90s'].includes(e.preset.category) || tagged(e, ['90s', 'arcade', 'crt', 'vhs', 'lcd', 'terminal', 'old hardware', '8-bit', 'screensaver', 'dial-up', 'camcorder', 'home video', 'cable']) },
   { id: 'vintage', name: 'Vintage & analog', test: (e) => e.preset.category === 'Retro Type' || e.preset.category === 'Vintage' || tagged(e, ['vintage', 'film', 'sepia', 'tape', 'vhs', 'photocopy', 'neon', 'silent film', 'home video']) },
   { id: 'y2k', name: 'Y2K & glossy', test: (e) => e.preset.category === 'Y2K & Aero' || tagged(e, ['y2k', 'chrome', 'glossy', 'candy', 'vaporwave', 'synthwave']) },

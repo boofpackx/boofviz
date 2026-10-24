@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "name": "Press Play on Tape",
+  "category": "Real 80s",
+  "tags": [
+    "80s",
+    "home computer",
+    "8-bit",
+    "cassette",
+    "basic",
+    "lyrics",
+    "old hardware",
+    "retro"
+  ],
+  "energy": 3,
+  "palette": "Neon",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "loader",
+      "name": "Tape loader",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "loader8",
+        "params": {
+          "machine": "micro64",
+          "cycleBars": 16,
+          "picture": "cover",
+          "program": "both",
+          "printSpeed": 1,
+          "stripeStride": 3,
+          "errors": 0.15,
+          "flash": true,
+          "soft": 0.35,
+          "source": "lyrics",
+          "text": ""
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.25,
+            "threshold": 0.7,
+            "radius": 0.5,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "tvSet",
+          "enabled": true,
+          "params": {
+            "set": "screen",
+            "zoom": 1,
+            "fit": "letterbox",
+            "curve": 1,
+            "glare": 0.8,
+            "room": 1,
+            "powerOn": true
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Load every",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cycleBars",
+          "range": [
+            4,
+            64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Print speed",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.printSpeed",
+          "range": [
+            0.25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stripe width",
+      "value": 0.182,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stripeStride",
+          "range": [
+            1,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glass curve",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.curve",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glare",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.glare",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "bpmHint": [
+    90,
+    150
+  ],
+  "description": "The 64K breadbox boots blue, types LOAD, waits for PRESS PLAY ON TAPE and FOUND, flickers its turbo-loader stripes while the album cover loads in fat multicolour pixels, then lists and runs 10 PRINT the lyric, 20 GOTO 10 — every other load it runs the famous one-line maze instead."
+}
