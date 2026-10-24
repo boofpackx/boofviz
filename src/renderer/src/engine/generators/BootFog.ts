@@ -53,15 +53,16 @@ void main() {
   vec3 ro = uCam;
   vec3 acc = vec3(0.0);
   float t = 0.2;
-  for (int i = 0; i < 72; i++) {
+  for (int i = 0; i < 56; i++) {
     vec3 p = ro + rd * t;
     vec2 d = towers(p);
     float fogFade = exp(-t * 0.07 * uFog);
     // Glow from being near a tower: soft faces, brighter edges.
-    float g = exp(-max(d.x, 0.0) * 6.0) * 0.045 + (d.x < 0.02 ? 0.02 : 0.0);
+    // (Weighted for the 0.1 minimum step; fewer, longer steps keep it fast.)
+    float g = (exp(-max(d.x, 0.0) * 6.0) * 0.045 + (d.x < 0.02 ? 0.02 : 0.0)) * 1.25;
     acc += (uPal[3] * g + uPal[4] * d.y * g * 3.0) * fogFade * uGlow;
-    t += clamp(d.x * 0.7, 0.08, 0.6);
-    if (t > 40.0) break;
+    t += clamp(d.x * 0.7, 0.1, 0.6);
+    if (t > 34.0) break;
   }
   // The void and its fog: darker above, glowing low towards the horizon.
   float hz = exp(-abs(rd.y + 0.05) * 6.0);
