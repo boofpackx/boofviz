@@ -507,6 +507,195 @@ export const GENERATORS: ModuleDef[] = [
     ],
   },
   {
+    kind: 'silhouette',
+    label: 'Silhouette dance',
+    description:
+      'The 2003 music-player ads: one flat, loud colour cutting to the next on every bar, pure black silhouettes dancing on the beat and thin white earphone cords whipping behind every move. A new dance every phrase; two dancers after the drop.',
+    params: [
+      t('moves', 'Moves', 'all', 'all, or a comma list: bounce, roof, running, jump, point, lean, pop, clap'),
+      e('framing', 'Framing', 'mixed', ['mixed', 'wide', 'close', 'pair'], 'mixed: a new framing every phrase, two dancers after a drop'),
+      i('cutBars', 'Colour every', 1, 1, 8, 'bars per background colour (the palette, all five colours)'),
+      f('bounce', 'Bounce', 1, 0, 2, 0.05, 'how much the kick bends the knees'),
+    ],
+  },
+  {
+    kind: 'pluginEra',
+    label: 'Plugin era',
+    description:
+      'The media-player visualizer plugins of 1999-2004: the last frame redrawn through a coarse warp mesh (zoom, turn, swirl, warp, ripple, drift), fading and drifting in hue, the music drawn on top as waves, rings, dots, an XY trace or spikes, with video echo, centre darkening and a beat of inversion on the drop. A new preset blends in every phrase.',
+    params: [
+      i('preset', 'Preset', -1, -1, 9, '-1 = a new one every phrase · 0-9 hold one'),
+      i('phrasesPerPreset', 'Preset every', 1, 1, 8, 'phrases'),
+      f('blendBars', 'Blend', 1, 0, 4, 0.25, 'bars ×2 to blend into the next preset; 0 = hard cuts'),
+      f('speed', 'Speed', 1, 0.2, 3, 0.05),
+      f('react', 'Reaction', 1, 0, 3, 0.05),
+      f('waveSize', 'Wave size', 1, 0.2, 3, 0.05),
+      f('hueDrift', 'Hue drift', 1, 0, 4, 0.05),
+      b('echo', 'Video echo', true),
+      b('invert', 'Drop inversion', true, 'the colours invert for a beat on the drop'),
+      f('lines', 'Buffer lines', 360, 120, 1080, 1, 'the small buffer stretched to the screen; lower is softer'),
+    ],
+  },
+  {
+    kind: 'bulletTime',
+    label: 'Bullet time',
+    description:
+      'The 1999 frozen-moment shot: a burst of glass shards and droplets on each phrase downbeat, time all but stopping within a beat while the camera swings round the frozen cloud in steps like a row of still cameras, dust hanging in a shaft of light, streaks only while time runs. The drop snaps time back.',
+    params: [
+      f('mix', 'Shards / drops', 0.5, 0, 1, 0.01, '0 = all glass shards · 1 = all water droplets'),
+      i('phrasesPerShot', 'Shot every', 1, 1, 4, 'phrases'),
+      f('burstBeats', 'Burst', 1, 0.25, 4, 0.25, 'beats of running time before the freeze'),
+      f('creep', 'Creep', 0.05, 0, 0.5, 0.01, 'how much time still moves while frozen (more in a build)'),
+      f('arc', 'Camera arc', 1, 0, 2.5, 0.05, 'how far the camera swings in a shot (more with the energy)'),
+      f('stutter', 'Camera steps', 0.6, 0, 1, 0.05, 'the stepping of a row of still cameras'),
+      f('streak', 'Streaks', 1, 0, 3, 0.05),
+    ],
+  },
+  {
+    kind: 'y2k',
+    label: 'Y2K rollover',
+    description:
+      'New Year\u2019s Eve 1999 as it went out live: a red LED countdown landing on the phrase downbeat, a giant 2000 and fireworks on every kick, then the bug: the year flickers to 1900, the segments scramble and the screen falls into a blue fatal-error page quoting the lyric, before the countdown reboots. The drop jumps straight to the bug.',
+    params: [f('bugAt', 'Bug after', 0.5, 0.1, 0.9, 0.05, 'how far into the midnight phrase the bug bites')],
+  },
+  {
+    kind: 'glowstick',
+    label: 'Glowstick rave',
+    description:
+      'Late-90s raves lit only by glowsticks: mirrored pairs swinging loops, figure eights, poi flowers, waves and pendulums locked to the beat, long-exposure trails fading over a bar, a new pattern every bar, more dancers through the phrase, and the sticks thrown up spinning on the drop.',
+    params: [
+      e('pattern', 'Pattern', 'mixed', ['mixed', 'circles', 'eights', 'flowers', 'waves', 'pendulum', 'antispin'], 'mixed: a new pattern every bar'),
+      i('pairs', 'Dancers', 3, 1, 4, 'pairs of sticks at the peak of a phrase'),
+      f('size', 'Size', 1, 0.4, 2, 0.05),
+      f('speed', 'Swing', 1, 0.25, 2, 0.25, 'loops per beat ×'),
+      f('trail', 'Trail', 1, 0.25, 2, 0.05, 'bars of trail'),
+      f('haze', 'Haze', 1, 0, 3, 0.05),
+    ],
+  },
+  {
+    kind: 'fractalFlame',
+    label: 'Fractal flame',
+    description:
+      'The 1999 distributed fractal screensaver: silky filaments of light like smoke, thin wisps faint and dense folds burning white, colour flowing along the structure, morphing into a new flame every phrase. The bass breathes it, the kick flares it, the drop shatters it into sparks.',
+    params: [
+      i('flame', 'Flame', -1, -1, 9, '-1 = a new one every phrase · 0-9 hold one'),
+      i('phrasesPerFlame', 'Flame every', 1, 1, 8, 'phrases'),
+      f('morph', 'Morph', 0.5, 0, 1, 0.05, 'share of the phrase spent morphing into the next flame'),
+      f('exposure', 'Exposure', 1, 0.2, 3, 0.05),
+      f('zoom', 'Zoom', 1, 0.5, 2, 0.01),
+      f('spin', 'Spin', 1, 0, 6, 0.05),
+      f('silk', 'Silk', 0.12, 0.02, 0.6, 0.01, 'seconds the light lingers (smoother, softer)'),
+      f('react', 'Reaction', 1, 0, 3, 0.05),
+      i('points', 'Points', 160000, 20000, 600000, 'per frame; fewer for slower machines'),
+      f('lines', 'Resolution', 540, 180, 1080, 1),
+    ],
+  },
+  {
+    kind: 'plasmaGlobe',
+    label: 'Plasma globe',
+    description:
+      'The novelty lamp: violet lightning tendrils crawling from a bright core to the glass, wriggling and forking, a hot spot where each lands, in 3D. Every kick gathers them to one point like a fingertip on the glass; the drop makes the whole globe crackle.',
+    params: [
+      i('tendrils', 'Tendrils', 11, 3, 20),
+      f('size', 'Size', 1, 0.5, 1.6, 0.01),
+      f('speed', 'Wander', 1, 0.2, 3, 0.05),
+      f('touch', 'Fingertip', 1, 0, 1.5, 0.05, 'how strongly the kick gathers the tendrils'),
+    ],
+  },
+  {
+    kind: 'fiberOptic',
+    label: 'Fiber optic lamp',
+    description:
+      'The novelty lamp: hundreds of fine fibres springing from the base, faint along their length and bright at the tips, the colour wheel stepping through the palette on every beat, the spray swaying and breathing with the bass, tips sparkling on the hats, the wheel spinning round on the drop.',
+    params: [
+      e('shape', 'Spray', 'mixed', ['mixed', 'dome', 'fountain', 'fan'], 'mixed: a new shape every phrase'),
+      e('colours', 'Colour wheel', 'split', ['single', 'split', 'rainbow'], 'one colour at a time, two split across the spray, or a rainbow'),
+      f('wheel', 'Wheel speed', 1, 0, 4, 0.25, 'notches per beat ×'),
+      f('size', 'Size', 1, 0.5, 1.5, 0.01),
+      f('react', 'Reaction', 1, 0, 3, 0.05),
+    ],
+  },
+  {
+    kind: 'rail',
+    label: 'Synesthesia rail',
+    description:
+      'The 2001 trance rail shooter: flying through a glowing wireframe world that changes form every phrase (grid ocean, tunnel, lattice, void), brackets locking on to wireframe targets a beat ahead and each hit landing exactly on a note of the song, read from the last bar\u2019s kicks, snares and hats.',
+    params: [
+      e('world', 'World', 'mixed', ['mixed', 'ocean', 'tunnel', 'lattice', 'void'], 'mixed: a new world every phrase'),
+      f('density', 'Hats as targets', 1, 0, 3, 0.05, 'how many hi-hat notes become targets'),
+      f('speed', 'Flight speed', 1, 0.2, 3, 0.05),
+    ],
+  },
+  {
+    kind: 'swoosh',
+    label: 'Trance swoosh',
+    description:
+      'Trance compilation art of the 2000s: electric light swooshes sweeping round a glowing core on tilted orbits, launched on every kick, a long anamorphic lens streak flashing on the snare, starburst rays on the drop, hairline orbit rings and a hexagon grid fading in with the phrase.',
+    params: [
+      f('speed', 'Sweep', 1, 0.2, 3, 0.05),
+      f('life', 'Swoosh life', 1, 0.5, 4, 0.25, 'bars'),
+      f('length', 'Length', 1, 0.3, 2, 0.05),
+      f('width', 'Width', 1, 0.3, 3, 0.05),
+      f('streak', 'Lens streak', 1, 0, 3, 0.05),
+      f('hex', 'Hex grid', 1, 0, 2, 0.05),
+      f('rings', 'Orbit rings', 1, 0, 2, 0.05),
+    ],
+  },
+  {
+    kind: 'bootFog',
+    label: 'Console boot fog',
+    description:
+      'The mood of the 2000 console start-up: a deep blue void thick with fog, translucent glowing towers rising out of the murk with the spectrum, light motes drifting, a slow camera glide, a soft swell of light at the end of each phrase, every tower surging up on the drop.',
+    params: [
+      f('speed', 'Glide', 1, 0.2, 3, 0.05),
+      f('react', 'Tower reaction', 1, 0, 3, 0.05),
+      f('fog', 'Fog', 1, 0.3, 2.5, 0.05),
+      f('glow', 'Glow', 1, 0.3, 3, 0.05),
+      f('motes', 'Motes', 1, 0, 3, 0.05),
+      f('swell', 'Phrase swell', 1, 0, 2, 0.05),
+    ],
+  },
+  {
+    kind: 'aquaGel',
+    label: 'Aqua gel',
+    description:
+      'The glossy gel interface material of 2000-2003 as a spectrum: translucent candy-gel capsules on pinstripes, the stripes bending through them, glossy highlights, glowing bottoms and tinted shadows, wobbling like jelly on the kick and popping into floating gel bubbles on the drop.',
+    params: [
+      i('capsules', 'Capsules', 12, 4, 24),
+      e('colours', 'Colours', 'rainbow', ['single', 'two', 'rainbow'], 'one gel colour, alternating two, or across the palette'),
+      e('stripes', 'Background', 'light', ['light', 'graphite']),
+      f('gain', 'Gain', 1, 0.3, 2.5, 0.05),
+      f('wobble', 'Wobble', 1, 0, 2.5, 0.05),
+    ],
+  },
+  {
+    kind: 'burnDisc',
+    label: 'Burn disc',
+    description:
+      'The CD-R mix era: a recordable disc close up, its dye tint, fine track grooves, a rainbow diffraction streak swinging with the light, the clear hub, and the burned area growing outward a band of tracks every phrase. It spins with the tempo, the diffraction flashes on the kick and the drop swings the light round.',
+    params: [
+      f('spin', 'Spin', 1, 0, 3, 0.05),
+      f('drift', 'Light drift', 1, 0, 4, 0.05),
+      f('flash', 'Kick flash', 1, 0, 3, 0.05),
+      i('phrasesToBurn', 'Burn over', 12, 2, 48, 'phrases to burn the whole disc'),
+      f('size', 'Size', 1, 0.6, 1.6, 0.01),
+    ],
+  },
+  {
+    kind: 'celShade',
+    label: 'Cel-shade',
+    description:
+      'The cel-shaded console look of 2000-2003: blobby 3D forms merging and parting in two flat tones with a hard highlight and thick ink outlines over a halftone sky, squashing on the kick, speed lines through the build and ink splats on the drop.',
+    params: [f('speed', 'Motion', 1, 0.2, 3, 0.05), f('squash', 'Squash', 1, 0, 2, 0.05), f('outline', 'Ink line', 1, 0.3, 3, 0.05), f('orbit', 'Camera orbit', 1, 0, 4, 0.05)],
+  },
+  {
+    kind: 'accelDemo',
+    label: 'Accelerator demo',
+    description:
+      'The demo that showed off a new 3D card around 1999: a bump-mapped planet with coloured lights sweeping across it on the beat, a chrome ring orbiting, a multi-element lens flare blooming on the kick, all in 16-bit colour with its banding and ordered dither.',
+    params: [f('sweep', 'Light sweep', 1, 0, 3, 0.05), f('spin', 'Spin', 1, 0, 4, 0.05), f('flare', 'Lens flare', 1, 0, 3, 0.05), b('bits16', '16-bit colour', true, 'the banding and dither of a 16-bit frame buffer')],
+  },
+  {
     kind: 'demoParts',
     label: 'Demo parts',
     description:
@@ -1148,6 +1337,24 @@ export const EFFECTS: ModuleDef[] = [
       f('buffering', 'Buffering', 0.2, 0, 1),
       i('seed', 'File', 0, 0, 99),
     ],
+  },
+  {
+    kind: 'fisheye',
+    label: 'Skate fisheye',
+    description: 'The late-90s camcorder fisheye from the skate videos: the middle bulging, the edges squeezed, black lens-hood corners, colour fringing at the edge and crushed camcorder colour.',
+    params: [f('amount', 'Fisheye', 0.8, 0, 1), f('hood', 'Lens hood', 1, 0.6, 1.6, 0.01, 'smaller = more of the corners go black'), f('fringe', 'Colour fringe', 1, 0, 3), f('crush', 'Crushed colour', 1, 0, 2)],
+  },
+  {
+    kind: 'dvInterlace',
+    label: 'DV interlace',
+    description: 'The 2000s camcorder and capture card: every other line shows the previous field, so motion combs; the colour is shared across four pixels; blocks drop out in short bursts on the kick.',
+    params: [f('combing', 'Combing', 1, 0, 1), f('chroma', 'Colour smear', 0.8, 0, 1), f('dropouts', 'Dropouts', 0.3, 0, 2)],
+  },
+  {
+    kind: 'earlyLcd',
+    label: 'Early LCD',
+    description: 'The first flat panels: slow pixels ghosting behind anything that moves, a visible RGB pixel grid, washed-out blacks and the colour shifting towards the top of the panel.',
+    params: [f('ghost', 'Ghosting', 0.55, 0, 0.92), f('grid', 'Pixel grid', 0.6, 0, 1), f('pixel', 'Pixel size', 4, 2, 12, 0.5), f('blacks', 'Washed blacks', 1, 0, 2), f('angle', 'Viewing angle', 0.5, 0, 1.5)],
   },
   {
     kind: 'crt',

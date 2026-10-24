@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "name": "Fractal Flame",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "fractal",
+    "screensaver",
+    "psychedelic",
+    "smoke"
+  ],
+  "energy": 2,
+  "palette": "Flame",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "flame",
+      "name": "Flame",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "fractalFlame",
+        "params": {
+          "flame": -1,
+          "phrasesPerFlame": 1,
+          "morph": 0.5,
+          "exposure": 1,
+          "zoom": 1,
+          "spin": 1,
+          "silk": 0.12,
+          "react": 1,
+          "points": 160000,
+          "lines": 540
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.5,
+            "threshold": 0.6,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Exposure",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.exposure",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Zoom",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.zoom",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.167,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            0,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Silk",
+      "value": 0.172,
+      "targets": [
+        {
+          "path": "layers.0.source.params.silk",
+          "range": [
+            0.02,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Morph",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.morph",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reaction",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Flame": [
+      "#000000",
+      "#2a1aff",
+      "#ff2a8a",
+      "#ffb42a",
+      "#3ae0ff"
+    ]
+  },
+  "bpmHint": [
+    70,
+    140
+  ],
+  "description": "The fractal screensaver everyone shared in 1999: silky filaments of light like smoke, the dense folds burning white, slowly morphing into a new flame every phrase, breathing with the bass and shattering into sparks on the drop."
+}

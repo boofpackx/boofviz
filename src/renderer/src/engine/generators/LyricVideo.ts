@@ -228,6 +228,7 @@ const AUTO_STYLE: Record<string, LyricStyle> = {
   'Pop Culture': 'drop',
   'Real 80s': 'teletext',
   'Real 90s': 'teletext',
+  'Real 2000s': 'infomercial',
   'Y2K & Aero': 'infomercial',
   'Retro Type': 'credits',
   'Lost Media': 'credits',

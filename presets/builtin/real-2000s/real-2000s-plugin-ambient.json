@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "name": "Plugin Ambient",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "visualizer",
+    "feedback",
+    "ambient",
+    "chill"
+  ],
+  "energy": 2,
+  "palette": "Plugin Night",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "plugin",
+      "name": "Visualizer",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "pluginEra",
+        "params": {
+          "preset": -1,
+          "phrasesPerPreset": 2,
+          "blendBars": 2,
+          "speed": 0.55,
+          "react": 0.6,
+          "waveSize": 1,
+          "hueDrift": 0.6,
+          "echo": true,
+          "invert": false,
+          "lines": 360
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Reaction",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wave size",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.waveSize",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hue drift",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.hueDrift",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Blend",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.blendBars",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Buffer lines",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lines",
+          "range": [
+            120,
+            1080
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Plugin Night": [
+      "#000000",
+      "#2a4cff",
+      "#8a3cff",
+      "#3cffd2",
+      "#ff6ab4"
+    ]
+  },
+  "bpmHint": [
+    70,
+    120
+  ],
+  "description": "The visualizer at 3am: slower warps, long smoky trails, presets melting into each other over four bars every second phrase, gentle reaction to the music."
+}

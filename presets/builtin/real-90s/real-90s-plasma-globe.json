@@ -1,0 +1,145 @@
+{
+  "schema": 1,
+  "name": "Plasma Globe",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "plasma",
+    "lightning",
+    "lamp",
+    "electric"
+  ],
+  "energy": 3,
+  "palette": "Plasma",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "globe",
+      "name": "Plasma globe",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "plasmaGlobe",
+        "params": {
+          "tendrils": 11,
+          "size": 1,
+          "speed": 1,
+          "touch": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.8,
+            "threshold": 0.5,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Tendrils",
+      "value": 0.471,
+      "targets": [
+        {
+          "path": "layers.0.source.params.tendrils",
+          "range": [
+            3,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wander",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fingertip",
+      "value": 0.667,
+      "targets": [
+        {
+          "path": "layers.0.source.params.touch",
+          "range": [
+            0,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Plasma": [
+      "#000000",
+      "#1a0630",
+      "#d23cff",
+      "#ffd2ff",
+      "#ff8ae8"
+    ]
+  },
+  "bpmHint": [
+    80,
+    150
+  ],
+  "description": "The novelty lamp in a dark bedroom: violet lightning tendrils crawling from the core to the glass, every kick pulling them together to one point like a fingertip on the glass, the whole globe crackling on the drop."
+}

@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "name": "Rail Ocean",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "trance",
+    "wireframe",
+    "game",
+    "ocean"
+  ],
+  "energy": 3,
+  "palette": "Rail Ocean",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "rail",
+      "name": "Rail",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "rail",
+        "params": {
+          "world": "ocean",
+          "density": 0.6,
+          "speed": 0.8
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.9,
+            "threshold": 0.45,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Hats as targets",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.density",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Flight speed",
+      "value": 0.214,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Rail Ocean": [
+      "#000000",
+      "#3a7aff",
+      "#2affd2",
+      "#ff7ae0",
+      "#ffffff"
+    ]
+  },
+  "bpmHint": [
+    110,
+    140
+  ],
+  "description": "Gliding low over a rolling wireframe ocean that swells with the bass, targets drifting in and bursting on the song’s notes."
+}

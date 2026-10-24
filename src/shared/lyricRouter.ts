@@ -163,6 +163,7 @@ export const THEME_DEFAULTS: Record<string, string> = {
   'Pop Culture': 'drop',
   'Real 80s': 'teletext',
   'Real 90s': 'teletext',
+  'Real 2000s': 'infomercial',
   'Y2K & Aero': 'infomercial',
   'Retro Type': 'credits',
   Lyrics: 'drop',

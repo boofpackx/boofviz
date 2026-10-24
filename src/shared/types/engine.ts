@@ -214,6 +214,7 @@ export const PRESET_CATEGORIES = [
   'Pop Culture',
   'Real 80s',
   'Real 90s',
+  'Real 2000s',
   'Y2K & Aero',
   'Retro Type',
   'Lyrics',

@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "name": "Boot Fog Violet",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "console",
+    "fog",
+    "ambient",
+    "3d",
+    "night"
+  ],
+  "energy": 2,
+  "palette": "Boot Violet",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "fog",
+      "name": "Boot fog",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "bootFog",
+        "params": {
+          "speed": 0.7,
+          "react": 1,
+          "fog": 1.4,
+          "glow": 1.2,
+          "motes": 1,
+          "swell": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.5,
+            "threshold": 0.6,
+            "radius": 0.8,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Glide",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tower reaction",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fog",
+      "value": 0.318,
+      "targets": [
+        {
+          "path": "layers.0.source.params.fog",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.259,
+      "targets": [
+        {
+          "path": "layers.0.source.params.glow",
+          "range": [
+            0.3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Motes",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.motes",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Boot Violet": [
+      "#040008",
+      "#100422",
+      "#4a1a8a",
+      "#c86aff",
+      "#ffe0ff"
+    ]
+  },
+  "bpmHint": [
+    60,
+    120
+  ],
+  "description": "The boot fog after midnight: violet murk, towers glowing pink at the edges, thicker fog and slower glide, the towers surging on the drop."
+}

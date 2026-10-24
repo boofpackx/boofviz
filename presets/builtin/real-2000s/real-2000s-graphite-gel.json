@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "name": "Graphite Gel",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "y2k",
+    "glossy",
+    "gel",
+    "equalizer",
+    "interface",
+    "dark"
+  ],
+  "energy": 3,
+  "palette": "Graphite",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "gel",
+      "name": "Gel",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "aquaGel",
+        "params": {
+          "capsules": 16,
+          "colours": "two",
+          "stripes": "graphite",
+          "gain": 1.1,
+          "wobble": 0.8
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Capsules",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.capsules",
+          "range": [
+            4,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gain",
+      "value": 0.318,
+      "targets": [
+        {
+          "path": "layers.0.source.params.gain",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wobble",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.wobble",
+          "range": [
+            0,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Graphite": [
+      "#000000",
+      "#5ac8ff",
+      "#a0a8b8",
+      "#3a6aff",
+      "#c0e8ff"
+    ]
+  },
+  "bpmHint": [
+    90,
+    140
+  ],
+  "description": "The gel capsules in the graphite theme: dark pinstripes, two alternating cool gels, the highlights glinting on the hats."
+}

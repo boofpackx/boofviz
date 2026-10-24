@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "name": "Silhouette Dance",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "silhouette",
+    "dance",
+    "flat colour",
+    "pop"
+  ],
+  "energy": 4,
+  "palette": "Silhouette",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "dance",
+      "name": "Dancers",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "silhouette",
+        "params": {
+          "moves": "all",
+          "framing": "mixed",
+          "cutBars": 1,
+          "bounce": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Bounce",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bounce",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Colour every",
+      "value": 0,
+      "targets": [
+        {
+          "path": "layers.0.source.params.cutBars",
+          "range": [
+            1,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Silhouette": [
+      "#9be256",
+      "#ff2c9c",
+      "#008bd3",
+      "#fe7b21",
+      "#8a1ef5"
+    ]
+  },
+  "bpmHint": [
+    95,
+    135
+  ],
+  "description": "The 2003 music-player ads: a loud flat colour cutting to the next on every bar, black silhouettes dancing on the beat, thin white earphone cords whipping behind every move. A new dance every phrase, two dancers after the drop."
+}

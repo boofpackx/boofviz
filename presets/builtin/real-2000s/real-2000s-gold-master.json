@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "name": "Gold Master",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "cd",
+    "gold",
+    "rainbow",
+    "disc"
+  ],
+  "energy": 2,
+  "palette": "Gold Dye",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "disc",
+      "name": "Disc",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "burnDisc",
+        "params": {
+          "spin": 0.8,
+          "drift": 0.8,
+          "flash": 0.8,
+          "phrasesToBurn": 16,
+          "size": 1.1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.4,
+            "threshold": 0.8,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Spin",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Light drift",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.drift",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick flash",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.flash",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.6,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Gold Dye": [
+      "#000000",
+      "#1a1004",
+      "#d8a83a",
+      "#6a4a10",
+      "#fff2c8"
+    ]
+  },
+  "bpmHint": [
+    80,
+    140
+  ],
+  "description": "The gold master disc: warm gold dye, the rainbow diffraction rolling across it, the burned area creeping outward through the song."
+}

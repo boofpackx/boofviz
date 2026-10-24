@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "name": "Fog Benchmark",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "3d card",
+    "tech demo",
+    "lens flare"
+  ],
+  "energy": 2,
+  "palette": "Benchmark",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "accel",
+      "name": "Accelerator demo",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "accelDemo",
+        "params": {
+          "sweep": 0.6,
+          "spin": 0.6,
+          "flare": 1.4,
+          "bits16": true
+        }
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.2,
+            "scanlines": 0.25,
+            "mask": 0.3,
+            "vignette": 0.4
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Light sweep",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.sweep",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lens flare",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.flare",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Benchmark": [
+      "#020004",
+      "#3aff6a",
+      "#a03aff",
+      "#6a7a8a",
+      "#e0ffe0"
+    ]
+  },
+  "bpmHint": [
+    80,
+    140
+  ],
+  "description": "The benchmark scene with the fog and coloured lighting turned up: a green and violet lit planet, the chrome ring and flare, dithered 16-bit colour."
+}

@@ -28,6 +28,8 @@
     "presets:check": "esbuild scripts/format-presets.ts --tsconfig=tsconfig.node.json --bundle --platform=node --format=esm --log-level=warning --outfile=out/tools/format-presets.mjs && node out/tools/format-presets.mjs --check",
     "music:organize": "esbuild scripts/organize-music.ts --tsconfig=tsconfig.node.json --bundle --platform=node --format=esm --log-level=warning --outfile=out/tools/organize-music.mjs && node out/tools/organize-music.mjs",
     "tour": "node scripts/preset-tour.mjs",
+    "suite": "node scripts/make-test-suite.mjs",
+    "look:check": "node scripts/look-check.mjs",
     "thumbs": "node scripts/make-thumbs.mjs",
     "fret:capture": "node scripts/fret-capture.mjs",
     "archive:e2e": "node scripts/archive-e2e.mjs",

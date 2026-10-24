@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "name": "Millennium Fireworks",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "y2k",
+    "countdown",
+    "fireworks",
+    "party"
+  ],
+  "energy": 4,
+  "palette": "Millennium",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "y2k",
+      "name": "Rollover",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "y2k",
+        "params": {
+          "bugAt": 0.9
+        }
+      },
+      "fx": [
+        {
+          "type": "tapeStack",
+          "enabled": true,
+          "params": {
+            "format": "vhs",
+            "generation": 2,
+            "wear": 0.35,
+            "events": 0.02,
+            "eventList": "focus",
+            "overwrite": 0,
+            "mood": 0.2,
+            "seed": 99
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Bug after",
+      "value": 1,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bugAt",
+          "range": [
+            0.1,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tape wear",
+      "value": 0.175,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.wear",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Millennium": [
+      "#000000",
+      "#0000aa",
+      "#ff5a1a",
+      "#ffd23a",
+      "#ff4ad8"
+    ]
+  },
+  "bpmHint": [
+    100,
+    150
+  ],
+  "description": "Midnight, 2000: the countdown, then most of a phrase of fireworks bursting on every kick and crackling on the hats over the giant date before the bug finally bites, on a worn tape of the broadcast."
+}

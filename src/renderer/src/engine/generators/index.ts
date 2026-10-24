@@ -1,19 +1,28 @@
 import { Adjust } from './Adjust';
 import { ArchiveFootage } from './ArchiveFootage';
+import { AccelDemo } from './AccelDemo';
+import { AquaGel } from './AquaGel';
 import { Background } from './Background';
 import { Broadcast } from './Broadcast';
 import { Desktop90 } from './Desktop90';
 import { BarCity } from './BarCity';
+import { BootFog } from './BootFog';
+import { BulletTime } from './BulletTime';
+import { BurnDisc } from './BurnDisc';
+import { CelShade } from './CelShade';
 import { CodeRain } from './CodeRain';
 import { Concrete } from './Concrete';
 import { Demo80 } from './Demo80';
 import { DemoParts } from './DemoParts';
 import { DeStijl } from './DeStijl';
+import { FiberOptic } from './FiberOptic';
 import { Dots } from './Dots';
 import { Dots80 } from './Dots80';
+import { FractalFlame } from './FractalFlame';
 import { FretHighway } from './FretHighway';
 import type { Generator } from './Generator';
 import { GlassMeadow } from './GlassMeadow';
+import { Glowstick } from './Glowstick';
 import { KineticType } from './KineticType';
 import { Lines } from './Lines';
 import { Loader8 } from './Loader8';
@@ -36,19 +45,24 @@ import { Keyframes } from './Keyframes';
 import { Poured } from './Poured';
 import { BeatGames } from './BeatGames';
 import { SketchScreen } from './SketchScreen';
+import { Silhouette } from './Silhouette';
 import { TapeDeck } from './TapeDeck';
 import { Orb } from './Orb';
 import { Pipes } from './Pipes';
+import { PlasmaGlobe } from './PlasmaGlobe';
 import { PlatinumStage } from './PlatinumStage';
 import { PixelArcade } from './PixelArcade';
+import { PluginEra } from './PluginEra';
 import { Polygon } from './Polygon';
 import { Prism } from './Prism';
+import { Rail } from './Rail';
 import { RadialSpectrum } from './RadialSpectrum';
 import { Raytrace80 } from './Raytrace80';
 import { Ricochet } from './Ricochet';
 import { Scope } from './Scope';
 import { Screensaver90 } from './Screensaver90';
 import { Spectrogram } from './Spectrogram';
+import { Swoosh } from './Swoosh';
 import { SpectrumBars } from './SpectrumBars';
 import { SwissGrid } from './SwissGrid';
 import { SynthSunset } from './SynthSunset';
@@ -58,6 +72,7 @@ import { Vector80 } from './Vector80';
 import { VitalSigns } from './VitalSigns';
 import { VideoSynth80 } from './VideoSynth80';
 import { Warp } from './Warp';
+import { Y2K } from './Y2K';
 
 const FACTORIES: Record<string, () => Generator> = {
   spectrumBars: () => new SpectrumBars(),
@@ -87,6 +102,21 @@ const FACTORIES: Record<string, () => Generator> = {
   raytrace80: () => new Raytrace80(),
   dots80: () => new Dots80(),
   vsynth80: () => new VideoSynth80(),
+  silhouette: () => new Silhouette(),
+  pluginEra: () => new PluginEra(),
+  bulletTime: () => new BulletTime(),
+  y2k: () => new Y2K(),
+  glowstick: () => new Glowstick(),
+  fractalFlame: () => new FractalFlame(),
+  plasmaGlobe: () => new PlasmaGlobe(),
+  fiberOptic: () => new FiberOptic(),
+  rail: () => new Rail(),
+  swoosh: () => new Swoosh(),
+  bootFog: () => new BootFog(),
+  aquaGel: () => new AquaGel(),
+  burnDisc: () => new BurnDisc(),
+  celShade: () => new CelShade(),
+  accelDemo: () => new AccelDemo(),
   demoParts: () => new DemoParts(),
   codeRain: () => new CodeRain(),
   warp: () => new Warp(),

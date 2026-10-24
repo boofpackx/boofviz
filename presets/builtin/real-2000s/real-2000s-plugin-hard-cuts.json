@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "name": "Plugin Hard Cuts",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "visualizer",
+    "feedback",
+    "club",
+    "party"
+  ],
+  "energy": 5,
+  "palette": "Plugin Hot",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "plugin",
+      "name": "Visualizer",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "pluginEra",
+        "params": {
+          "preset": -1,
+          "phrasesPerPreset": 1,
+          "blendBars": 0,
+          "speed": 1.3,
+          "react": 1.6,
+          "waveSize": 1.4,
+          "hueDrift": 1,
+          "echo": true,
+          "invert": true,
+          "lines": 360
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Reaction",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wave size",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.waveSize",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hue drift",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.hueDrift",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Blend",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.blendBars",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Buffer lines",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lines",
+          "range": [
+            120,
+            1080
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Plugin Hot": [
+      "#000000",
+      "#ff2a00",
+      "#ffd000",
+      "#00e0ff",
+      "#ff00a0"
+    ]
+  },
+  "bpmHint": [
+    120,
+    175
+  ],
+  "description": "The visualizer on random with the hard cuts on: a different preset slammed in on every phrase, high reaction, big waves, inversion on the drop."
+}

@@ -3,7 +3,7 @@ import * as THREE from 'three';
 const VERT = /* glsl */ `
 precision highp float;
 in vec2 position;
-in vec3 aEdge;   // x: -1..1 across the stroke, y: kind (0 core, 1 glow, 2 fill), z: half width in px
+in vec3 aEdge;   // x: -1..1 across the stroke, y: kind (0 core, 1 glow, 2 fill, 3 soft dot, 4 solid dot), z: half width in px (dots: -1..1 along)
 in vec4 aColor;  // linear rgb, w = intensity
 uniform vec2 uRes;
 out vec3 vEdge;
@@ -22,14 +22,21 @@ in vec4 vColor;
 out vec4 fragColor;
 void main() {
   float a;
-  if (vEdge.y > 1.5) a = 1.0;                                  // fill
+  if (vEdge.y > 3.5) {                                         // solid dot
+    float d = length(vEdge.xz);
+    a = smoothstep(1.0, 0.8, d);
+  } else if (vEdge.y > 2.5) {                                  // soft dot
+    float d2 = dot(vEdge.xz, vEdge.xz);
+    a = d2 < 1.0 ? exp(-d2 * 4.0) * (1.0 - d2) : 0.0;
+  } else if (vEdge.y > 1.5) a = 1.0;                           // fill
   else if (vEdge.y > 0.5) a = exp(-vEdge.x * vEdge.x * 4.0);    // glow
   else {
     float aa = 1.2 / max(vEdge.z, 0.5);
     a = smoothstep(0.0, aa, 1.0 - abs(vEdge.x));                // anti-aliased core
   }
   a *= vColor.w;
-  fragColor = vec4(vColor.rgb * a, vEdge.y > 1.5 ? 1.0 : clamp(a, 0.0, 1.0));
+  bool fill = vEdge.y > 1.5 && vEdge.y < 2.5;
+  fragColor = vec4(vColor.rgb * a, fill ? 1.0 : clamp(a, 0.0, 1.0));
 }
 `;
 
@@ -179,6 +186,17 @@ export class StrokeBatch {
       const c0 = first + ((k + 1) % count) * 2;
       this.quad(a0, a0 + 1, c0, c0 + 1);
     }
+  }
+
+  /** A round dot at (x, y): a soft gaussian glow, or solid with an anti-aliased edge. */
+  dot(x: number, y: number, radius: number, r: number, g: number, b: number, a: number, soft = true): void {
+    if (this.v + 4 > this.maxVerts) return;
+    const kind = soft ? 3 : 4;
+    const v0 = this.vert(x - radius, y - radius, -1, kind, -1, r, g, b, a);
+    this.vert(x + radius, y - radius, 1, kind, -1, r, g, b, a);
+    this.vert(x - radius, y + radius, -1, kind, 1, r, g, b, a);
+    this.vert(x + radius, y + radius, 1, kind, 1, r, g, b, a);
+    this.quad(v0, v0 + 1, v0 + 2, v0 + 3);
   }
 
   /** Solid fill between a polyline and a horizontal baseline (for occluding ridge lines). */

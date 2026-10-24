@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "name": "Skate Video",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "skate",
+    "fisheye",
+    "dv",
+    "silhouette",
+    "dance"
+  ],
+  "energy": 4,
+  "palette": "Skate",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "dance",
+      "name": "Dancers",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "silhouette",
+        "params": {
+          "moves": "all",
+          "framing": "mixed",
+          "cutBars": 1,
+          "bounce": 1.2
+        }
+      },
+      "fx": [
+        {
+          "type": "fisheye",
+          "enabled": true,
+          "params": {
+            "amount": 0.85,
+            "hood": 1,
+            "fringe": 1.2,
+            "crush": 1.2
+          }
+        },
+        {
+          "type": "dvInterlace",
+          "enabled": true,
+          "params": {
+            "combing": 1,
+            "chroma": 0.8,
+            "dropouts": 0.4
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Fisheye",
+      "value": 0.85,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.amount",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lens hood",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.hood",
+          "range": [
+            0.6,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Combing",
+      "value": 1,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.combing",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dropouts",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.fx.1.params.dropouts",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Skate": [
+      "#ff5a2a",
+      "#2aa0ff",
+      "#ffd23a",
+      "#9be256",
+      "#ff2c9c"
+    ]
+  },
+  "bpmHint": [
+    90,
+    140
+  ],
+  "description": "Silhouettes dancing through the late-90s skate-video fisheye: the middle bulging, black lens-hood corners, colour fringing, then the DV interlace combing on every move."
+}

@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "name": "Trance Swoosh",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "trance",
+    "lens flare",
+    "glow",
+    "club"
+  ],
+  "energy": 4,
+  "palette": "Trance",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "swoosh",
+      "name": "Swooshes",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "swoosh",
+        "params": {
+          "speed": 1,
+          "life": 1,
+          "length": 1,
+          "width": 1,
+          "streak": 1,
+          "hex": 1,
+          "rings": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.8,
+            "threshold": 0.5,
+            "radius": 0.8,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Sweep",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Swoosh life",
+      "value": 0.143,
+      "targets": [
+        {
+          "path": "layers.0.source.params.life",
+          "range": [
+            0.5,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Width",
+      "value": 0.259,
+      "targets": [
+        {
+          "path": "layers.0.source.params.width",
+          "range": [
+            0.3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lens streak",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.streak",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Trance": [
+      "#00020a",
+      "#061a5a",
+      "#2a8aff",
+      "#7ad8ff",
+      "#e8f6ff"
+    ]
+  },
+  "bpmHint": [
+    128,
+    145
+  ],
+  "description": "The look of every trance compilation in 2001: electric-blue light swooshes sweeping round a glowing core on every kick, a long lens streak flashing on the snare, starburst rays on the drop, hairline orbit rings and a hexagon grid breathing with the phrase."
+}

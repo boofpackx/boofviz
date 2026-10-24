@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "name": "Flame Embers",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "fractal",
+    "screensaver",
+    "ambient",
+    "fire"
+  ],
+  "energy": 1,
+  "palette": "Embers",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "flame",
+      "name": "Flame",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "fractalFlame",
+        "params": {
+          "flame": -1,
+          "phrasesPerFlame": 2,
+          "morph": 0.7,
+          "exposure": 1.2,
+          "zoom": 1,
+          "spin": 0.5,
+          "silk": 0.3,
+          "react": 1,
+          "points": 160000,
+          "lines": 540
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.5,
+            "threshold": 0.6,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Exposure",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.exposure",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Zoom",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.zoom",
+          "range": [
+            0.5,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.167,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            0,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Silk",
+      "value": 0.172,
+      "targets": [
+        {
+          "path": "layers.0.source.params.silk",
+          "range": [
+            0.02,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Morph",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.morph",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reaction",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Embers": [
+      "#000000",
+      "#5a0a00",
+      "#ff3a00",
+      "#ffa21a",
+      "#fff0b0"
+    ]
+  },
+  "bpmHint": [
+    60,
+    120
+  ],
+  "description": "The fractal flame in fire colours, turning slowly and morphing every two phrases, the light lingering long like glowing embers."
+}

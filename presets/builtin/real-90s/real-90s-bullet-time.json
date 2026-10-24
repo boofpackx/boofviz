@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "name": "Bullet Time",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "bullet time",
+    "freeze",
+    "3d",
+    "film",
+    "glass"
+  ],
+  "energy": 3,
+  "palette": "Bullet Green",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "bullet",
+      "name": "Bullet time",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "bulletTime",
+        "params": {
+          "mix": 0.5,
+          "phrasesPerShot": 1,
+          "burstBeats": 1,
+          "creep": 0.05,
+          "arc": 1,
+          "stutter": 0.6,
+          "streak": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.8,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        },
+        {
+          "type": "grade",
+          "enabled": true,
+          "params": {
+            "exposure": 0,
+            "contrast": 1.25,
+            "saturation": 0.85,
+            "hue": 0,
+            "temperature": -0.15
+          }
+        },
+        {
+          "type": "grain",
+          "enabled": true,
+          "params": {
+            "amount": 0.05,
+            "size": 1
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Shards / drops",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.mix",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Camera arc",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.arc",
+          "range": [
+            0,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Camera steps",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.source.params.stutter",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Burst",
+      "value": 0.2,
+      "targets": [
+        {
+          "path": "layers.0.source.params.burstBeats",
+          "range": [
+            0.25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Creep",
+      "value": 0.1,
+      "targets": [
+        {
+          "path": "layers.0.source.params.creep",
+          "range": [
+            0,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.375,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Bullet Green": [
+      "#020604",
+      "#0c2a16",
+      "#7dffa0",
+      "#d8ffe6",
+      "#ffffff"
+    ]
+  },
+  "bpmHint": [
+    80,
+    150
+  ],
+  "description": "The 1999 frozen moment: glass shards and droplets burst out on each phrase and freeze in the air while the camera swings round them in steps, in the cool green grade of that film. Time snaps back on the drop."
+}

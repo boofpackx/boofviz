@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "name": "Poi Flowers",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "rave",
+    "glowsticks",
+    "poi",
+    "light trails",
+    "chill"
+  ],
+  "energy": 3,
+  "palette": "Poi",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "sticks",
+      "name": "Glowsticks",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "glowstick",
+        "params": {
+          "pattern": "flowers",
+          "pairs": 1,
+          "size": 1.6,
+          "speed": 0.5,
+          "trail": 2,
+          "haze": 1.5
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.5,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Dancers",
+      "value": 0.667,
+      "targets": [
+        {
+          "path": "layers.0.source.params.pairs",
+          "range": [
+            1,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.375,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.4,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trail",
+      "value": 0.429,
+      "targets": [
+        {
+          "path": "layers.0.source.params.trail",
+          "range": [
+            0.25,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Haze",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.haze",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.375,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Poi": [
+      "#000000",
+      "#ff7a1a",
+      "#2aff9a",
+      "#c02aff",
+      "#2ad2ff"
+    ]
+  },
+  "bpmHint": [
+    90,
+    140
+  ],
+  "description": "One dancer, two glowsticks on strings, drawing big poi flowers and antispin petals in the dark, every loop on the beat, the trails hanging for two bars."
+}

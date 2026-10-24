@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "name": "Accelerator Demo",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "3d card",
+    "tech demo",
+    "lens flare",
+    "chrome"
+  ],
+  "energy": 3,
+  "palette": "Accel",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "accel",
+      "name": "Accelerator demo",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "accelDemo",
+        "params": {
+          "sweep": 1,
+          "spin": 1,
+          "flare": 1,
+          "bits16": true
+        }
+      },
+      "fx": [
+        {
+          "type": "crt",
+          "enabled": true,
+          "params": {
+            "curvature": 0.2,
+            "scanlines": 0.25,
+            "mask": 0.3,
+            "vignette": 0.4
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Light sweep",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.sweep",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spin",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lens flare",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.flare",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Accel": [
+      "#000006",
+      "#ff3a2a",
+      "#2a8aff",
+      "#8a7a6a",
+      "#fff0c0"
+    ]
+  },
+  "bpmHint": [
+    90,
+    150
+  ],
+  "description": "The demo that came with your new 3D card in 1999: a bump-mapped planet lit by coloured lights sweeping on the beat, a chrome ring orbiting, a lens flare blooming on the kick, all in 16-bit colour with its banding and dither, on a CRT monitor."
+}

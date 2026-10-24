@@ -1,0 +1,151 @@
+{
+  "schema": 1,
+  "name": "Flat Panel Plugin",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "visualizer",
+    "lcd",
+    "feedback"
+  ],
+  "energy": 3,
+  "palette": "Plugin",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "plugin",
+      "name": "Visualizer",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "pluginEra",
+        "params": {
+          "preset": -1,
+          "phrasesPerPreset": 1,
+          "blendBars": 1,
+          "speed": 1,
+          "react": 1,
+          "waveSize": 1,
+          "hueDrift": 1,
+          "echo": true,
+          "invert": true,
+          "lines": 360
+        }
+      },
+      "fx": [
+        {
+          "type": "earlyLcd",
+          "enabled": true,
+          "params": {
+            "ghost": 0.6,
+            "grid": 0.6,
+            "pixel": 4,
+            "blacks": 1,
+            "angle": 0.6
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Ghosting",
+      "value": 0.652,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.ghost",
+          "range": [
+            0,
+            0.92
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pixel grid",
+      "value": 0.6,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.grid",
+          "range": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Washed blacks",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.blacks",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reaction",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Plugin": [
+      "#000000",
+      "#ff3cc8",
+      "#3cc8ff",
+      "#ffe03c",
+      "#7cff3c"
+    ]
+  },
+  "bpmHint": [
+    100,
+    160
+  ],
+  "description": "The media-player visualizer on one of the first flat screens: everything ghosting behind itself, the RGB pixel grid showing, blacks washed out grey-blue."
+}

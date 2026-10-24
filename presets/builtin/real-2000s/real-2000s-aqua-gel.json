@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "name": "Aqua Gel",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "y2k",
+    "glossy",
+    "gel",
+    "equalizer",
+    "interface"
+  ],
+  "energy": 3,
+  "palette": "Aqua",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "gel",
+      "name": "Gel",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "aquaGel",
+        "params": {
+          "capsules": 12,
+          "colours": "rainbow",
+          "stripes": "light",
+          "gain": 1,
+          "wobble": 1
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Capsules",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.capsules",
+          "range": [
+            4,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gain",
+      "value": 0.318,
+      "targets": [
+        {
+          "path": "layers.0.source.params.gain",
+          "range": [
+            0.3,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wobble",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.wobble",
+          "range": [
+            0,
+            2.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Aqua": [
+      "#000000",
+      "#1f8bff",
+      "#2ad66a",
+      "#ff8a1a",
+      "#ff3a8a"
+    ]
+  },
+  "bpmHint": [
+    90,
+    140
+  ],
+  "description": "The glossy candy-gel buttons of the early-2000s desktop as a spectrum: translucent capsules on pinstripes with glossy highlights and tinted shadows, wobbling like jelly on the kick and popping into gel bubbles on the drop."
+}

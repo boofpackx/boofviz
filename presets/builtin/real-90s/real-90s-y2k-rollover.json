@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "name": "Y2K Rollover",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "y2k",
+    "countdown",
+    "fireworks",
+    "glitch",
+    "lyrics"
+  ],
+  "energy": 4,
+  "palette": "Y2K",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "y2k",
+      "name": "Rollover",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "y2k",
+        "params": {
+          "bugAt": 0.5
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Bug after",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.bugAt",
+          "range": [
+            0.1,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Y2K": [
+      "#000000",
+      "#0000aa",
+      "#ff3a1a",
+      "#ffd23a",
+      "#7ad8ff"
+    ]
+  },
+  "bpmHint": [
+    90,
+    150
+  ],
+  "description": "New Year’s Eve 1999, live: the red LED clock runs out to a giant 10 to 1 landing on the phrase, 2000 and fireworks on every kick, then the bug: the year flips to 1900, the digits scramble and the screen crashes to a blue fatal error quoting the lyric. Then the countdown reboots."
+}

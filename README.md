@@ -2,7 +2,7 @@
 
 Real-time audio visualizer and auto-VJ for Windows (macOS second). It listens to anything playing on the computer (Serato, Rekordbox, Traktor, Spotify, YouTube, DAWs) and renders beat-locked visuals to a clean output window for a projector, LED wall or second screen.
 
-> **Status: Phase 6 (Performance layer) complete.** Over 200 built-in looks (now with a Real 80s set), synced lyrics on every look (Off / Looks' own / Everywhere) with four hero lyric looks, archive footage, and clips cut to the beat. See [Roadmap](#roadmap).
+> **Status: Phase 6 (Performance layer) complete.** Over 250 built-in looks (now with Real 80s, late-90s and Real 2000s sets), synced lyrics on every look (Off / Looks' own / Everywhere) with four hero lyric looks, archive footage, and clips cut to the beat. See [Roadmap](#roadmap).
 
 ## Run it (Windows)
 
@@ -63,6 +63,16 @@ Twenty-two looks from things you actually saw in the 80s, at the old hardware's 
 * **Video synth** feeds the waveform back into itself and cuts it into bands of colour like the video colourizers (**Video Synth**, **Colourizer Mirror**), and **VFD analyzer** is a stereo's glowing spectrum display filling the screen (**VFD Analyzer**, **VFD Mirror**).
 
 Autopilot has an *80s night* playlist.
+
+### Late 90s and early 2000s
+
+Thirty new looks, each one a piece of 1997-2004 people remember: twelve join **Real 90s** and eighteen make up the new **Real 2000s** category. Like the 80s set, every one follows the colour scheme and ships with a palette of its original colours. Each was checked against the same test tracks for the groove, the build, the drop, the breakdown, singing, breakbeats and silence, at 16:9, 4:3, 21:9 and 9:16, over three minutes, and in four palettes.
+
+* **Real 90s, the end of the decade:** the **Y2K Rollover** (an LED countdown to 2000, fireworks, then the year flipping to 1900 and a blue crash screen) and **Millennium Fireworks**; **Bullet Time** and **Frozen Rain**, shards and droplets frozen in the air while the camera swings round them; **Glowstick Rave** and **Poi Flowers**, long-exposure glowstick trails in the dark; the **Fractal Flame** screensaver and **Flame Embers**; the **Plasma Globe** and **Fiber Optic Lamp** novelty lamps; and the **Accelerator Demo** and **Fog Benchmark**, a 3D card's showpiece in 16-bit colour with dither.
+* **Real 2000s:** **Silhouette Dance**, dancers in black with white earphone cords on loud flat colour; the media-player visualizer (**Plugin Party**, **Plugin Ambient**, **Plugin Hard Cuts**, **Flat Panel Plugin**); the trance rail shooter (**Synesthesia Rail**, **Rail Ocean**); trance-compilation light swooshes (**Trance Swoosh**, **Sunrise Set**); the new console's boot fog (**Console Boot Fog**, **Boot Fog Violet**); the glossy gel spectrum (**Aqua Gel**, **Graphite Gel**); burning the mix CD (**Burn Disc**, **Gold Master**); the cel-shaded console look (**Cel-Shade**, **Ink Rush**); and **Skate Video**, the fisheye lens and DV tape.
+* **Three new screen effects** go on any look: **Fisheye** (the skate-video lens with its black hood corners), **DV interlace** (combing on movement, as on a camcorder tape) and **Early LCD** (ghosting, the pixel grid and grey blacks of the first flat panels).
+
+Autopilot has a *2000s night* playlist.
 
 ### Building looks
 
@@ -215,7 +225,7 @@ Both windows receive identical packets. Each one rebuilds the same `AudioFrame` 
 1. **Foundation**: done ✅
 2. **Engine core**: done ✅. Compositor, modulation, macros, palettes, preset save/load
 3. **Beat engine**: done ✅. Stronger beat tracker, Ableton Link, MIDI Clock in, beat-quantized changes
-4. **3D, techniques and looks**: done ✅. 3D scenes, raymarching, SDF text, particles, post-FX, and the era looks (Real 80s, Real 90s, Y2K, Lost Media, Retro TV, Brutalist, Neo 90s, Vintage, Lyrics)
+4. **3D, techniques and looks**: done ✅. 3D scenes, raymarching, SDF text, particles, post-FX, and the era looks (Real 80s, Real 90s, Real 2000s, Y2K, Lost Media, Retro TV, Brutalist, Neo 90s, Vintage, Lyrics)
 5. **Clip engine**: done ✅. Clips cut to the beat from the archive or your own videos folder (the next clip cued before its cut), beat-synced stutter, reverse, scratch and freeze, and music-video mode: your own video for the playing song (named "Artist - Title" in the videos folder), in time with the song
 6. **Performance layer**: done ✅. Cue and GO, MIDI learn for any controller, sets played in order, blackout / strobe / freeze, on top of the beat-quantized launches and 9 transition types
 7. Output pro: Spout, recording, keystone, auto-quality, photosensitivity limiter

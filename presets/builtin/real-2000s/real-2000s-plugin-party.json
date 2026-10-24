@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "name": "Plugin Party",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "visualizer",
+    "feedback",
+    "psychedelic",
+    "party"
+  ],
+  "energy": 4,
+  "palette": "Plugin",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "plugin",
+      "name": "Visualizer",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "pluginEra",
+        "params": {
+          "preset": -1,
+          "phrasesPerPreset": 1,
+          "blendBars": 1,
+          "speed": 1,
+          "react": 1,
+          "waveSize": 1,
+          "hueDrift": 1,
+          "echo": true,
+          "invert": true,
+          "lines": 360
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Reaction",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Speed",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wave size",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.waveSize",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hue drift",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.hueDrift",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Blend",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.blendBars",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Buffer lines",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.lines",
+          "range": [
+            120,
+            1080
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Plugin": [
+      "#000000",
+      "#ff3cc8",
+      "#3cc8ff",
+      "#ffe03c",
+      "#7cff3c"
+    ]
+  },
+  "bpmHint": [
+    100,
+    160
+  ],
+  "description": "The media-player visualizer left running at the party: the whole frame streaming through a warp mesh into tunnels and spirals, waves, rings and spikes drawn by the music on top, video echo and centre darkening flickering in, a new preset blending in every phrase and a beat of inverted colour on the drop."
+}

@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "name": "Fiber Optic Lamp",
+  "category": "Real 90s",
+  "tags": [
+    "90s",
+    "fibre optic",
+    "lamp",
+    "chill",
+    "sparkle"
+  ],
+  "energy": 2,
+  "palette": "Fibre",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "lamp",
+      "name": "Fibre optic",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "fiberOptic",
+        "params": {
+          "shape": "mixed",
+          "colours": "split",
+          "wheel": 1,
+          "size": 1,
+          "react": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.6,
+            "threshold": 0.5,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Wheel speed",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.wheel",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.5,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reaction",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.react",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.3,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Fibre": [
+      "#000000",
+      "#ff2a6a",
+      "#2affb4",
+      "#3a6aff",
+      "#ffd23a"
+    ]
+  },
+  "bpmHint": [
+    70,
+    130
+  ],
+  "description": "A fibre optic lamp in the dark: hundreds of glowing tips swaying in a spray, the colour wheel turning a notch on every beat with two colours split across the spray, tips sparkling on the hats and the wheel spinning on the drop."
+}

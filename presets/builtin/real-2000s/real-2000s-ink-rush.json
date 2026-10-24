@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "name": "Ink Rush",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "cel-shaded",
+    "cartoon",
+    "3d",
+    "console"
+  ],
+  "energy": 4,
+  "palette": "Cel Orange",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "cel",
+      "name": "Cel-shade",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "celShade",
+        "params": {
+          "speed": 1.7,
+          "squash": 1.6,
+          "outline": 1.6,
+          "orbit": 2
+        }
+      },
+      "fx": [],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Motion",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Squash",
+      "value": 0.5,
+      "targets": [
+        {
+          "path": "layers.0.source.params.squash",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ink line",
+      "value": 0.259,
+      "targets": [
+        {
+          "path": "layers.0.source.params.outline",
+          "range": [
+            0.3,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Camera orbit",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.orbit",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Cel Orange": [
+      "#ff8a2a",
+      "#2a5aff",
+      "#ffffff",
+      "#ff2a8a",
+      "#ffe0a0"
+    ]
+  },
+  "bpmHint": [
+    120,
+    175
+  ],
+  "description": "The cel-shaded forms at full tilt on an orange sky: fast motion, heavy ink lines, big squash on the kick, wobbly camera."
+}

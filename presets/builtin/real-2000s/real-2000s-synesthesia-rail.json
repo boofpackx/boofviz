@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "name": "Synesthesia Rail",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "trance",
+    "wireframe",
+    "game",
+    "rhythm",
+    "club"
+  ],
+  "energy": 4,
+  "palette": "Rail",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "rail",
+      "name": "Rail",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "rail",
+        "params": {
+          "world": "mixed",
+          "density": 1,
+          "speed": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.9,
+            "threshold": 0.45,
+            "radius": 0.7,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Hats as targets",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.density",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Flight speed",
+      "value": 0.286,
+      "targets": [
+        {
+          "path": "layers.0.source.params.speed",
+          "range": [
+            0.2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Glow",
+      "value": 0.45,
+      "targets": [
+        {
+          "path": "layers.0.fx.0.params.strength",
+          "range": [
+            0,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Rail": [
+      "#000000",
+      "#2ad2ff",
+      "#ff3ac8",
+      "#ffe03a",
+      "#ffffff"
+    ]
+  },
+  "bpmHint": [
+    120,
+    150
+  ],
+  "description": "The 2001 trance rail shooter: flying through glowing wireframe worlds that change every phrase, brackets locking on to targets a beat ahead and every hit bursting exactly on a note of the song."
+}

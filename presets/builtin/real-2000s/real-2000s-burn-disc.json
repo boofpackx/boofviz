@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "name": "Burn Disc",
+  "category": "Real 2000s",
+  "tags": [
+    "2000s",
+    "cd",
+    "mix",
+    "rainbow",
+    "disc"
+  ],
+  "energy": 2,
+  "palette": "Green Dye",
+  "paletteCycle": {
+    "mode": "off",
+    "every": 1,
+    "fadeBeats": 1,
+    "list": []
+  },
+  "hueRotate": {
+    "mode": "off",
+    "rate": 0,
+    "amount": 0
+  },
+  "layers": [
+    {
+      "id": "disc",
+      "name": "Disc",
+      "enabled": true,
+      "source": {
+        "type": "generator",
+        "kind": "burnDisc",
+        "params": {
+          "spin": 1,
+          "drift": 1,
+          "flash": 1,
+          "phrasesToBurn": 12,
+          "size": 1
+        }
+      },
+      "fx": [
+        {
+          "type": "bloom",
+          "enabled": true,
+          "params": {
+            "strength": 0.4,
+            "threshold": 0.8,
+            "radius": 0.6,
+            "knee": 0.5
+          }
+        }
+      ],
+      "blend": "normal",
+      "opacity": 1,
+      "modulators": []
+    }
+  ],
+  "macros": [
+    {
+      "name": "Spin",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.spin",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Light drift",
+      "value": 0.25,
+      "targets": [
+        {
+          "path": "layers.0.source.params.drift",
+          "range": [
+            0,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kick flash",
+      "value": 0.333,
+      "targets": [
+        {
+          "path": "layers.0.source.params.flash",
+          "range": [
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Size",
+      "value": 0.4,
+      "targets": [
+        {
+          "path": "layers.0.source.params.size",
+          "range": [
+            0.6,
+            1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    },
+    {
+      "name": "",
+      "value": 0.5,
+      "targets": []
+    }
+  ],
+  "customPalettes": {
+    "Green Dye": [
+      "#000000",
+      "#05140c",
+      "#3ab88a",
+      "#1a4a3a",
+      "#d8fff0"
+    ]
+  },
+  "bpmHint": [
+    80,
+    140
+  ],
+  "description": "Burning the mix CD: a recordable disc spinning close up, rainbow diffraction sweeping across its green dye as the light moves, the burned tracks darkening outward a band every phrase, the light swinging round on the drop."
+}
